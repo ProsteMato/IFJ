@@ -15,15 +15,50 @@
 
 #define DEFAULT_STR_LEN 100
 
-// Scanner states.
-#define SCANST_START 0 // Starting state of every token
-#define SCANST_EOL 1 // End of line
-#define SCANST_COMM 2 // Line commentary until the SCANST_EOL
-#define SCANST_COMM_BLOCK 3 // 
-#define SCANST_COMM_BLOCK_EXIT 4 //
-#define SCANST_START_OF_KW_ID 5 //
-#define SCANST_NUMBER 6 //
-#define SCANST_ 7 //
+/**
+ * @enum States in finite deterministic automata
+ */
+typedef enum
+{
+	START,
+	NUM,
+	NUM_POINT,
+	NUM_FLOAT,
+	NUM_EXP,
+	NUM_EXP_OPT,
+	NUM_EXP_FIN,
+	LINE_COMMENT,
+	BLOCK_COMMENT0,
+	BLOCK_COMMENT1,
+	BLOCK_COMMENT2,
+	BLOCK_COMMENT3,
+	BLOCK_COMMENT4,
+	STRING,
+	STRING_ESCSEQ,
+	STRING_HEX0,
+	STRING_HEX1,
+	STRING_FIN,
+	EOL,
+	ID_OR_KW,
+	ID,
+	COMMA,
+	BRACKET_L,
+	BRACKET_R,
+	PLUS,
+	MINUS,
+	MULT,
+	DIV,
+	DIV_DIV,
+	EQUAL,
+	NOT_EQUAL,
+	NEG,
+	ASSIGN,
+	LESSER,
+	LESSER_EQUAL,
+	GREATER,
+	GREATER_EQUAL,
+	COLON,
+} States;
 
 /**
  * @enum Keywords used in language IFJ19
@@ -45,6 +80,9 @@ typedef enum
 	KW_SUBSTR,
 	KW_ORD,
 	KW_CHR,
+	KW_INT,
+	KW_FLOAT,
+	KW_STR,
 } Keywords;
 
 /**
