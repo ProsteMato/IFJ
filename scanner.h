@@ -18,8 +18,7 @@
 /**
  * @enum States in finite deterministic automata
  */
-typedef enum
-{
+typedef enum{
 	START,
 	NUM,
 	NUM_POINT,
@@ -63,8 +62,7 @@ typedef enum
 /**
  * @enum Keywords used in language IFJ19
  */
-typedef enum
-{
+typedef enum{
 	KW_DEF,
 	KW_ELSE,
 	KW_IF,
@@ -91,16 +89,50 @@ typedef enum
 typedef enum{
 	TK_EOF,
 	TK_EOL,
-	TK_ID, //identifier
-	TK_KW, //keyword
-
-	// TODO
-
-	// operators
+	TK_ID,
+	TK_KW,
+	TK_COMMA,
+	TK_BRACKET_L,
+	TK_BRACKET_R,
+	TK_PLUS,
+	TK_MINUS,
+	TK_MULT,
+	TK_DIV,
+	TK_DIV_DIV,
+	TK_EQUAL,
+	TK_NOT_EQUAL,
+	TK_NEG,
+	TK_ASSIGN,
+	TK_LESSER,
+	TK_LESSER_EQUAL,
+	TK_GREATER,
+	TK_GREATER_EQUAL,
+	TK_COLON,
+	TK_STRING,
+	TK_INT,
+	TK_FLOAT,
+	TK_EMPTY,
 } Tokens;
 
+/**
+ * @union Token attribute.
+ */
+typedef union{
+	Keywords keyword;
+	char *string;
+	int integer;
+	float decimal;
+} Attribute;
 
-int get_next_token(); // poriesit odovzdavanie tokenov ...
+/**
+ * @struct Token representation.
+ */
+typedef struct{
+	Tokens type;
+	Attribute attribute; 
+} Token;
+
+int get_next_token((FILE *source, Token *token);
 int indentify(str* s); // zisti ci je string keyword
 
 #endif //_SCANNER_H
