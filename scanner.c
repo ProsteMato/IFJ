@@ -8,6 +8,22 @@
 
 #include "scanner.h"
 
+int append_char (char *str, unsigned long *i, unsigned long *cap, char c){
+	if (*i >= *cap -1){
+		*cap += DEFAULT_STR_LEN;
+		char *tmp = realloc (str, sizeof(char) * cap);
+		if (tmp == NULL){
+			// chyba alokacie pamate
+			return -1;
+		} else {
+			str = tmp;
+		}
+	}
+	str[*i] = c;
+	*i++;
+	return 0;
+}
+
 Keywords is_keyword(char* s, unsigned len){
 	if (strncmp (s, "def", len) == 0){
 		return KW_DEF;
@@ -57,7 +73,12 @@ int get_next_token(FILE *source, Token *token){
 	}
 
 	// inicializacia premennych
-	char* str = malloc(DEFAULT_STR_LEN);
+	char* str = malloc(sizeof(char) * DEFAULT_STR_LEN);
+	if (str == NULL){
+		// chyba alokacie pamate
+		return 1;
+	}
+	unsigned long cap = DEFAULT_STR_LEN;
 	unsigned long str_i = 0;
 	char c;
 	int state = START;
@@ -68,19 +89,25 @@ int get_next_token(FILE *source, Token *token){
 		c = getc(source);
 		switch(state){
 			case (START):
-				if (c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z'){
-					str[str_i] = c;
-					str_i++;
+				if (isalpha(c)){
+					if (!append_char(str, &str_i, &cap, c)){
+						free(str);
+						return -1;
+					}
 					state = ID_OR_KW;
 				} else if (isdigit(c)){
-					str[str_i] = c;
-					str_i++;
+					if (!append_char(str, &str_i, &cap, c)){
+						free(str);
+						return -1;
+					}
 					state = NUM;
 				} else if (isspace(c)){
 					stare = START;
 				} else if (c == '_'){
-					str[str_i] = c;
-					str_i++;
+					if (!append_char(str, &str_i, &cap, c)){
+						free(str);
+						return -1;
+					}
 					state = ID;					
 				} else if (c == '#'){
 					state = LINE_COMMENT;				
@@ -135,9 +162,11 @@ int get_next_token(FILE *source, Token *token){
 				}
 				break;
 			case (ID):
-				if (c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z' || isdigit(c) || c == '_'){
-					str[str_i] = c;
-					str_i++;
+				if (isalpha(c) || isdigit(c) || c == '_'){
+					if (!append_char(str, &str_i, &cap, c)){
+						free(str);
+						return -1;
+					}
 					state = ID;
 				} else {
 					token->type = TK_ID;
@@ -147,14 +176,18 @@ int get_next_token(FILE *source, Token *token){
 				}
 				break;
 			case (ID_OR_KW):
-				if (c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z'){
-					str[str_i] = c;
-					str_i++;
+				if (isalpha(c)){
+					if (!append_char(str, &str_i, &cap, c)){
+						free(str);
+						return -1;
+					}
 					keyword = is_keyword(str, str_i);
 					state = ID_OR_KW;
 				} else if (isdigit(c) || c == '_'){
-					str[str_i] = c;
-					str_i++;
+					if (!append_char(str, &str_i, &cap, c)){
+						free(str);
+						return -1;
+					}
 					state = ID;
 				} else {
 					if (keyword >= 0){
@@ -172,18 +205,383 @@ int get_next_token(FILE *source, Token *token){
 				}
 				break;
 			case (NUM):
-				if (isdigit(c){
-					str[str_i] = c;
-					str_i++;
+				if (isdigit(c)){
+					if (!append_char(str, &str_i, &cap, c)){
+						free(str);
+						return -1;
+					}
 					state = NUM;
-				} else if (isdigit(c) || c == '_'){
-					str[str_i] = c;
-					state = ID;
+				} else if (c == '.'){
+					if (!append_char(str, &str_i, &cap, c)){
+						free(str);
+						return -1;
+					}
+					state = NUM_POINT;
+				} else if (c == 'E' || c == 'e'){
+					if (!append_char(str, &str_i, &cap, c)){
+						free(str);
+						return -1;
+					}
+					state = NUM_EXP;
 				} else {
 					token->type = TK_INT;
-					token->atribute.integer = strol(str,NULL,10);
+					token->atribute.integer = atoi(str);
 					ungetc(c,source);
 					free(str);
+					return 0;
+				}
+				break;
+			case (NUM_POINT):
+				if (isdigit(c)){
+					if (!append_char(str, &str_i, &cap, c)){
+						free(str);
+						return -1;
+					}
+					state = NUM_FLOAT;
+				} else {
+					ungetc(c,source);
+					free(str);
+					return 1;
+				}
+				break;
+			case (NUM_FLOAT):
+				if (isdigit(c)){
+					if (!append_char(str, &str_i, &cap, c)){
+						free(str);
+						return -1;
+					}
+					state = NUM_FLOAT;
+				} else if (c == 'e' || c == 'E'){
+					if (!append_char(str, &str_i, &cap, c)){
+						free(str);
+						return -1;
+					}
+					state = NUM_EXP;
+				} else {
+					token->type = TK_FLOAT;
+					token->atribute.decimal = strtod(str,NULL);
+					ungetc(c,source);
+					free(str);
+					return 0;
+				}
+				break;
+			case (NUM_EXP):
+				if (isdigit(c)){
+					if (!append_char(str, &str_i, &cap, c)){
+						free(str);
+						return -1;
+					}
+					state = NUM_EXP_FIN;
+				} else if (c == '-' || c == '+'){
+					if (!append_char(str, &str_i, &cap, c)){
+						free(str);
+						return -1;
+					}
+					state = NUM_EXP_OPT;
+				} else {
+					ungetc(c,source);
+					free(str);
+					return 1;
+				}
+				break;
+			case (NUM_EXP_OPT):
+				if (isdigit(c)){
+					if (!append_char(str, &str_i, &cap, c)){
+						free(str);
+						return -1;
+					}
+					state = NUM_EXP_FIN;
+				} else {
+					ungetc(c,source);
+					free(str);
+					return 1;
+				}
+				break;
+			case (NUM_EXP_FIN):
+				if (isdigit(c)){
+					if (!append_char(str, &str_i, &cap, c)){
+						free(str);
+						return -1;
+					}
+					state = NUM_EXP_FIN;
+				} else {
+					token->type = TK_FLOAT;
+					token->atribute.decimal = strtod(str,NULL);
+					ungetc(c,source);
+					free(str);
+					return 0;
+				}
+				break;
+			case (LINE_COMMENT):
+				if (c == '\n'){
+					ungetc(c,source);
+					state = START;
+				} else {
+					state = LINE_COMMENT;
+				}
+			case (BLOCK_COMMENT0):
+				if (c == '"'){
+					state = BLOCK_COMMENT1;
+				} else {
+					ungetc(c,source);
+					free(str);
+					return 1;
+				}
+				break;
+			case (BLOCK_COMMENT1):
+				if (c == '"'){
+					state = BLOCK_COMMENT2;
+				} else {
+					ungetc(c,source);
+					free(str);
+					return 1;
+				}
+				break;
+			case (BLOCK_COMMENT2):
+				if (c == '"'){
+					state = BLOCK_COMMENT3;
+				} else {
+					state = BLOCK_COMMENT2;
+				}
+				break;
+			case (BLOCK_COMMENT3):
+				if (c == '"'){
+					state = BLOCK_COMMENT4;
+				} else {
+					state = BLOCK_COMMENT2;
+				}
+			case (BLOCK_COMMENT04):
+				if (c == '"'){
+					state = START;
+				} else {
+					state = BLOCK_COMMENT2;
+				}
+				break;
+			case (STRING):
+				if (c == '\\'){
+					state = STRING_ESCSEQ;
+				} else if (c == '\''){
+					state = STRING_FIN;
+				} else if (c >= 32 && c <=127 && c !='\'' && c != '\\'){
+					if (!append_char(str, &str_i, &cap, c)){
+						free(str);
+						return -1;
+					}
+					state = STRING;
+				} else {
+					ungetc(c,source);
+					free(str);
+					return 1;
+				}
+				break;
+			case (STRING_ESCSEQ): //otestovat
+				if (c >= 32 && c <=127 && c !='x'){
+					if (c == '\''){
+						if (!append_char(str, &str_i, &cap, '\'')){
+							free(str);
+							return -1;
+						}
+					} else if (c == '\\'){
+						if (!append_char(str, &str_i, &cap, '\\')){
+							free(str);
+							return -1;
+						}
+					} else if (c == 'n'){
+						if (!append_char(str, &str_i, &cap, '\n')){
+							free(str);
+							return -1;
+						}
+					} else if (c == 't'){
+						if (!append_char(str, &str_i, &cap, '\t')){
+							free(str);
+							return -1;
+						}
+					} else if (c == '\"'){
+						if (!append_char(str, &str_i, &cap, '\"')){
+							free(str);
+							return -1;
+						}
+					} else {
+						if (!append_char(str, &str_i, &cap, '\\')){
+							free(str);
+							return -1;
+						}
+						if (!append_char(str, &str_i, &cap, c)){
+							free(str);
+							return -1;
+						}
+					}
+					state = STRING;
+				} else if (c == 'x'){
+					state = STRING_HEX0;
+				} else {
+					ungetc(c,source);
+					free(str);
+					return 1;
+				}
+				break;
+			case (STRING_HEX0):
+				if (c >= 'a' && c <= 'f' || c >= 'A' && c <= 'F' || isalpha(c)){
+					char hex[2];
+					hex[0] = c;
+					state = STRING_HEX1;
+				} else if (c == '\\'){
+					if (!append_char(str, &str_i, &cap, '\\')){
+						free(str);
+						return -1;
+					}
+					if (!append_char(str, &str_i, &cap, 'x')){
+						free(str);
+						return -1;
+					}
+					state = STRING_ESCSEQ;
+				} else if (c == '\''){
+					if (!append_char(str, &str_i, &cap, '\\')){
+						free(str);
+						return -1;
+					}
+					if (!append_char(str, &str_i, &cap, 'x')){
+						free(str);
+						return -1;
+					}
+					state = STRING_FIN;
+				} else {
+					if (!append_char(str, &str_i, &cap, '\\')){
+						free(str);
+						return -1;
+					}
+					if (!append_char(str, &str_i, &cap, 'x')){
+						free(str);
+						return -1;
+					}
+					if (!append_char(str, &str_i, &cap, c)){
+						free(str);
+						return -1;
+					}
+					state = STRING;
+				}
+				break;
+			case (STRING_HEX1):
+				if(c == '\''){
+					if (!append_char(str, &str_i, &cap, '\\')){
+						free(str);
+						return -1;
+					}
+					if (!append_char(str, &str_i, &cap, 'x')){
+						free(str);
+						return -1;
+					}
+					if (!append_char(str, &str_i, &cap, c)){
+						free(str);
+						return -1;
+					}
+					state = STRING_FIN;
+				} else if (c == '\\'){
+					if (!append_char(str, &str_i, &cap, '\\')){
+						free(str);
+						return -1;
+					}
+					if (!append_char(str, &str_i, &cap, 'x')){
+						free(str);
+						return -1;
+					}
+					if (!append_char(str, &str_i, &cap, c)){
+						free(str);
+						return -1;
+					}
+					state = STRING_ESCSEQ;
+				} else {
+					if (c >= 'a' && c <= 'f' || c >= 'A' && c <= 'F' || isalpha(c)){
+						hex[1] = c;
+						c = (int)strtol(hex, NULL, 16); 
+						if (!append_char(str, &str_i, &cap, c)){
+							free(str);
+							return -1;
+						}
+					} else {
+						if (!append_char(str, &str_i, &cap, '\\')){
+							free(str);
+							return -1;
+						}
+						if (!append_char(str, &str_i, &cap, 'x')){
+							free(str);
+							return -1;
+						}
+						if (!append_char(str, &str_i, &cap, c)){
+							free(str);
+							return -1;
+						}
+					}
+					state = STRING;
+				}
+				break;
+			case (STRING_FIN):
+				str[str_i] = '\0';
+				token->type = TK_STRING;
+				token->atribute.string = str;
+				ungetc(c,source);
+				return 0;
+				break;
+			case (EOL):
+				if (c == '#'){
+					ungetc(c,source);
+					state = START;
+				} else if (c == ' '){
+					state = EOL;
+				} else if (c == '\t'){
+					state = EOL;
+				} else {
+					ungetc(c,source);
+					state = START;
+				}
+				break;
+			case (DIV):
+				if (c == '/'){
+					token->type = TK_DIV_DIV;
+					return 0;
+				} else {
+					ungetc(c,source);
+					token->type = TK_DIV;
+					return 0;
+				}
+				break;
+			case (ASSIGN):
+				if (c == '='){
+					token->type = TK_EQUAL;
+					return 0;
+				} else {
+					ungetc(c,source);
+					token->type = TK_ASSIGN;
+					return 0;
+				}
+				break;
+			case (NEG):
+				if (c == '='){
+					token->type = TK_NOT_EQUAL;
+					return 0;
+				} else {
+					ungetc(c,source);
+					token->type = TK_NEG;
+					return 0;
+				}
+				break;
+			case (LESSER):
+				if (c == '='){
+					token->type = TK_LESSER_EQUAL;
+					return 0;
+				} else {
+					ungetc(c,source);
+					token->type = TK_LESSER;
+					return 0;
+				}
+				break;
+			case (GREATER):
+				if (c == '='){
+					token->type = TK_GREATER_EQUAL;
+					return 0;
+				} else {
+					ungetc(c,source);
+					token->type = TK_GREATER;
 					return 0;
 				}
 				break;
