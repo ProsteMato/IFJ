@@ -121,7 +121,7 @@ typedef union{
 	Keywords keyword;
 	char *string;
 	int integer;
-	float decimal;
+	double decimal;
 } Attribute;
 
 /**
