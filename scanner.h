@@ -134,5 +134,6 @@ typedef struct{
 
 int get_next_token(FILE *source, Token *token);
 Keywords is_keyword (char* s, unsigned len);
+int append_char (char *str, unsigned long *i, unsigned long *cap, char c);
 
 #endif //_SCANNER_H
