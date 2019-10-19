@@ -132,7 +132,7 @@ typedef struct{
 	Attribute attribute; 
 } Token;
 
-int get_next_token((FILE *source, Token *token);
-int indentify(str* s); // zisti ci je string keyword
+int get_next_token(FILE *source, Token *token);
+Keywords is_keyword (char* s, unsigned len);
 
 #endif //_SCANNER_H
