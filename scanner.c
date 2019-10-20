@@ -11,7 +11,7 @@
 int append_char (char *str, unsigned long *i, unsigned long *cap, char c){
 	if (*i >= *cap -1){
 		*cap += DEFAULT_STR_LEN;
-		char *tmp = realloc (str, sizeof(char) * cap);
+		char *tmp = realloc (str, sizeof(char) * (*cap));
 		if (tmp == NULL){
 			// chyba alokacie pamate
 			return -1;
@@ -20,7 +20,7 @@ int append_char (char *str, unsigned long *i, unsigned long *cap, char c){
 		}
 	}
 	str[*i] = c;
-	*i++;
+	(*i)++;
 	return 0;
 }
 
@@ -83,9 +83,10 @@ int get_next_token(FILE *source, Token *token){
 	char c;
 	int state = START;
 	int keyword = 0;
+	char hex[2];
 	token->type = TK_EMPTY;
 
-	while(TRUE){
+	while(true){
 		c = getc(source);
 		switch(state){
 			case (START):
@@ -102,7 +103,7 @@ int get_next_token(FILE *source, Token *token){
 					}
 					state = NUM;
 				} else if (isspace(c)){
-					stare = START;
+					state = START;
 				} else if (c == '_'){
 					if (!append_char(str, &str_i, &cap, c)){
 						free(str);
@@ -170,7 +171,7 @@ int get_next_token(FILE *source, Token *token){
 					state = ID;
 				} else {
 					token->type = TK_ID;
-					token->atribute.string = str;
+					token->attribute.string = str;
 					ungetc(c, source);
 					return 0;
 				}
@@ -192,13 +193,13 @@ int get_next_token(FILE *source, Token *token){
 				} else {
 					if (keyword >= 0){
 						token->type = TK_KW;
-						token->atribute.keyword = keyword;
+						token->attribute.keyword = keyword;
 						ungetc(c, source);
 						free(str);
 						return 0;
 					} else {
 						token->type = TK_ID;
-						toke->atribute.string = str;
+						token->attribute.string = str;
 						ungetc(c, source);
 						return 0;
 					}
@@ -225,7 +226,7 @@ int get_next_token(FILE *source, Token *token){
 					state = NUM_EXP;
 				} else {
 					token->type = TK_INT;
-					token->atribute.integer = atoi(str);
+					token->attribute.integer = atoi(str);
 					ungetc(c,source);
 					free(str);
 					return 0;
@@ -259,7 +260,7 @@ int get_next_token(FILE *source, Token *token){
 					state = NUM_EXP;
 				} else {
 					token->type = TK_FLOAT;
-					token->atribute.decimal = strtod(str,NULL);
+					token->attribute.decimal = strtod(str,NULL);
 					ungetc(c,source);
 					free(str);
 					return 0;
@@ -306,7 +307,7 @@ int get_next_token(FILE *source, Token *token){
 					state = NUM_EXP_FIN;
 				} else {
 					token->type = TK_FLOAT;
-					token->atribute.decimal = strtod(str,NULL);
+					token->attribute.decimal = strtod(str,NULL);
 					ungetc(c,source);
 					free(str);
 					return 0;
@@ -350,7 +351,7 @@ int get_next_token(FILE *source, Token *token){
 				} else {
 					state = BLOCK_COMMENT2;
 				}
-			case (BLOCK_COMMENT04):
+			case (BLOCK_COMMENT4):
 				if (c == '"'){
 					state = START;
 				} else {
@@ -421,8 +422,7 @@ int get_next_token(FILE *source, Token *token){
 				}
 				break;
 			case (STRING_HEX0):
-				if (c >= 'a' && c <= 'f' || c >= 'A' && c <= 'F' || isalpha(c)){
-					char hex[2];
+				if ((c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F') || isalpha(c)){
 					hex[0] = c;
 					state = STRING_HEX1;
 				} else if (c == '\\'){
@@ -491,7 +491,7 @@ int get_next_token(FILE *source, Token *token){
 					}
 					state = STRING_ESCSEQ;
 				} else {
-					if (c >= 'a' && c <= 'f' || c >= 'A' && c <= 'F' || isalpha(c)){
+					if ((c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F') || isalpha(c)){
 						hex[1] = c;
 						c = (int)strtol(hex, NULL, 16); 
 						if (!append_char(str, &str_i, &cap, c)){
@@ -518,7 +518,7 @@ int get_next_token(FILE *source, Token *token){
 			case (STRING_FIN):
 				str[str_i] = '\0';
 				token->type = TK_STRING;
-				token->atribute.string = str;
+				token->attribute.string = str;
 				ungetc(c,source);
 				return 0;
 				break;
