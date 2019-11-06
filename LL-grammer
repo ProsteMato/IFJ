@@ -1,0 +1,72 @@
+-----------------------------------------------------------------------------------------------
+LL-grammer pre IFJ19
+-----------------------------------------------------------------------------------------------
+1: <prog> -> <st-list> EOF
+2: <st-list> -> <stat> EOL <st-list>
+3: <stat> -> def id ( <params> : EOL INDENT <nested-st-list>
+4: <stat> -> id = <assign>
+5: <stat> -> <expr>
+6: <stat> -> return <expr>
+7: <stat> -> pass
+8: <stat> -> while <expr> : EOL INDENT <nested-st-list>
+9: <stat> -> if <expr> : EOL INDENT <nested-st-list> else : EOL <nested-st-list>
+10: <params> -> )
+11: <params> -> id <next-param>
+12: <next-param> -> , <params>
+13: <next-param> -> )
+14: <arg-params> -> )
+15: <arg-params> -> <value> <arg-next-params>
+16: <arg-next-params> -> , <value> <arg-next-params>
+17: <arg-next-params> -> )
+18: <value> -> none
+19: <value> -> float
+20: <value> -> string
+21: <value> -> int
+22: <value> -> id
+23: <nested-st-list> -> <nested-stat> EOL <nested-st-list>
+24: <nested-stat> -> pass
+25: <nested-stat> -> if <expr> : EOL INDENT <nested-st-list> else : EOL <nested-st-list>
+26: <nested-stat> -> <expr>
+27: <nested-stat> -> while <expr> : EOL INDENT <nested-st-list>
+28: <nested-stat> -> id = <assign>
+29: <nested-stat> -> return <expr>
+30: <nested-st-list> -> DEDENT
+31: <assign> -> <expr>
+32: <assign> -> id ( <arg-params>
+
+-----------------------------------------------------------------------------------------------
+Pre program na tvorenie LL tabulky pre iný dovod to tu nieje
+-----------------------------------------------------------------------------------------------
+1: PROG  →  ST-LIST eof
+2: ST-LIST  →  STAT eol ST-LIST
+3: STAT → def id ( PARAMS : eol indent NESTED-ST-LIST
+4: STAT → id = ASSIGN
+5: STAT → EXPR
+6: STAT → return EXPR
+7: STAT → pass
+8: STAT → while EXPR : eol indent NESTED-ST-LIST
+9: STAT → if EXPR : eol indent NESTED-ST-LIST else : eol NESTED-ST-LIST
+10: PARAMS → )
+11: PARAMS → id NEXT-PARAM
+12: NEXT-PARAM → , PARAMS
+13: NEXT-PARAM → )
+14: ARG-PARAMS → )
+15: ARG-PARAMS → VALUE ARG-NEXT-PARAMS
+16: ARG-NEXT-PARAMS → , VALUE ARG-NEXT-PARAMS
+17: ARG-NEXT-PARAMS → )
+18: VALUE → none
+19: VALUE → float
+20: VALUE → string
+21: VALUE → int
+22: VALUE → id
+23: NESTED-ST-LIST → NESTED-STAT eol NESTED-ST-LIST
+24: NESTED-STAT → pass
+25: NESTED-STAT → if EXPR : eol indent NESTED-ST-LIST else : eol NESTED-ST-LIST
+26: NESTED-STAT → EXPR
+27: NESTED-STAT → while EXPR : eol indent NESTED-ST-LIST
+28: NESTED-STAT → id = ASSIGN
+29: NESTED-STAT → return EXPR
+30: NESTED-ST-LIST → dedent
+31: ASSIGN → EXPR
+32: ASSIGN → id ( ARG-PARAMS 
+-----------------------------------------------------------------------------------------------
