@@ -13,8 +13,7 @@
 #include <ctype.h>
 #include <stdbool.h>
 #include <string.h>
-
-#define DEFAULT_STR_LEN 100
+#include "error.h"
 
 /**
  * @enum States in finite deterministic automata
@@ -79,9 +78,6 @@ typedef enum{
 	KW_SUBSTR,
 	KW_ORD,
 	KW_CHR,
-	KW_INT,
-	KW_FLOAT,
-	KW_STR,
 } Keywords;
 
 /**
@@ -116,25 +112,32 @@ typedef enum{
 } Tokens;
 
 /**
- * @union Token attribute.
- */
-typedef union{
-	Keywords keyword;
-	char *string;
-	int integer;
-	double decimal;
-} Attribute;
-
-/**
  * @struct Token representation.
  */
 typedef struct{
 	Tokens type;
-	Attribute attribute; 
+	char *atribute;
 } Token;
 
+
+/**
+ * @brief      Runs the scanner and returns the next token
+ *
+ * @param      source  The source stream
+ * @param      token   Pointer to the allocated token struct
+ *
+ * @return     OK-token is returned successfully, INTERNAL_ERROR-internal error, LEX_ERROR lex error
+ */
 int get_next_token(FILE *source, Token *token);
+
+/**
+ * @brief      Determines whether the string is keyword
+ *
+ * @param      s     Pointer to the string
+ * @param[in]  len   The length of string
+ *
+ * @return     Type of keyword, KW_NONE in case the string is not keyword
+ */
 Keywords is_keyword (char* s, unsigned len);
-int append_char (char *str, unsigned long *i, unsigned long *cap, char c);
 
 #endif //_SCANNER_H
