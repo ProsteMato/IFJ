@@ -21,6 +21,5 @@
 // lex - scannner
 #define LEX_SUCCESS 10
 #define LEX_INTERNAL 11
-#define LEX_ERROR 12
 
 #endif //_ERROR_H
