@@ -17,9 +17,6 @@
 #define OTHER_ERROR 6
 #define DIVISION_BY_ZERO_ERROR 9
 #define INTERNAL_ERROR 99
-
-// lex - scannner
-#define LEX_SUCCESS 10
-#define LEX_INTERNAL 11
+#define OK 0
 
 #endif //_ERROR_H
