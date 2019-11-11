@@ -12,10 +12,9 @@ void s_init(Stack *stack){
     int *data;
     data = (int *) malloc(10*sizeof(int));
     if (data == NULL){
-        fprintf(stderr, "Chyba alokacie pamati\n");
-        exit(1);
+        stack->data = NULL;
+        return;
     }
-
     stack->data = data;
     stack->size = 10;
     stack->top = -1;
@@ -30,8 +29,7 @@ void s_destroy(Stack *stack){
 
 void s_resize(Stack *stack){
     int *resized_data;
-    resized_data = (int *) malloc((stack->size + 10) * sizeof(int));
-    memcpy(resized_data, stack->data, sizeof(int) * (stack->top + 1));
+    resized_data = (int *) realloc(stack->data ,(stack->size + 10) * sizeof(int));
     free(stack->data);
     stack->data = resized_data;
     stack->size = stack->size + 10;
@@ -71,6 +69,5 @@ int s_pop(Stack *stack){
         stack->top = stack->top - 1;
         return data;
     }
-    fprintf(stderr, "Stack is empty\n");
     return -1;
 }
