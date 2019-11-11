@@ -10,105 +10,110 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <ctype.h>
 #include <stdbool.h>
 #include <string.h>
+#include <ctype.h>
 #include "error.h"
+#include "my_string.h"
+#include "stack.h"
 
 /**
  * @enum States in finite deterministic automata
  */
 typedef enum{
-	START,
-	NUM,
-	NUM_POINT,
-	NUM_FLOAT,
-	NUM_EXP,
-	NUM_EXP_OPT,
-	NUM_EXP_FIN,
-	LINE_COMMENT,
-	BLOCK_COMMENT0,
-	BLOCK_COMMENT1,
-	BLOCK_COMMENT2,
-	BLOCK_COMMENT3,
-	BLOCK_COMMENT4,
-	STRING,
-	STRING_ESCSEQ,
-	STRING_HEX0,
-	STRING_HEX1,
-	STRING_FIN,
-	EOL,
-	ID_OR_KW,
-	ID,
-	COMMA,
-	BRACKET_L,
-	BRACKET_R,
-	PLUS,
-	MINUS,
-	MULT,
-	DIV,
-	DIV_DIV,
-	EQUAL,
-	NOT_EQUAL,
-	NEG,
-	ASSIGN,
-	LESSER,
-	LESSER_EQUAL,
-	GREATER,
-	GREATER_EQUAL,
-	COLON,
+	START,				//0
+	NUM,				//1
+	NUM_POINT,			//2
+	NUM_FLOAT,			//3
+	NUM_EXP,			//4
+	NUM_EXP_OPT,		//5
+	NUM_EXP_FIN,		//6
+	LINE_COMMENT,		//7
+	BLOCK_COMMENT0,		//8
+	BLOCK_COMMENT1,		//9
+	BLOCK_COMMENT2,		//10
+	BLOCK_COMMENT3,		//11
+	BLOCK_COMMENT4,		//12
+	STRING,				//13
+	STRING_ESCSEQ,		//14
+	STRING_HEX0,		//15
+	STRING_HEX1,		//16
+	STRING_FIN,			//17
+	EOL,				//18
+	ID_OR_KW,			//19
+	ID,					//20
+	COMMA,				//21
+	BRACKET_L,			//22
+	BRACKET_R,			//23
+	PLUS,				//24
+	MINUS,				//25
+	MULT,				//26
+	DIV,				//27
+	DIV_DIV,			//28
+	EQUAL,				//29
+	NOT_EQUAL,			//30
+	NEG,				//31
+	ASSIGN,				//32
+	LESSER,				//33
+	LESSER_EQUAL,		//34
+	GREATER,			//35
+	GREATER_EQUAL,		//36
+	COLON,				//37
+	INDENTATION,		//38
 } States;
 
 /**
  * @enum Keywords used in language IFJ19
  */
 typedef enum{
-	KW_DEF,
-	KW_ELSE,
-	KW_IF,
-	KW_NONE,
-	KW_PASS,
-	KW_RETURN,
-	KW_WHILE,
-	KW_INPUTS,
-	KW_INPUTI,
-	KW_INPUTF,
-	KW_PRINT,
-	KW_LEN,
-	KW_SUBSTR,
-	KW_ORD,
-	KW_CHR,
+	KW_DEF,		//1
+	KW_ELSE,	//2
+	KW_IF,		//3
+	KW_NONE,	//4
+	KW_PASS,	//5
+	KW_RETURN,	//6
+	KW_WHILE,	//7
+	KW_INPUTS,	//8
+	KW_INPUTI,	//9
+	KW_INPUTF,	//10
+	KW_PRINT,	//11
+	KW_LEN,		//12
+	KW_SUBSTR,	//13
+	KW_ORD,		//14
+	KW_CHR,		//15
 } Keywords;
 
 /**
  * @enum Tokens for syntax analysis
  */
 typedef enum{
-	TK_EOF,
-	TK_EOL,
-	TK_ID,
-	TK_KW,
-	TK_COMMA,
-	TK_BRACKET_L,
-	TK_BRACKET_R,
-	TK_PLUS,
-	TK_MINUS,
-	TK_MULT,
-	TK_DIV,
-	TK_DIV_DIV,
-	TK_EQUAL,
-	TK_NOT_EQUAL,
-	TK_NEG,
-	TK_ASSIGN,
-	TK_LESSER,
-	TK_LESSER_EQUAL,
-	TK_GREATER,
-	TK_GREATER_EQUAL,
-	TK_COLON,
-	TK_STRING,
-	TK_INT,
-	TK_FLOAT,
-	TK_EMPTY,
+	TK_EOF,		    // 0
+	TK_EOL,		    // 1
+	TK_ID,		    // 2
+	TK_KW, 		    // 3
+	TK_COMMA, 		// 4 
+	TK_BRACKET_L,   // 5
+	TK_BRACKET_R,   // 6
+	TK_PLUS,        // 7
+	TK_MINUS, 		// 8
+	TK_MULT, 		// 9
+	TK_DIV, 		// 10
+	TK_DIV_DIV, 	// 11
+	TK_EQUAL, 		// 12
+	TK_NOT_EQUAL, 	// 13
+	TK_NEG, 		// 14
+	TK_ASSIGN, 		// 15
+	TK_LESSER, 		// 16
+	TK_LESSER_EQUAL,// 17
+	TK_GREATER, 	// 18
+	TK_GREATER_EQUAL,// 19
+	TK_COLON, 		// 20
+	TK_STRING, 		// 21
+	TK_INT, 		// 22
+	TK_FLOAT, 		// 23
+	TK_EMPTY, 		// 24
+	TK_INDENT, 		// 25
+	TK_DEDENT, 		// 26
 } Tokens;
 
 /**
@@ -116,7 +121,7 @@ typedef enum{
  */
 typedef struct{
 	Tokens type;
-	char *atribute;
+	char *attribute;
 } Token;
 
 
@@ -128,7 +133,7 @@ typedef struct{
  *
  * @return     OK-token is returned successfully, INTERNAL_ERROR-internal error, LEX_ERROR lex error
  */
-int get_next_token(FILE *source, Token *token);
+int get_next_token(Token *token);
 
 /**
  * @brief      Determines whether the string is keyword
@@ -136,7 +141,7 @@ int get_next_token(FILE *source, Token *token);
  * @param      s     Pointer to the string
  * @param[in]  len   The length of string
  *
- * @return     Type of keyword, KW_NONE in case the string is not keyword
+ * @return     Type of keyword, -1 in case the string is not keyword
  */
 Keywords is_keyword (char* s, unsigned len);
 
