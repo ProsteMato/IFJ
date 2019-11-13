@@ -145,4 +145,6 @@ int get_next_token(Token *token);
  */
 Keywords is_keyword (char* s, unsigned len);
 
+int preload_token(Token *token);
+
 #endif //_SCANNER_H
