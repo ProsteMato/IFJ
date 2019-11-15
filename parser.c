@@ -2,7 +2,7 @@
  * @file parser.c
  * @author Martin Koči (xkocim05@stud.fit.vutbr.com)
  * 
- * @brief Implementation of parser to programming language IFJ19
+ * @brief Implementation of parser for syntactic analysis of programming language IFJ19
  * 
  * @date 2019-11-15
  * 

@@ -1,3 +1,13 @@
+/**
+ * @file parser.h
+ * @author Martin Koči (xkocim05@stud.fit.vutbr.com)
+ * 
+ * @brief Header file of parser for syntactic analysis of programming language IFJ19
+ * 
+ * @date 2019-11-15
+ * 
+ */
+
 #ifndef _PARSER_H_
 #define _PARSER_H_
 
@@ -7,13 +17,12 @@
 #include <stdio.h>
 
 /**
- * @brief      reprezentuje pravidlo <prog>
+ * @brief      Representing rule <prog>
  * 	
- * Buď bude načítaný nejaký správny KEYWORD
- * alebo pridadenie do premennej prípadne nejaký
- * expression tak nasledujúci stav bude st-list
- * Ak bude hneď na začiatku EOF tak analýza končí
- * Inak nastáva syntaktická chyba.
+ * It will be called at the begining of parser.
+ * It will forward control to function st-list if the token is Keyword, identifier or expresstion
+ * It will end the program as correct if the token is EOF.
+ * Otherwise is a syntax error
  *
  * @param      token  Token from scanner
  *
@@ -23,16 +32,13 @@ int prog(Token *token);
 
 /**
  * @brief      
- * 	Reprezentuje pravidlá 
- * 	<st-list>, <nested-st-list>, <func-nested-st-list>
- * 	rozdielny je pri nich len mód:
- * 	- st-list = hlavne telo
+ * 	Representing rules: <st-list>, <nested-st-list>, <func-nested-st-list>
+ * 	Diff is in they scope:
+ * 	- st-list = main body of source code
  * 	- nested-st-list = if-else statement
- * 	- func-nested-st-list = platí pri deklarácii funkcii
- * 	  bude platiť aj pre if - else statementy ked sme vo funkcii
- *  Bud dostane KEYWORD, identifikátor, expression tak
- *  sa dostaneme do stavu <stat>
- *  inak syntaktická chyba.
+ * 	- func-nested-st-list = in function
+ *  It will forward controle to function stat if token was keyword, identifier or expresstion
+ *  Otherwise is a syntax error
  * 
  *
  * @param      token  Token from scanner
@@ -43,16 +49,14 @@ int st_list(Token *token);
 
 /**
  * @brief      
- * 	Reprezentuje pravidlá 
- * 	<stat>, <nested-stat>, <func-nested-stat>
- * 	rozdielny je pri nich len mód:
- * 	- st-list = hlavne telo
+ * 	Representing rules: <stat>, <nested-stat>, <func-nested-stat>
+ * 	Diff is in they scope:
+ * 	- st-list = main body of source code
  * 	- nested-st-list = if-else statement
- * 	- func-nested-st-list = platí pri deklarácii funkcii
- * 	  bude platiť aj pre if - else statementy ked sme vo funkcii
- *  KEYWORD, identifikátor, expresstion - po dokončení tohoto pravidla
- *  sa vždy očakáva EOL a následne buď jeho opetovné zavolanie alebo DEDENT
- *  ktorý ukončí danú sekvenciu vo funkcii, while, if-else statemente.
+ * 	- func-nested-st-list = in function
+ *  It will loop in this function if it will be identifier, keyword or expression it need to end with EOL
+ *  and continue in this function or end the program.
+ *  
  * @param      token  Token from scanner
  *
  * @return     Error code
@@ -60,7 +64,7 @@ int st_list(Token *token);
 int stat(Token *token);
 
 /**
- * @brief      kontrolovanie prametrov funkcie pri deklarácii
+ * @brief      Checking parameters of function in declaration
  *
  * @param      token  Token from scanner
  *
@@ -69,7 +73,7 @@ int stat(Token *token);
 int params(Token *token);
 
 /**
- * @brief      kontrolovanie parametrov funkcie pri deklarovanii
+ * @brief      Checking parameters of function in declaration
  *
  * @param      token  Token from scanner
  *
@@ -78,7 +82,7 @@ int params(Token *token);
 int params_next(Token *token);
 
 /**
- * @brief      kontrolovanie parametrov funckcie pri jej volaní.
+ * @brief      Checking parameters of function when is called
  *
  * @param      token  Token from scanner
  *
@@ -87,7 +91,7 @@ int params_next(Token *token);
 int arg_params(Token *token);
 
 /**
- * @brief      kontrolovanie parametrov funckcie pri jej volaní.
+ * @brief      Checking parameters of function when is called
  *
  * @param      token  Token from scanner
  *
@@ -96,7 +100,7 @@ int arg_params(Token *token);
 int arg_next_params(Token *token);
 
 /**
- * @brief      kontrolovanie typu argumentov pri volaní funkcie.
+ * @brief      Check parameters of the function for which type it is it will be usefull for generating
  *
  * @param      token  Token from scanner
  *
@@ -105,7 +109,7 @@ int arg_next_params(Token *token);
 int value(Token *token);
 
 /**
- * @brief      Priradzovanie identifikátoru buď výsledok funkcie alebo expresstion.
+ * @brief      Assigining the return value of function or identifier or expresttion
  *
  * @param      token  Token from scanner
  *
