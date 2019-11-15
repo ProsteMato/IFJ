@@ -6,10 +6,10 @@ LL-grammer pre IFJ19
 3: <st-list> -> EOF
 4: <stat> -> def id ( <params> : EOL INDENT <func-nested-st-list>
 5: <stat> -> id = <assign>
-6: <stat> -> <expr>
+6: <stat> -> expr
 7: <stat> -> pass
-8: <stat> -> while <expr> : EOL INDENT <nested-st-list>
-9: <stat> -> if <expr> : EOL INDENT <nested-st-list> else : EOL <nested-st-list>
+8: <stat> -> while expr : EOL INDENT <nested-st-list>
+9: <stat> -> if expr : EOL INDENT <nested-st-list> else : EOL <nested-st-list>
 10: <params> -> )
 11: <params> -> id <next-param>
 12: <next-param> -> , <params>
@@ -25,21 +25,23 @@ LL-grammer pre IFJ19
 22: <value> -> id
 23: <func-nested-st-list> -> <func-nested-stat> EOL <func-nested-st-list>
 24: <func-nested-stat> -> pass
-25: <func-nested-stat> -> if <expr> : EOL INDENT <func-nested-stat> else : EOL <func-nested-stat>
-26: <func-nested-stat> -> <expr>
-27: <func-nested-stat> -> while <expr> : EOL INDENT <func-nested-stat>
+25: <func-nested-stat> -> if expr : EOL INDENT <func-nested-stat> else : EOL <func-nested-stat>
+26: <func-nested-stat> -> expr
+27: <func-nested-stat> -> while expr : EOL INDENT <func-nested-stat>
 28: <func-nested-stat> -> id = <assign>
-29: <func-nested-stat> -> return <expr>
+29: <func-nested-stat> -> return expr
 30: <func-nested-stat> -> DEDENT
 31: <nested-st-list> -> <nested-stat> EOL <nested-st-list>
 32: <nested-stat> -> pass
-33: <nested-stat> -> if <expr> : EOL INDENT <nested-st-list> else : EOL <nested-st-list>
-34: <nested-stat> -> <expr>
-35: <nested-stat> -> while <expr> : EOL INDENT <nested-st-list>
+33: <nested-stat> -> if expr : EOL INDENT <nested-st-list> else : EOL <nested-st-list>
+34: <nested-stat> -> expr
+35: <nested-stat> -> while expr : EOL INDENT <nested-st-list>
 36: <nested-stat> -> id = <assign>
 37: <nested-st-list> -> DEDENT
-38: <assign> -> <expr>
-39: <assign> -> id ( <arg-params>
+38: <assign> -> expr
+39: <assign> -> id <def-id>
+40: <def-id> -> ( <arg-params>
+41: <def-id> -> EOL
 
 
 ---------------------------------------------------------------------------------------------
@@ -50,10 +52,10 @@ Pre program na tvorenie LL tabulky pre iný dovod to tu nieje
 3: ST-LIST -> eof
 4: STAT → def id ( PARAMS : eol indent NESTED-ST-LIST
 5: STAT → id = ASSIGN
-6: STAT → EXPR
+6: STAT → expr
 7: STAT → pass
-8: STAT → while EXPR : eol indent NESTED-ST-LIST
-9: STAT → if EXPR : eol indent NESTED-ST-LIST else : eol NESTED-ST-LIST
+8: STAT → while expr : eol indent NESTED-ST-LIST
+9: STAT → if expr : eol indent NESTED-ST-LIST else : eol NESTED-ST-LIST
 10: PARAMS → )
 11: PARAMS → id NEXT-PARAM
 12: NEXT-PARAM → , PARAMS
@@ -69,19 +71,21 @@ Pre program na tvorenie LL tabulky pre iný dovod to tu nieje
 22: VALUE → id
 23: FUNC-NESTED-ST-LIST -> FUNC-NESTED-STAT eol FUNC-NESTED-ST-LIST
 24: FUNC-NESTED-STAT -> pass
-25: FUNC-NESTED-STAT -> if EXPR : eol indent FUNC-NESTED-STAT else : eol FUNC-NESTED-STAT
-26: FUNC-NESTED-STAT -> EXPR
-27: FUNC-NESTED-STAT -> while EXPR : eol indent FUNC-NESTED-STAT
+25: FUNC-NESTED-STAT -> if expr : eol indent FUNC-NESTED-STAT else : eol FUNC-NESTED-STAT
+26: FUNC-NESTED-STAT -> expr
+27: FUNC-NESTED-STAT -> while expr : eol indent FUNC-NESTED-STAT
 28: FUNC-NESTED-STAT -> id = ASSIGN
-29: FUNC-NESTED-STAT -> return EXPR
+29: FUNC-NESTED-STAT -> return expr
 30: FUNC-NESTED-STAT -> dedent
 31: NESTED-ST-LIST → NESTED-STAT eol NESTED-ST-LIST
 32: NESTED-STAT → pass
-33: NESTED-STAT → if EXPR : eol indent NESTED-ST-LIST else : eol NESTED-ST-LIST
-34: NESTED-STAT → EXPR
-35: NESTED-STAT → while EXPR : eol indent NESTED-ST-LIST
+33: NESTED-STAT → if expr : eol indent NESTED-ST-LIST else : eol NESTED-ST-LIST
+34: NESTED-STAT → expr
+35: NESTED-STAT → while expr : eol indent NESTED-ST-LIST
 36: NESTED-STAT → id = ASSIGN
 37: NESTED-ST-LIST → dedent
-38: ASSIGN → EXPR
-39: ASSIGN → id ( ARG-PARAMS 
+38: ASSIGN → expr
+39: ASSIGN -> id DEF-ID
+40: DEF-ID -> ( ARG-PARAMS
+41: DEF-ID -> eol
 -----------------------------------------------------------------------------------------------
