@@ -1,7 +1,24 @@
+/**
+ * @file parser.c
+ * @author Martin Koči (xkocim05@stud.fit.vutbr.com)
+ * 
+ * @brief Implementation of parser to programming language IFJ19
+ * 
+ * @date 2019-11-15
+ * 
+ */
+
 #include "parser.h"
 
 
 int prog(Token *token) {
+
+	/*	
+	Rule 1:
+	+----------------------+
+  	|1: <prog> -> <st-list>|
+  	+----------------------+ 
+	*/
 	if (token->type == TK_KW) {
 		if(strcmp(token->attribute, "if")) {
 
