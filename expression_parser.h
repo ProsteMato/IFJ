@@ -58,26 +58,6 @@ typedef enum {
 int getIndex(Token *token) ;
 
 /**
- * @brief Check if the first token is right (if its some ID/INT/FLOAT/STRING/LEFT_BRACKET)
- * 
- * @param token Token to check 
- * 
- * @return OK if everything is OK 
- *         SYNTAX_ERROR 
- */
-int checkFirstToken(Token *token);
-
-/**
- * @brief Check if the last token is right (if its some ID/INT/FLOAT/STRING/RIGHT_BRACKET)
- * 
- * @param token Token to check 
- * 
- * @return OK if everything is OK 
- *         SYNTAX_ERROR 
- */
-int checkLastToken(Token *token);
-
-/**
  * @brief Check if after / or // isnt next token 0 
  * 
  * @param token token / or // 
