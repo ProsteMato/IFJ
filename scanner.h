@@ -125,12 +125,15 @@ typedef struct{
 
 
 /**
- * @brief      Runs the scanner and returns the next token, if preload is set to true then preloads the next token
+ * @brief      Runs the scanner and returns the next token, if preload is set to
+ *             true then preloads the next token
  *
+ * @param      token    Pointer to the allocated token struct
+ * @param[in]  preload  The preload
  * @param      source  The source stream
- * @param      token   Pointer to the allocated token struct
  *
- * @return     OK-token is returned successfully, INTERNAL_ERROR-internal error, LEX_ERROR lex error
+ * @return     OK-token is returned successfully, INTERNAL_ERROR-internal error,
+ *             LEX_ERROR lex error
  */
 int get_next_token(Token *token, int preload);
 
@@ -149,11 +152,22 @@ Keywords is_keyword (char* s, unsigned len);
  *
  * @param      preloaded    The preloaded
  * @param      dest         The destination
- * @param      dest_return  The destination return
  * @param[in]  return_val   The return value
+ * @param      dest_return  The destination return
  *
- * @return     { description_of_the_return_value }
+ * @return     return_val
  */
 int save_preload(Token *preloaded, Token *dest, int return_val, int *dest_return);
+
+/**
+ * @brief      Destroys the stack, deallocates the string and returns
+ *             INTERNAL_ERROR
+ *
+ * @param      s     Pointer to the stack struct
+ * @param      str   Pointer to the string
+ *
+ * @return     INTERNAL_ERROR
+ */
+int internal_error_exit(Stack *s, char *str);
 
 #endif //_SCANNER_H
