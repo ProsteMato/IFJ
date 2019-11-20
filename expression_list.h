@@ -57,6 +57,18 @@ int listInsertFirst(exprList *eList, Token* token);
  **/
 int listInsertAct(exprList *eList, Token* token);
 
+/**
+ * @brief Function returns token from active item and next item becomes active
+ * 
+ * @param eList list of tokens 
+ */
+Token* copyAct(exprList *eList);
 
+/**
+ * @brief Delete all items on the list 
+ * 
+ * @param eList list to delete 
+ */
+void listDispose(exprList *eList);
 
 #endif //_EXPRESSION_LIST_H
