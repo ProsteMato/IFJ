@@ -239,7 +239,7 @@ int stat(Token *token) {
 				return returnValue;
 			}
 		//8:  <stat> -> while expr : EOL INDENT <nested-st-list>
-		} else if (strcmp(token->attribute, "while")) {
+		} else if (strcmp(token->attribute, "while") == 0) {
 			//TODO generovanie while ziskavanie uniq lable...
 			if ((returnValue = callExpression(token)) == OK) {
 				GET_NEXT_TOKEN(token);
@@ -258,9 +258,30 @@ int stat(Token *token) {
 			} else {
 				return returnValue;
 			}
-		} else if(true) {
-			//TODO pridat pass
-			;
+		} else if (strcmp(token->attribute, "pass") == 0) {
+			return OK;
+		} else if (strcmp(token->attribute, "return") == 0 && in_function) {
+			GET_NEXT_TOKEN(token);
+			if((returnValue = callExpression(token)) == OK) {
+				return OK;
+			}
+		}
+	} else if (token->type == TK_ID) {
+		Token tmpToken;
+		PRELOAD_NEXT_TOKEN(&tmpToken);
+		if (
+			tmpToken.type == TK_MINUS ||
+			tmpToken.type == TK_PLUS ||
+			tmpToken.type == TK_MULT ||
+			tmpToken.type == TK_DIV ||
+			tmpToken.type == TK_DIV_DIV) {
+			
+			if((returnValue = callExpression(token)) == OK) {
+				return OK;
+			}
+		} else {
+			//TODO implementovat after_id
+			return after_id(token);
 		}
 	}
 }
@@ -270,5 +291,29 @@ int params(Token *token) {
 }
 
 int params_next(Token *token) {
+	;
+}
+
+int arg_params(Token *token) {
+	;
+}
+
+int arg_next_params(Token *token) {
+	;
+}
+
+int assign(Token *token) {
+	;
+}
+
+int after_id(Token *token) {
+	;
+}
+
+int def_id(Token *token) {
+	;
+}
+
+int value(Token *token) {
 	;
 }
