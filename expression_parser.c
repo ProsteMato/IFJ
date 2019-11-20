@@ -13,7 +13,7 @@
 #include "scanner.h"
 #include <stdio.h>
 #include <stdlib.h>
-
+#include "expression_list.h"
 
 const char precedenceTable[tableSize][tableSize] = {
   // 0  , 1 ,  2,   3,   4,   5.   6,   7,   8,   9,  10,  11,  12,  13,   14,  15,   16, 17, 18
@@ -70,27 +70,21 @@ int getIndex(Token *token)
           return 4;
           break; 
     case (TK_EQUAL):
-          isRelational = true;
           return 9;
           break;
     case (TK_NOT_EQUAL):
-          isRelational = true;
           return 10;
           break;
     case (TK_LESSER):
-          isRelational = true;
           return 5;
           break; 
     case (TK_LESSER_EQUAL):
-          isRelational = true;
           return 6;
           break;
     case (TK_GREATER):
-          isRelational = true;
           return 7;
           break;
     case (TK_GREATER_EQUAL):
-          isRelational = true;
           return 8;
           break;
     case (TK_BRACKET_L):
@@ -109,7 +103,7 @@ int getIndex(Token *token)
           return 16;
           break; 
     case (TK_KW): 
-          if (strcmp(token->attribute, 'None'))
+          if ((strcmp(token->attribute, "None")) == 0)
           { 
             return 17;
             break;
@@ -131,7 +125,7 @@ int checkDivisionByZero(Token *token)
   Token *nextToken;
   get_next_token(nextToken,1);
 
-  if (!strcmp(nextToken -> attribute, '0'))
+  if (!strcmp(nextToken -> attribute, "0"))
   {
     return SYNTAX_ERROR;
   }
@@ -144,18 +138,57 @@ int callExpression(Token *token)
   isRelational = false;
   int leftBracket = 0;
   int rightBracket =0; 
+  exprList *eList;
+  listInsertFirst(eList,token);
 
-  // TODO insert this to while (with other functions)
-
-  //count number of brackets - must be even
-  if (token->type == TK_BRACKET_L)
+  // Load tokens into list 
+  do 
   {
-    leftBracket+=1;
+      token=get_next_token(token,0); 
+      //count number of brackets - must be even
+      if (token->type == TK_BRACKET_L)
+      {
+            leftBracket+=1;
+      }
+
+      if (token->type == TK_BRACKET_R)
+      {
+            rightBracket+=1;
+      }
+      
+      if (token->type == TK_EQUAL)
+      {
+            isRelational = true; 
+      }
+      else if (token->type == TK_NOT_EQUAL)
+      {
+            isRelational =true; 
+      }
+      else if (token->type == TK_LESSER)
+      {
+            isRelational = true;
+      }
+      else if (token->type == TK_LESSER_EQUAL)
+      {
+            isRelational = true;
+      }
+      else if ( token->type == TK_GREATER)
+      {
+            isRelational = true; 
+      }
+      else if (token->type == TK_GREATER_EQUAL)
+      {
+            isRelational = true;
+      }
+
+      listInsertAct(eList,token);
+      
   }
+  while ( token->attribute != TK_EOL);
 
-  if (token->type == TK_BRACKET_R)
+  if ( leftBracket != rightBracket) 
   {
-    rightBracket+=1;
+      return SYNTAX_ERROR;
   }
 
   // index to the table  
@@ -185,7 +218,7 @@ int callExpression(Token *token)
   // check the symbol in precedence table 
   char symbol = precedenceTable[indexStack][indexInput];
   // # not defined sequence of operands and operators in expression, so syntax error
-  if ( strcmp(symbol, '#'))
+  if ( (strcmp(symbol, "#") )== 0)
   {
     return SYNTAX_ERROR;
   }
@@ -194,10 +227,6 @@ int callExpression(Token *token)
   // after while, when all the tokens are loaded to stack 
   // check if the brackets are even and there is the same number 
   // of left brackets and right brackets 
-  if ( leftBracket != rightBracket) 
-  {
-    return SYNTAX_ERROR;
-  }
 
   // TODO get the rule and push it to the stack
   // TODO continue with other tokens 
