@@ -117,4 +117,29 @@ int value(Token *token);
  * @return     Error code
  */
 int assign(Token *token);
+
+/**
+ * @brief       This is checking what is after ID if is Left Bracket, operator, assign, EOL..
+ * 
+ * @param       token   Token from scanner
+ * @return      Error code
+ */
+int after_id(Token *token);
+
+/**
+ * @brief       This is checking if token is ID or FUNCTION_ID
+ * 
+ * @param       token   Token from scanner
+ * @return      Error code 
+ */
+int def_id(Token *token);
+
+/**
+ * @brief       Can be called only in function or if or while it is checking if next token is
+ *              DEDENT or something else.
+ * 
+ * @param       token   Token from scanner
+ * @return      Error code
+ */
+int next_st_list(Token *token);
 #endif
