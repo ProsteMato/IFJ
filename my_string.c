@@ -8,7 +8,7 @@
 
 #include "my_string.h"
 
-char* string_init (){
+char* mystring_init (){
 	char* str = malloc(sizeof(char) * DEFAULT_STR_LEN);
 	if (str == NULL){
 		// chyba alokacie pamate
@@ -17,18 +17,19 @@ char* string_init (){
 	return str;
 }
 
-int append_char (char *str, unsigned long *i, unsigned long *cap, char c){
-	if (*i >= *cap -1){
+int append_char (char **str, unsigned long *i, unsigned long *cap, char c){
+	char *tmp = NULL;
+	if (*i >= (*cap) -1){
 		*cap += DEFAULT_STR_LEN;
-		char *tmp = realloc (str, sizeof(char) * (*cap));
+		tmp = (char *) realloc (*str, sizeof(char) * (*cap));
 		if (tmp == NULL){
 			// chyba alokacie pamate
 			return 0;
 		} else {
-			str = tmp;
+			*str = tmp;
 		}
 	}
-	str[*i] = c;
+	(*str)[*i] = c;
 	(*i)++;
 	return 1;
 }

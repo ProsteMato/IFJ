@@ -87,7 +87,7 @@ int get_next_token(Token *token, int preload){
 		s_push(&s, 0);
 	}
 	// inicializacia premennych
-	char* str = malloc(sizeof(char) * DEFAULT_STR_LEN);
+	char* str = mystring_init();
 	if (str == NULL){
 		// chyba alokacie pamate
 		s_destroy(&s);
@@ -113,12 +113,15 @@ int get_next_token(Token *token, int preload){
 			case (START):
 			str_i = 0;
 				if (isalpha(c)){
-					if (!append_char(str, &str_i, &cap, c)){
+					if (!append_char(&str, &str_i, &cap, c)){
 						return internal_error_exit(&s, str);
 					}
 					first_token = 0;
 					state = ID_OR_KW;
 				} else if (c == EOF){
+					if (!append_char(&str, &str_i, &cap, '\0')){
+						return internal_error_exit(&s, str);
+					}
 					token->attribute = str;
 					token->type = TK_EOF;
 					s_destroy(&s);
@@ -128,7 +131,7 @@ int get_next_token(Token *token, int preload){
 						return OK;
 					}								
 				} else if (isdigit(c)){
-					if (!append_char(str, &str_i, &cap, c)){
+					if (!append_char(&str, &str_i, &cap, c)){
 						return internal_error_exit(&s, str);
 					}
 					first_token = 0;
@@ -141,7 +144,7 @@ int get_next_token(Token *token, int preload){
 						state = START;
 					}
 				} else if (c == '_'){
-					if (!append_char(str, &str_i, &cap, c)){
+					if (!append_char(&str, &str_i, &cap, c)){
 						return internal_error_exit(&s, str);
 					}
 					first_token = 0;
@@ -155,31 +158,31 @@ int get_next_token(Token *token, int preload){
 					state = STRING;
 				} else if (c == '/'){
 					first_token = 0;
-					if (!append_char(str, &str_i, &cap, c)){
+					if (!append_char(&str, &str_i, &cap, c)){
 						return internal_error_exit(&s, str);
 					}
 					state = DIV;										
 				} else if (c == '='){
 					first_token = 0;
-					if (!append_char(str, &str_i, &cap, c)){
+					if (!append_char(&str, &str_i, &cap, c)){
 						return internal_error_exit(&s, str);
 					}
 					state = ASSIGN;
 				} else if (c == '<'){
 					first_token = 0;
-					if (!append_char(str, &str_i, &cap, c)){
+					if (!append_char(&str, &str_i, &cap, c)){
 						return internal_error_exit(&s, str);
 					}
 					state = LESSER;
 				} else if (c == '>'){
 					first_token = 0;
-					if (!append_char(str, &str_i, &cap, c)){
+					if (!append_char(&str, &str_i, &cap, c)){
 						return internal_error_exit(&s, str);
 					}
 					state = GREATER;
 				} else if (c == '!'){
 					first_token = 0;
-					if (!append_char(str, &str_i, &cap, c)){
+					if (!append_char(&str, &str_i, &cap, c)){
 						return internal_error_exit(&s, str);
 					}
 					state = NEG;
@@ -189,9 +192,12 @@ int get_next_token(Token *token, int preload){
 						token->type = TK_EOL;
 						spc_counter = 0;
 						first_token = 1;
-						if (!append_char(str, &str_i, &cap, c)){
+						if (!append_char(&str, &str_i, &cap, c)){
 							return internal_error_exit(&s, str);
 						}
+						if (!append_char(&str, &str_i, &cap, '\0')){
+						return internal_error_exit(&s, str);
+					}
 						token->attribute = str;
 						if (preload){
 							return save_preload(token, &preloaded_token, OK, &preloaded_return);
@@ -206,9 +212,12 @@ int get_next_token(Token *token, int preload){
 						spc_counter = 0;
 						first_token = 1;
 						ungetc(c, stdin);
-						if (!append_char(str, &str_i, &cap, c)){
+						if (!append_char(&str, &str_i, &cap, c)){
 							return internal_error_exit(&s, str);
 						}
+						if (!append_char(&str, &str_i, &cap, '\0')){
+						return internal_error_exit(&s, str);
+					}
 						token->attribute = str;
 						if (preload){
 							return save_preload(token, &preloaded_token, OK, &preloaded_return);
@@ -219,7 +228,10 @@ int get_next_token(Token *token, int preload){
 				} else if (c == '*'){
 					first_token = 0;
 					token->type = TK_MULT;
-					if (!append_char(str, &str_i, &cap, c)){
+					if (!append_char(&str, &str_i, &cap, c)){
+						return internal_error_exit(&s, str);
+					}
+					if (!append_char(&str, &str_i, &cap, '\0')){
 						return internal_error_exit(&s, str);
 					}
 					token->attribute = str;
@@ -231,7 +243,10 @@ int get_next_token(Token *token, int preload){
 				} else if (c == '+'){
 					first_token = 0;
 					token->type = TK_PLUS;
-					if (!append_char(str, &str_i, &cap, c)){
+					if (!append_char(&str, &str_i, &cap, c)){
+						return internal_error_exit(&s, str);
+					}
+					if (!append_char(&str, &str_i, &cap, '\0')){
 						return internal_error_exit(&s, str);
 					}
 					token->attribute = str;
@@ -243,7 +258,10 @@ int get_next_token(Token *token, int preload){
 				} else if (c == '-'){
 					first_token = 0;
 					token->type = TK_MINUS;
-					if (!append_char(str, &str_i, &cap, c)){
+					if (!append_char(&str, &str_i, &cap, c)){
+						return internal_error_exit(&s, str);
+					}
+					if (!append_char(&str, &str_i, &cap, '\0')){
 						return internal_error_exit(&s, str);
 					}
 					token->attribute = str;
@@ -255,7 +273,10 @@ int get_next_token(Token *token, int preload){
 				} else if (c == ':'){
 					first_token = 0;
 					token->type = TK_COLON;
-					if (!append_char(str, &str_i, &cap, c)){
+					if (!append_char(&str, &str_i, &cap, c)){
+						return internal_error_exit(&s, str);
+					}
+					if (!append_char(&str, &str_i, &cap, '\0')){
 						return internal_error_exit(&s, str);
 					}
 					token->attribute = str;
@@ -267,7 +288,10 @@ int get_next_token(Token *token, int preload){
 				} else if (c == '('){
 					first_token = 0;
 					token->type = TK_BRACKET_L;
-					if (!append_char(str, &str_i, &cap, c)){
+					if (!append_char(&str, &str_i, &cap, c)){
+						return internal_error_exit(&s, str);
+					}
+					if (!append_char(&str, &str_i, &cap, '\0')){
 						return internal_error_exit(&s, str);
 					}
 					token->attribute = str;
@@ -279,7 +303,10 @@ int get_next_token(Token *token, int preload){
 				} else if (c == ')'){
 					first_token = 0;
 					token->type = TK_BRACKET_R;
-					if (!append_char(str, &str_i, &cap, c)){
+					if (!append_char(&str, &str_i, &cap, c)){
+						return internal_error_exit(&s, str);
+					}
+					if (!append_char(&str, &str_i, &cap, '\0')){
 						return internal_error_exit(&s, str);
 					}
 					token->attribute = str;
@@ -291,10 +318,43 @@ int get_next_token(Token *token, int preload){
 				} else if (c == ','){
 					first_token = 0;
 					token->type = TK_COMMA;
-					if (!append_char(str, &str_i, &cap, c)){
+					if (!append_char(&str, &str_i, &cap, c)){
+						return internal_error_exit(&s, str);
+					}
+					if (!append_char(&str, &str_i, &cap, '\0')){
 						return internal_error_exit(&s, str);
 					}
 					token->attribute = str;
+					if (preload){
+						return save_preload(token, &preloaded_token, OK, &preloaded_return);
+					} else {
+						return OK;
+					}
+				} else if (c == '['){
+					first_token = 0;
+					if (!append_char(&str, &str_i, &cap, c)){
+						return internal_error_exit(&s, str);
+					}
+					if (!append_char(&str, &str_i, &cap, '\0')){
+						return internal_error_exit(&s, str);
+					}
+					token->attribute = str;
+					token->type = TK_SQR_L_BRACKET;
+					if (preload){
+						return save_preload(token, &preloaded_token, OK, &preloaded_return);
+					} else {
+						return OK;
+					}
+				} else if (c == ']'){
+					first_token = 0;
+					if (!append_char(&str, &str_i, &cap, c)){
+						return internal_error_exit(&s, str);
+					}
+					if (!append_char(&str, &str_i, &cap, '\0')){
+						return internal_error_exit(&s, str);
+					}
+					token->attribute = str;
+					token->type = TK_SQR_R_BRACKET;
 					if (preload){
 						return save_preload(token, &preloaded_token, OK, &preloaded_return);
 					} else {
@@ -312,11 +372,14 @@ int get_next_token(Token *token, int preload){
 				break;
 			case (ID):
 				if (isalpha(c) || isdigit(c) || c == '_'){
-					if (!append_char(str, &str_i, &cap, c)){
+					if (!append_char(&str, &str_i, &cap, c)){
 						return internal_error_exit(&s, str);
 					}
 					state = ID;
 				} else {
+					if (!append_char(&str, &str_i, &cap, '\0')){
+						return internal_error_exit(&s, str);
+					}
 					token->type = TK_ID;
 					token->attribute = str;
 					ungetc(c, stdin);
@@ -328,18 +391,21 @@ int get_next_token(Token *token, int preload){
 				break;
 			case (ID_OR_KW):
 				if (isalpha(c)){
-					if (!append_char(str, &str_i, &cap, c)){
+					if (!append_char(&str, &str_i, &cap, c)){
 						return internal_error_exit(&s, str);
 					}
 					keyword = is_keyword(str, str_i);
 					state = ID_OR_KW;
 				} else if (isdigit(c) || c == '_'){
-					if (!append_char(str, &str_i, &cap, c)){
+					if (!append_char(&str, &str_i, &cap, c)){
 						return internal_error_exit(&s, str);
 					}
 					state = ID;
 				} else {
 					if (keyword >= 0){
+						if (!append_char(&str, &str_i, &cap, '\0')){
+							return internal_error_exit(&s, str);
+						}
 						token->type = TK_KW;
 						token->attribute = str;
 						ungetc(c, stdin);
@@ -349,11 +415,11 @@ int get_next_token(Token *token, int preload){
 							return OK;
 						}
 					} else {
-						token->type = TK_ID;
-						token->attribute = str;
-						if (!append_char(str, &str_i, &cap, '\0')){
+						if (!append_char(&str, &str_i, &cap, '\0')){
 							return internal_error_exit(&s, str);
 						}
+						token->type = TK_ID;
+						token->attribute = str;
 						ungetc(c, stdin);
 						if (preload){
 							return save_preload(token, &preloaded_token, OK, &preloaded_return);
@@ -365,21 +431,24 @@ int get_next_token(Token *token, int preload){
 				break;
 			case (NUM):
 				if (isdigit(c)){
-					if (!append_char(str, &str_i, &cap, c)){
+					if (!append_char(&str, &str_i, &cap, c)){
 						return internal_error_exit(&s, str);
 					}
 					state = NUM;
 				} else if (c == '.'){
-					if (!append_char(str, &str_i, &cap, c)){
+					if (!append_char(&str, &str_i, &cap, c)){
 						return internal_error_exit(&s, str);
 					}
 					state = NUM_POINT;
 				} else if (c == 'E' || c == 'e'){
-					if (!append_char(str, &str_i, &cap, c)){
+					if (!append_char(&str, &str_i, &cap, c)){
 						return internal_error_exit(&s, str);
 					}
 					state = NUM_EXP;
 				} else {
+					if (!append_char(&str, &str_i, &cap, '\0')){
+						return internal_error_exit(&s, str);
+					}
 					token->type = TK_INT;
 					token->attribute = str;
 					ungetc(c,stdin);
@@ -392,7 +461,7 @@ int get_next_token(Token *token, int preload){
 				break;
 			case (NUM_POINT):
 				if (isdigit(c)){
-					if (!append_char(str, &str_i, &cap, c)){
+					if (!append_char(&str, &str_i, &cap, c)){
 						return internal_error_exit(&s, str);
 					}
 					state = NUM_FLOAT;
@@ -405,16 +474,19 @@ int get_next_token(Token *token, int preload){
 				break;
 			case (NUM_FLOAT):
 				if (isdigit(c)){
-					if (!append_char(str, &str_i, &cap, c)){
+					if (!append_char(&str, &str_i, &cap, c)){
 						return internal_error_exit(&s, str);
 					}
 					state = NUM_FLOAT;
 				} else if (c == 'e' || c == 'E'){
-					if (!append_char(str, &str_i, &cap, c)){
+					if (!append_char(&str, &str_i, &cap, c)){
 						return internal_error_exit(&s, str);
 					}
 					state = NUM_EXP;
 				} else {
+					if (!append_char(&str, &str_i, &cap, '\0')){
+						return internal_error_exit(&s, str);
+					}
 					token->type = TK_FLOAT;
 					token->attribute = str;
 					ungetc(c,stdin);
@@ -427,12 +499,12 @@ int get_next_token(Token *token, int preload){
 				break;
 			case (NUM_EXP):
 				if (isdigit(c)){
-					if (!append_char(str, &str_i, &cap, c)){
+					if (!append_char(&str, &str_i, &cap, c)){
 						return internal_error_exit(&s, str);
 					}
 					state = NUM_EXP_FIN;
 				} else if (c == '-' || c == '+'){
-					if (!append_char(str, &str_i, &cap, c)){
+					if (!append_char(&str, &str_i, &cap, c)){
 						return internal_error_exit(&s, str);
 					}
 					state = NUM_EXP_OPT;
@@ -445,7 +517,7 @@ int get_next_token(Token *token, int preload){
 				break;
 			case (NUM_EXP_OPT):
 				if (isdigit(c)){
-					if (!append_char(str, &str_i, &cap, c)){
+					if (!append_char(&str, &str_i, &cap, c)){
 						return internal_error_exit(&s, str);
 					}
 					state = NUM_EXP_FIN;
@@ -458,11 +530,14 @@ int get_next_token(Token *token, int preload){
 				break;
 			case (NUM_EXP_FIN):
 				if (isdigit(c)){
-					if (!append_char(str, &str_i, &cap, c)){
+					if (!append_char(&str, &str_i, &cap, c)){
 						return internal_error_exit(&s, str);
 					}
 					state = NUM_EXP_FIN;
 				} else {
+					if (!append_char(&str, &str_i, &cap, '\0')){
+						return internal_error_exit(&s, str);
+					}
 					token->type = TK_FLOAT;
 					token->attribute = str;
 					ungetc(c,stdin);
@@ -477,6 +552,9 @@ int get_next_token(Token *token, int preload){
 				if (c == '\n'){
 					ungetc(c,stdin);
 					comment_eol = 1;
+					state = START;
+				} else if (c == EOF){
+					ungetc(c,stdin);
 					state = START;
 				} else {
 					state = LINE_COMMENT;
@@ -507,8 +585,10 @@ int get_next_token(Token *token, int preload){
 					state = BLOCK_COMMENT3;
 					block_end++;
 				} else {
-					if (!append_char(str, &str_i, &cap, c)){
-						return internal_error_exit(&s, str);
+					if (!first_token){
+						if (!append_char(&str, &str_i, &cap, c)){
+							return internal_error_exit(&s, str);
+						}
 					}
 					block_end = 0;
 					state = BLOCK_COMMENT2;
@@ -519,12 +599,14 @@ int get_next_token(Token *token, int preload){
 					state = BLOCK_COMMENT4;
 					block_end++;
 				} else {
-					if (!append_char(str, &str_i, &cap, c)){
-						return internal_error_exit(&s, str);
-					}
-					for (int i = 0; i < block_end; i++){
-						if (!append_char(str, &str_i, &cap, '"')){
+					if (!first_token){
+						if (!append_char(&str, &str_i, &cap, c)){
 							return internal_error_exit(&s, str);
+						}
+						for (int i = 0; i < block_end; i++){
+							if (!append_char(&str, &str_i, &cap, '"')){
+								return internal_error_exit(&s, str);
+							}
 						}
 					}
 					block_end = 0;
@@ -541,7 +623,9 @@ int get_next_token(Token *token, int preload){
 						// dokumentacny retazec - koment
 						if (first_token){
 							state = START;
+							//str_i = 0;
 							// zahodenie ulozeneho komentu
+							/**
 							free(str);
 							str = malloc(sizeof(char) * DEFAULT_STR_LEN);
 							if (str == NULL){
@@ -549,12 +633,16 @@ int get_next_token(Token *token, int preload){
 								s_destroy(&s);
 								return INTERNAL_ERROR;
 							}
+							**/
 						// dokumentacny retazec - string
 						} else {
 							for (int i = 0; i < block_end -3; i++){
-								if (!append_char(str, &str_i, &cap, '"')){
+								if (!append_char(&str, &str_i, &cap, '"')){
 									return internal_error_exit(&s, str);
 								}
+							}
+							if (!append_char(&str, &str_i, &cap, '\0')){
+								return internal_error_exit(&s, str);
 							}
 							token->type = TK_STRING;
 							token->attribute = str;
@@ -565,9 +653,11 @@ int get_next_token(Token *token, int preload){
 							}	
 						}
 					} else {
-						for (int i = 0; i < block_end; i++){
-							if (!append_char(str, &str_i, &cap, '"')){
-								return internal_error_exit(&s, str);
+						if (!first_token){
+							for (int i = 0; i < block_end; i++){
+								if (!append_char(&str, &str_i, &cap, '"')){
+									return internal_error_exit(&s, str);
+								}
 							}
 						}
 						block_end = 0;
@@ -581,7 +671,7 @@ int get_next_token(Token *token, int preload){
 				} else if (c == '\''){
 					state = STRING_FIN;
 				} else if (c >= 32 && c <=127 && c !='\'' && c != '\\'){
-					if (!append_char(str, &str_i, &cap, c)){
+					if (!append_char(&str, &str_i, &cap, c)){
 						return internal_error_exit(&s, str);
 					}
 					state = STRING;
@@ -595,30 +685,30 @@ int get_next_token(Token *token, int preload){
 			case (STRING_ESCSEQ): //otestovat
 				if (c >= 32 && c <=127 && c !='x'){
 					if (c == '\''){
-						if (!append_char(str, &str_i, &cap, '\'')){
+						if (!append_char(&str, &str_i, &cap, '\'')){
 							return internal_error_exit(&s, str);
 						}
 					} else if (c == '\\'){
-						if (!append_char(str, &str_i, &cap, '\\')){
+						if (!append_char(&str, &str_i, &cap, '\\')){
 							return internal_error_exit(&s, str);
 						}
 					} else if (c == 'n'){
-						if (!append_char(str, &str_i, &cap, '\n')){
+						if (!append_char(&str, &str_i, &cap, '\n')){
 							return internal_error_exit(&s, str);
 						}
 					} else if (c == 't'){
-						if (!append_char(str, &str_i, &cap, '\t')){
+						if (!append_char(&str, &str_i, &cap, '\t')){
 							return internal_error_exit(&s, str);
 						}
 					} else if (c == '\"'){
-						if (!append_char(str, &str_i, &cap, '\"')){
+						if (!append_char(&str, &str_i, &cap, '\"')){
 							return internal_error_exit(&s, str);
 						}
 					} else {
-						if (!append_char(str, &str_i, &cap, '\\')){
+						if (!append_char(&str, &str_i, &cap, '\\')){
 							return internal_error_exit(&s, str);
 						}
-						if (!append_char(str, &str_i, &cap, c)){
+						if (!append_char(&str, &str_i, &cap, c)){
 							return internal_error_exit(&s, str);
 						}
 					}
@@ -637,29 +727,29 @@ int get_next_token(Token *token, int preload){
 					hex[0] = c;
 					state = STRING_HEX1;
 				} else if (c == '\\'){
-					if (!append_char(str, &str_i, &cap, '\\')){
+					if (!append_char(&str, &str_i, &cap, '\\')){
 						return internal_error_exit(&s, str);
 					}
-					if (!append_char(str, &str_i, &cap, 'x')){
+					if (!append_char(&str, &str_i, &cap, 'x')){
 						return internal_error_exit(&s, str);
 					}
 					state = STRING_ESCSEQ;
 				} else if (c == '\''){
-					if (!append_char(str, &str_i, &cap, '\\')){
+					if (!append_char(&str, &str_i, &cap, '\\')){
 						return internal_error_exit(&s, str);
 					}
-					if (!append_char(str, &str_i, &cap, 'x')){
+					if (!append_char(&str, &str_i, &cap, 'x')){
 						return internal_error_exit(&s, str);
 					}
 					state = STRING_FIN;
 				} else {
-					if (!append_char(str, &str_i, &cap, '\\')){
+					if (!append_char(&str, &str_i, &cap, '\\')){
 						return internal_error_exit(&s, str);
 					}
-					if (!append_char(str, &str_i, &cap, 'x')){
+					if (!append_char(&str, &str_i, &cap, 'x')){
 						return internal_error_exit(&s, str);
 					}
-					if (!append_char(str, &str_i, &cap, c)){
+					if (!append_char(&str, &str_i, &cap, c)){
 						return internal_error_exit(&s, str);
 					}
 					state = STRING;
@@ -667,24 +757,24 @@ int get_next_token(Token *token, int preload){
 				break;
 			case (STRING_HEX1):
 				if(c == '\''){
-					if (!append_char(str, &str_i, &cap, '\\')){
+					if (!append_char(&str, &str_i, &cap, '\\')){
 						return internal_error_exit(&s, str);
 					}
-					if (!append_char(str, &str_i, &cap, 'x')){
+					if (!append_char(&str, &str_i, &cap, 'x')){
 						return internal_error_exit(&s, str);
 					}
-					if (!append_char(str, &str_i, &cap, c)){
+					if (!append_char(&str, &str_i, &cap, c)){
 						return internal_error_exit(&s, str);
 					}
 					state = STRING_FIN;
 				} else if (c == '\\'){
-					if (!append_char(str, &str_i, &cap, '\\')){
+					if (!append_char(&str, &str_i, &cap, '\\')){
 						return internal_error_exit(&s, str);
 					}
-					if (!append_char(str, &str_i, &cap, 'x')){
+					if (!append_char(&str, &str_i, &cap, 'x')){
 						return internal_error_exit(&s, str);
 					}
-					if (!append_char(str, &str_i, &cap, c)){
+					if (!append_char(&str, &str_i, &cap, c)){
 						return internal_error_exit(&s, str);
 					}
 					state = STRING_ESCSEQ;
@@ -692,17 +782,17 @@ int get_next_token(Token *token, int preload){
 					if ((c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F') || isalpha(c)){
 						hex[1] = c;
 						c = (int)strtol(hex, NULL, 16); 
-						if (!append_char(str, &str_i, &cap, c)){
+						if (!append_char(&str, &str_i, &cap, c)){
 							return internal_error_exit(&s, str);
 						}
 					} else {
-						if (!append_char(str, &str_i, &cap, '\\')){
+						if (!append_char(&str, &str_i, &cap, '\\')){
 							return internal_error_exit(&s, str);
 						}
-						if (!append_char(str, &str_i, &cap, 'x')){
+						if (!append_char(&str, &str_i, &cap, 'x')){
 							return internal_error_exit(&s, str);
 						}
-						if (!append_char(str, &str_i, &cap, c)){
+						if (!append_char(&str, &str_i, &cap, c)){
 							return internal_error_exit(&s, str);
 						}
 					}
@@ -710,7 +800,7 @@ int get_next_token(Token *token, int preload){
 				}
 				break;
 			case (STRING_FIN):
-				if (!append_char(str, &str_i, &cap, '\0')){
+				if (!append_char(&str, &str_i, &cap, '\0')){
 					return internal_error_exit(&s, str);
 				}
 				token->type = TK_STRING;
@@ -723,7 +813,10 @@ int get_next_token(Token *token, int preload){
 				}
 			case (DIV):
 				if (c == '/'){
-					if (!append_char(str, &str_i, &cap, c)){
+					if (!append_char(&str, &str_i, &cap, c)){
+						return internal_error_exit(&s, str);
+					}
+					if (!append_char(&str, &str_i, &cap, '\0')){
 						return internal_error_exit(&s, str);
 					}
 					token->attribute = str;
@@ -735,6 +828,9 @@ int get_next_token(Token *token, int preload){
 					}
 				} else {
 					ungetc(c,stdin);
+					if (!append_char(&str, &str_i, &cap, '\0')){
+						return internal_error_exit(&s, str);
+					}
 					token->type = TK_DIV;
 					token->attribute = str;
 					if (preload){
@@ -745,7 +841,10 @@ int get_next_token(Token *token, int preload){
 				}
 			case (ASSIGN):
 				if (c == '='){
-					if (!append_char(str, &str_i, &cap, c)){
+					if (!append_char(&str, &str_i, &cap, c)){
+						return internal_error_exit(&s, str);
+					}
+					if (!append_char(&str, &str_i, &cap, '\0')){
 						return internal_error_exit(&s, str);
 					}
 					token->attribute = str;
@@ -757,6 +856,9 @@ int get_next_token(Token *token, int preload){
 					}
 				} else {
 					ungetc(c,stdin);
+					if (!append_char(&str, &str_i, &cap, '\0')){
+						return internal_error_exit(&s, str);
+					}
 					token->type = TK_ASSIGN;
 					token->attribute = str;
 					if (preload){
@@ -767,7 +869,10 @@ int get_next_token(Token *token, int preload){
 				}
 			case (NEG):
 				if (c == '='){
-					if (!append_char(str, &str_i, &cap, c)){
+					if (!append_char(&str, &str_i, &cap, c)){
+						return internal_error_exit(&s, str);
+					}
+					if (!append_char(&str, &str_i, &cap, '\0')){
 						return internal_error_exit(&s, str);
 					}
 					token->attribute = str;
@@ -779,6 +884,9 @@ int get_next_token(Token *token, int preload){
 					}
 				} else {
 					ungetc(c,stdin);
+					if (!append_char(&str, &str_i, &cap, '\0')){
+						return internal_error_exit(&s, str);
+					}
 					token->attribute = str;
 					token->type = TK_NEG;
 					if (preload){
@@ -789,7 +897,10 @@ int get_next_token(Token *token, int preload){
 				}
 			case (LESSER):
 				if (c == '='){
-					if (!append_char(str, &str_i, &cap, c)){
+					if (!append_char(&str, &str_i, &cap, c)){
+						return internal_error_exit(&s, str);
+					}
+					if (!append_char(&str, &str_i, &cap, '\0')){
 						return internal_error_exit(&s, str);
 					}
 					token->type = TK_LESSER_EQUAL;
@@ -801,6 +912,9 @@ int get_next_token(Token *token, int preload){
 					}
 				} else {
 					ungetc(c,stdin);
+					if (!append_char(&str, &str_i, &cap, '\0')){
+						return internal_error_exit(&s, str);
+					}
 					token->type = TK_LESSER;
 					token->attribute = str;
 					if (preload){
@@ -811,7 +925,10 @@ int get_next_token(Token *token, int preload){
 				}
 			case (GREATER):
 				if (c == '='){
-					if (!append_char(str, &str_i, &cap, c)){
+					if (!append_char(&str, &str_i, &cap, c)){
+						return internal_error_exit(&s, str);
+					}
+					if (!append_char(&str, &str_i, &cap, '\0')){
 						return internal_error_exit(&s, str);
 					}
 					token->type = TK_GREATER_EQUAL;
@@ -823,6 +940,9 @@ int get_next_token(Token *token, int preload){
 					}
 				} else {
 					ungetc(c,stdin);
+					if (!append_char(&str, &str_i, &cap, '\0')){
+						return internal_error_exit(&s, str);
+					}
 					token->type = TK_GREATER;
 					token->attribute = str;
 					if (preload){
@@ -840,12 +960,15 @@ int get_next_token(Token *token, int preload){
 						state = START;
 						dedent_flag = 0;
 						break;
-					} else if (s_top(&s) == -1){
+					} else if (s_top(&s) == 0){
 						// zla uroven odsadenia
 						free(str);
 						s_destroy(&s);
 						return LEX_ERROR;
 					} else {
+						if (!append_char(&str, &str_i, &cap, '\0')){
+							return internal_error_exit(&s, str);
+						}
 						token->type = TK_DEDENT;
 						token->attribute = str;
 						s_pop(&s);
@@ -860,13 +983,16 @@ int get_next_token(Token *token, int preload){
 				if (c == ' '){
 					spc_counter++;
 					state = INDENTATION;
-				} else if (c == '\n' || c == '#'){
+				} else if (c == '\n' || c == '#' || c == '"'){
 					ungetc(c,stdin);
 					state = START;
 					spc_counter = 0;
 				} else {
 					ungetc(c,stdin);
 					if (spc_counter > s_top(&s)){
+						if (!append_char(&str, &str_i, &cap, '\0')){
+							return internal_error_exit(&s, str);
+						}
 						token->type = TK_INDENT;
 						token->attribute = str;
 						s_push(&s, spc_counter);
@@ -877,6 +1003,9 @@ int get_next_token(Token *token, int preload){
 							return OK;
 						}
 					} else if (spc_counter < s_top(&s)){
+						if (!append_char(&str, &str_i, &cap, '\0')){
+							return internal_error_exit(&s, str);
+						}
 						token->type = TK_DEDENT;
 						token->attribute = str;
 						s_pop(&s);
