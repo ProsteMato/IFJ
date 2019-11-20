@@ -188,8 +188,10 @@ int callExpression(Token *token)
 
   if ( leftBracket != rightBracket) 
   {
+      fprintf(stderr, "Number of left brackets doesnt match number of right brackets");
       return SYNTAX_ERROR;
   }
+
 
   // index to the table  
   int indexStack=getIndex(token);
