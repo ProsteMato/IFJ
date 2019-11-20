@@ -113,8 +113,6 @@ typedef enum{
 	TK_FLOAT, 		// 23
 	TK_DEDENT, 		// 24
 	TK_INDENT, 		// 25
-	TK_SQR_L_BRACKET, // 26
-	TK_SQR_R_BRACKET, // 27
 } Tokens;
 
 /**
