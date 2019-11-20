@@ -9,7 +9,7 @@ LL-grammer pre IFJ19
  6:  <stat> -> expr
  7:  <stat> -> pass
  8:  <stat> -> while expr : EOL INDENT <nested-st-list>
- 9:  <stat> -> if expr : EOL INDENT <nested-st-list> else : EOL <nested-st-list>
+ 9:  <stat> -> if expr : EOL INDENT <nested-st-list> else : EOL INDENT <nested-st-list>
 10:  <params> -> )
 11:  <params> -> id <next-param>
 12:  <next-param> -> , <params>
@@ -25,7 +25,7 @@ LL-grammer pre IFJ19
 22:  <value> -> id
 23:  <func-nested-st-list> -> <func-nested-stat> EOL <next-func-nested-st-list>
 24:  <func-nested-stat> -> pass
-25:  <func-nested-stat> -> if expr : EOL INDENT <func-nested-st-list> else : EOL <func-nested-st-list>
+25:  <func-nested-stat> -> if expr : EOL INDENT <func-nested-st-list> else : EOL INDENT <func-nested-st-list>
 26:  <func-nested-stat> -> expr
 27:  <func-nested-stat> -> while expr : EOL INDENT <func-nested-st-list>
 28:  <func-nested-stat> -> id <after_id>
@@ -34,7 +34,7 @@ LL-grammer pre IFJ19
 31:  <next-func-nested-st-list> -> <func-nested-st-list>
 32:  <nested-st-list> -> <nested-stat> EOL <next-nested-st-list>
 33:  <nested-stat> -> pass
-34:  <nested-stat> -> if expr : EOL INDENT <nested-st-list> else : EOL <nested-st-list>
+34:  <nested-stat> -> if expr : EOL INDENT <nested-st-list> else : EOL INDENT <nested-st-list>
 35:  <nested-stat> -> expr
 36:  <nested-stat> -> while expr : EOL INDENT <nested-st-list>
 37:  <nested-stat> -> id <after_id>
@@ -59,7 +59,7 @@ Pre program na tvorenie LL tabulky pre iný dovod to tu nieje
  6:   STAT → expr
  7:   STAT → pass
  8:   STAT → while expr : eol indent NESTED-ST-LIST
- 9:   STAT → if expr : eol indent NESTED-ST-LIST else : eol NESTED-ST-LIST
+ 9:   STAT → if expr : eol indent NESTED-ST-LIST else : eol indent NESTED-ST-LIST
 10:   PARAMS → )
 11:   PARAMS → id NEXT-PARAM
 12:   NEXT-PARAM → , PARAMS
@@ -75,7 +75,7 @@ Pre program na tvorenie LL tabulky pre iný dovod to tu nieje
 22:   VALUE → id
 23:   FUNC-NESTED-ST-LIST -> FUNC-NESTED-STAT eol NEXT-FUNC-NESTED-ST-LIST
 24:   FUNC-NESTED-STAT -> pass
-25:   FUNC-NESTED-STAT -> if expr : eol indent FUNC-NESTED-STAT else : eol FUNC-NESTED-STAT
+25:   FUNC-NESTED-STAT -> if expr : eol indent FUNC-NESTED-STAT else : eol indent FUNC-NESTED-STAT
 26:   FUNC-NESTED-STAT -> expr
 27:   FUNC-NESTED-STAT -> while expr : eol indent FUNC-NESTED-STAT
 28:   FUNC-NESTED-STAT -> id AFTED_ID
@@ -84,7 +84,7 @@ Pre program na tvorenie LL tabulky pre iný dovod to tu nieje
 31:   NEXT-FUNC-NESTED-ST-LIST -> FUNC-NESTED-ST-LIST
 32:   NESTED-ST-LIST → NESTED-STAT eol NEXT-NESTED-ST-LIST
 33:   NESTED-STAT → pass
-34:   NESTED-STAT → if expr : eol indent NESTED-ST-LIST else : eol NESTED-ST-LIST
+34:   NESTED-STAT → if expr : eol indent NESTED-ST-LIST else : eol indent NESTED-ST-LIST
 35:   NESTED-STAT → expr
 36:   NESTED-STAT → while expr : eol indent NESTED-ST-LIST
 37:   NESTED-STAT → id AFTED_ID
