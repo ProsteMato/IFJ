@@ -18,7 +18,7 @@
 #include <stdbool.h> 
 
 
-#define tableSize 18 
+#define tableSize 19 
 bool isRelational;  //is operator relational? <, <=, >, >=, ==, != 
 
 typedef enum {
