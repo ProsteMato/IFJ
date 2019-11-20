@@ -330,36 +330,6 @@ int get_next_token(Token *token, int preload){
 					} else {
 						return OK;
 					}
-				} else if (c == '['){
-					first_token = 0;
-					if (!append_char(&str, &str_i, &cap, c)){
-						return internal_error_exit(&s, str);
-					}
-					if (!append_char(&str, &str_i, &cap, '\0')){
-						return internal_error_exit(&s, str);
-					}
-					token->attribute = str;
-					token->type = TK_SQR_L_BRACKET;
-					if (preload){
-						return save_preload(token, &preloaded_token, OK, &preloaded_return);
-					} else {
-						return OK;
-					}
-				} else if (c == ']'){
-					first_token = 0;
-					if (!append_char(&str, &str_i, &cap, c)){
-						return internal_error_exit(&s, str);
-					}
-					if (!append_char(&str, &str_i, &cap, '\0')){
-						return internal_error_exit(&s, str);
-					}
-					token->attribute = str;
-					token->type = TK_SQR_R_BRACKET;
-					if (preload){
-						return save_preload(token, &preloaded_token, OK, &preloaded_return);
-					} else {
-						return OK;
-					}
 				} else {
 					// lex chyba
 					free(str);
