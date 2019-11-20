@@ -72,10 +72,10 @@ int st_list(Token *token) {
 	
 	/* TODO opravit podľa novej LL tabulky a gramatiky
 		2: <st-list> -> <stat> EOL <st-list>
-		31: <nested-st-list> -> <nested-stat> EOL <nested-st-list>
-		23: <func-nested-st-list> -> <func-nested-stat> EOL <func-nested-st-list>
+		23: <func-nested-st-list> -> <func-nested-stat> EOL <next-func-nested-st-list>
+		31: <nested-st-list> -> <nested-stat> EOL <next-nested-st-list>
 	*/
-	int returnValue = 0;
+	int returnValue = SYNTAX_ERROR; //TODO mozno bude treba zmenit...
 	if (token->type == TK_KW) {
 		if (strcmp(token->attribute, "def") == 0 && !in_function && !in_if_while) {
 			returnValue = stat(token);
@@ -86,70 +86,36 @@ int st_list(Token *token) {
 					return st_list(token);
 				}
 			}
-		} else if (strcmp(token->attribute, "if") == 0) {
+		} else if (
+				(strcmp(token->attribute, "if") == 0) ||
+				(strcmp(token->attribute, "while") == 0) ||
+				(strcmp(token->attribute, "pass") == 0) ||
+				(strcmp(token->attribute, "return") == 0 && in_function)
+				) {
 			returnValue = stat(token);
 			if (returnValue == OK) {
 				GET_NEXT_TOKEN(token);
 				if (token->type == TK_EOL) {
 					GET_NEXT_TOKEN(token);
-					return st_list(token);
+					if (!in_function && !in_if_while) {
+						return st_list(token);
+					} else {
+						return next_st_list(token);
+					}
 				}
 			}
-		} else if (strcmp(token->attribute, "while") == 0) {
-			returnValue = stat(token);
-			if (returnValue == OK) {
-				GET_NEXT_TOKEN(token);
-				if (token->type == TK_EOL) {
-					GET_NEXT_TOKEN(token);
-					return st_list(token);
-				}
-			}
-		} else if (strcmp(token->attribute, "pass") == 0) {
-			returnValue = stat(token);
-			if (returnValue == OK) {
-				GET_NEXT_TOKEN(token);
-				if (token->type == TK_EOL) {
-					GET_NEXT_TOKEN(token);
-					return st_list(token);
-				}
-			}
-		} else if (strcmp(token->attribute, "return") == 0 && in_function) {
-			returnValue = stat(token);
-			if (returnValue == OK) {
-				GET_NEXT_TOKEN(token);
-				if (token->type == TK_EOL) {
-					GET_NEXT_TOKEN(token);
-					return st_list(token);
-				}
-			}
-		}
-	}
-
-	/*
-		37: <nested-st-list> -> DEDENT
-		30: <func-nested-stat> -> DEDENT
-	*/
-
-	else if (token->type == TK_DEDENT) {
-		if (in_if_while || in_function) {
-			return OK;
-		} else if (in_function && !in_if_while && depth == 0) {
-			
-			/* TODO bude treba opravit este pre dogenerovanie funkcie následne
-			bude treba pridat asi lepšie kontrolu na dedent pre funckiu.
-			*/
-
-			return OK;
-		}
+		} 
 	} else if (token->type == TK_ID) {
-		/* TODO bude treba pridať asi pravdidlo na to že sa funkcia len tak zavolá
-		a nebude do ničoho priradená následne pridať sématické akcie k tomuto.*/
 		returnValue = stat(token);
 		if (returnValue == OK) {
 			GET_NEXT_TOKEN(token);
 			if (token->type == TK_EOL) {
 				GET_NEXT_TOKEN(token);
-				return st_list(token);
+				if (!in_function && !in_if_while) {
+					return st_list(token);
+				} else {
+					return next_st_list(token);
+				}
 			}
 		}
 	}
@@ -157,8 +123,7 @@ int st_list(Token *token) {
 	/*
 		3: <st-list> -> EOF
 	*/
-
-	else if (token->type == EOF) {
+	 else if (token->type == EOF) {
 		// TODO možno bude treba ešte upraviť teraz som si neni istý
 		return OK;
 	} else if (token->type == TK_ID || token->type == TK_STRING || 
@@ -172,8 +137,30 @@ int st_list(Token *token) {
 	return returnValue;
 }
 
+int next_st_list(Token *token) {
+
+	/*
+		38:  <next-nested-st-list> -> DEDENT
+		39:  <next-nested-st-list> -> <nested-st-list>
+		30:  <next-func-nested-st-list> -> DEDENT
+		31:  <next-func-nested-st-list> -> <func-nested-st-list>
+	*/
+	if (token->type == TK_DEDENT) {
+		if (in_if_while || in_function) {
+			return OK;
+		} else if (in_function && !in_if_while && depth == 0) {
+			/* TODO bude treba opravit este pre dogenerovanie funkcie následne
+			bude treba pridat asi lepšie kontrolu na dedent pre funckiu.
+			*/
+			return OK;
+		}
+	} else {
+		return st_list(token);
+	}
+}
+
 int stat(Token *token) {
-	;
+	
 }
 
 int params(Token *token) {
