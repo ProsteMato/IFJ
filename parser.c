@@ -178,6 +178,7 @@ int stat(Token *token) {
 							if (token->type == TK_EOL) {
 								GET_NEXT_TOKEN(token);
 								if(token->type == TK_INDENT) {
+									depth++;
 									in_function = true;
 									return st_list(token);
 								}
@@ -189,6 +190,48 @@ int stat(Token *token) {
 		 
 		//9:  <stat> -> if expr : EOL INDENT <nested-st-list> else : EOL <nested-st-list>
 		} else if (strcmp(token->attribute, "if") == 0) {
+			GET_NEXT_TOKEN(token);
+			//TODO priprava na generovanie...ziskat lables for if and else
+			//TODO urobit samotne generovanie...
+			//TODO volanie maggie...
+			if ((returnValue = call_maggie(token)) == OK) {
+				GET_NEXT_TOKEN(token);
+				if (token->type == TK_COLON) {
+					GET_NEXT_TOKEN(token);
+					if (token->type == TK_EOL) {
+						GET_NEXT_TOKEN(token);
+						if (token->type == TK_INDENT) {
+							depth++;
+							GET_NEXT_TOKEN(token);
+							in_if_while = true;
+							returnValue = st_list(token);
+							if (returnValue == OK) {
+								GET_NEXT_TOKEN(token);
+								if (token->type == TK_KW && strcmp(token->attribute, "else") == 0) {
+									GET_NEXT_TOKEN(token);
+									if (token->type == TK_COLON) {
+										GET_NEXT_TOKEN(token);
+										if (token->type == TK_EOL) {
+											GET_NEXT_TOKEN(token);
+											if (token->type == TK_INDENT) {
+												GET_NEXT_TOKEN(token);
+												depth++;
+												return st_list(token);
+											}
+										}
+									}
+								}
+							} else {
+								return returnValue;
+							}
+						}
+					}
+				}
+			} else {
+				return returnValue;
+			}
+		//8:  <stat> -> while expr : EOL INDENT <nested-st-list>
+		} else if (strcmp(token->attribute, "while")) {
 			
 		}
 	}
