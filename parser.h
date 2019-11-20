@@ -12,6 +12,7 @@
 #define _PARSER_H_
 
 #include "scanner.h"
+#include "expression_parser.h"
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>

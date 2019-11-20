@@ -146,7 +146,16 @@ int next_st_list(Token *token) {
 		31:  <next-func-nested-st-list> -> <func-nested-st-list>
 	*/
 	if (token->type == TK_DEDENT) {
+		//TODO skontrolovat este neskor potom tento if else statementy či sú spravne
 		if (in_if_while || in_function) {
+			depth--;
+			if (in_function && in_if_while && depth == 1) {
+				in_if_while = false;
+			} else if (in_function && !in_if_while && depth == 0) {
+				in_function = false;
+			} else if (!in_function && in_if_while && depth == 0) {
+				in_if_while = false;
+			}
 			return OK;
 		} else if (in_function && !in_if_while && depth == 0) {
 			/* TODO bude treba opravit este pre dogenerovanie funkcie následne
@@ -193,8 +202,7 @@ int stat(Token *token) {
 			GET_NEXT_TOKEN(token);
 			//TODO priprava na generovanie...ziskat lables for if and else
 			//TODO urobit samotne generovanie...
-			//TODO volanie maggie...
-			if ((returnValue = call_maggie(token)) == OK) {
+			if ((returnValue = callExpression(token)) == OK) {
 				GET_NEXT_TOKEN(token);
 				if (token->type == TK_COLON) {
 					GET_NEXT_TOKEN(token);
@@ -232,7 +240,27 @@ int stat(Token *token) {
 			}
 		//8:  <stat> -> while expr : EOL INDENT <nested-st-list>
 		} else if (strcmp(token->attribute, "while")) {
-			
+			//TODO generovanie while ziskavanie uniq lable...
+			if ((returnValue = callExpression(token)) == OK) {
+				GET_NEXT_TOKEN(token);
+				if (token->type == TK_COLON) {
+					GET_NEXT_TOKEN(token);
+					if (token->type == TK_EOL) {
+						GET_NEXT_TOKEN(token);
+						if (token->type == TK_INDENT) {
+							depth++;
+							GET_NEXT_TOKEN(token);
+							in_if_while = true;
+							return st_list(token);
+						}
+					}
+				}
+			} else {
+				return returnValue;
+			}
+		} else if(true) {
+			//TODO pridat pass
+			;
 		}
 	}
 }
