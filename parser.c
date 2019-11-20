@@ -160,7 +160,38 @@ int next_st_list(Token *token) {
 }
 
 int stat(Token *token) {
+	int returnValue = 0;
 	
+	if (token->type == TK_KW) {
+		//4:  <stat> -> def id ( <params> : EOL INDENT <func-nested-st-list>
+		if (strcmp(token->attribute, "def") == 0 && !in_function && !in_if_while) {
+			GET_NEXT_TOKEN(token);
+			if (token->type == TK_ID) {
+				//TODO urobit nieco z ID pre novú definiciu funkcie
+				GET_NEXT_TOKEN(token);
+				if (token->type == TK_BRACKET_L) {
+					returnValue = params(token);
+					if (returnValue == OK) {
+						GET_NEXT_TOKEN(token);
+						if (token->type == TK_COLON) {
+							GET_NEXT_TOKEN(token);
+							if (token->type == TK_EOL) {
+								GET_NEXT_TOKEN(token);
+								if(token->type == TK_INDENT) {
+									in_function = true;
+									return st_list(token);
+								}
+							}
+						}
+					}
+				}
+			}
+		 
+		//9:  <stat> -> if expr : EOL INDENT <nested-st-list> else : EOL <nested-st-list>
+		} else if (strcmp(token->attribute, "if") == 0) {
+			
+		}
+	}
 }
 
 int params(Token *token) {
