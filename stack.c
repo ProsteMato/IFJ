@@ -30,7 +30,6 @@ void s_destroy(Stack *stack){
 void s_resize(Stack *stack){
     int *resized_data;
     resized_data = (int *) realloc(stack->data ,(stack->size + 10) * sizeof(int));
-    free(stack->data);
     stack->data = resized_data;
     stack->size = stack->size + 10;
 }
