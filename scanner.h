@@ -111,9 +111,8 @@ typedef enum{
 	TK_STRING, 		// 21
 	TK_INT, 		// 22
 	TK_FLOAT, 		// 23
-	TK_EMPTY, 		// 24
+	TK_DEDENT, 		// 24
 	TK_INDENT, 		// 25
-	TK_DEDENT, 		// 26
 } Tokens;
 
 /**
@@ -126,14 +125,17 @@ typedef struct{
 
 
 /**
- * @brief      Runs the scanner and returns the next token
+ * @brief      Runs the scanner and returns the next token, if preload is set to
+ *             true then preloads the next token
  *
+ * @param      token    Pointer to the allocated token struct
+ * @param[in]  preload  The preload
  * @param      source  The source stream
- * @param      token   Pointer to the allocated token struct
  *
- * @return     OK-token is returned successfully, INTERNAL_ERROR-internal error, LEX_ERROR lex error
+ * @return     OK-token is returned successfully, INTERNAL_ERROR-internal error,
+ *             LEX_ERROR lex error
  */
-int get_next_token(Token *token);
+int get_next_token(Token *token, int preload);
 
 /**
  * @brief      Determines whether the string is keyword
@@ -145,6 +147,27 @@ int get_next_token(Token *token);
  */
 Keywords is_keyword (char* s, unsigned len);
 
-int preload_token(Token *token);
+/**
+ * @brief      Saves a preload.
+ *
+ * @param      preloaded    The preloaded
+ * @param      dest         The destination
+ * @param[in]  return_val   The return value
+ * @param      dest_return  The destination return
+ *
+ * @return     return_val
+ */
+int save_preload(Token *preloaded, Token *dest, int return_val, int *dest_return);
+
+/**
+ * @brief      Destroys the stack, deallocates the string and returns
+ *             INTERNAL_ERROR
+ *
+ * @param      s     Pointer to the stack struct
+ * @param      str   Pointer to the string
+ *
+ * @return     INTERNAL_ERROR
+ */
+int internal_error_exit(Stack *s, char *str);
 
 #endif //_SCANNER_H
