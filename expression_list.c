@@ -56,10 +56,39 @@ int listInsertAct(exprList *eList, Token* token)
         return INTERNAL_ERROR;
     }
 
-    newItem->lptr= NULL;
-    newItem->rptr = NULL;
     newItem->token=token;
-
-    
-
+    newItem->lptr = eList->act;
+    newItem->rptr= NULL;
+    eList->last = newItem;
+    eList->act = newItem;
 }
+
+
+Token* copyAct(exprList *eList)
+{
+    if (eList->act != NULL)
+    {
+        Token* tokenReturn = eList->act->token;
+        eList->act=eList->act->rptr;
+        return tokenReturn;
+    }
+}
+
+
+void listDispose(exprList *eList)
+{
+    item itemDelete; 
+    itemDelete= eList->first;
+
+    while (eList->first != NULL)
+    {
+        eList->first=eList->first->rptr;
+        free(itemDelete);
+        itemDelete = eList->first;
+    }
+
+    eList->first= NULL;
+    eList->act = NULL;
+    eList->last = NULL;
+}
+
