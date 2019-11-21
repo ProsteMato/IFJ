@@ -73,10 +73,10 @@ int st_list(Token *token) {
 	/* TODO opravit podľa novej LL tabulky a gramatiky
 		2: <st-list> -> <stat> EOL <st-list>
 		23: <func-nested-st-list> -> <func-nested-stat> EOL <next-func-nested-st-list>
-		31: <nested-st-list> -> <nested-stat> EOL <next-nested-st-list>
+		32:  <nested-st-list> -> <nested-stat> EOL <next-nested-st-list>
 	*/
-	int returnValue = SYNTAX_ERROR; //TODO mozno bude treba zmenit...
-	if (token->type == TK_KW) {
+	int returnValue = SYNTAX_ERROR;
+	if (token->type == TK_KW && !(strcmp(token->attribute, "None") == 0)) {
 		if (strcmp(token->attribute, "def") == 0 && !in_function && !in_if_while) {
 			returnValue = stat(token);
 			if (returnValue == OK) {
@@ -131,8 +131,6 @@ int st_list(Token *token) {
 			   token->type == TK_BRACKET_L) {
 
 		return stat(token);
-	} else {
-		return SYNTAX_ERROR;
 	}
 	return returnValue;
 }
@@ -172,7 +170,9 @@ int stat(Token *token) {
 	int returnValue = 0;
 	
 	if (token->type == TK_KW) {
-		//4:  <stat> -> def id ( <params> : EOL INDENT <func-nested-st-list>
+		/*
+			4:  <stat> -> def id ( <params> : EOL INDENT <func-nested-st-list>
+		*/
 		if (strcmp(token->attribute, "def") == 0 && !in_function && !in_if_while) {
 			GET_NEXT_TOKEN(token);
 			if (token->type == TK_ID) {
@@ -197,7 +197,11 @@ int stat(Token *token) {
 				}
 			}
 		 
-		//9:  <stat> -> if expr : EOL INDENT <nested-st-list> else : EOL <nested-st-list>
+		/*
+			9:  <stat> -> if expr : EOL INDENT <nested-st-list> else : EOL <nested-st-list>
+			25:  <func-nested-stat> -> if expr : EOL INDENT <func-nested-st-list> else : EOL INDENT <func-nested-st-list>
+			34:  <nested-stat> -> if expr : EOL INDENT <nested-st-list> else : EOL INDENT <nested-st-list>
+		*/
 		} else if (strcmp(token->attribute, "if") == 0) {
 			GET_NEXT_TOKEN(token);
 			//TODO priprava na generovanie...ziskat lables for if and else
@@ -238,7 +242,11 @@ int stat(Token *token) {
 			} else {
 				return returnValue;
 			}
-		//8:  <stat> -> while expr : EOL INDENT <nested-st-list>
+		/*
+			8:  <stat> -> while expr : EOL INDENT <nested-st-list>
+			27:  <func-nested-stat> -> while expr : EOL INDENT <func-nested-st-list>
+			36:  <nested-stat> -> while expr : EOL INDENT <nested-st-list>
+		*/
 		} else if (strcmp(token->attribute, "while") == 0) {
 			//TODO generovanie while ziskavanie uniq lable...
 			if ((returnValue = callExpression(token)) == OK) {
@@ -258,32 +266,85 @@ int stat(Token *token) {
 			} else {
 				return returnValue;
 			}
+		/*
+			7:  <stat> -> pass
+			24:  <func-nested-stat> -> pass
+			33:  <nested-stat> -> pass
+		*/
 		} else if (strcmp(token->attribute, "pass") == 0) {
 			return OK;
+		/*
+			29:  <func-nested-stat> -> return expr
+		*/
 		} else if (strcmp(token->attribute, "return") == 0 && in_function) {
 			GET_NEXT_TOKEN(token);
 			if((returnValue = callExpression(token)) == OK) {
-				return OK;
+				if (!isRelational) {
+					return OK;
+				} else {
+					return SYNTAX_ERROR;
+				}
+			} else {
+				return returnValue;
 			}
 		}
+	/*
+		5:  <stat> -> id <after_id>
+		28:  <func-nested-stat> -> id <after_id>
+		37:  <nested-stat> -> id <after_id>
+		26:  <func-nested-stat> -> expr
+		35:  <nested-stat> -> expr
+		6:  <stat> -> expr
+	*/
 	} else if (token->type == TK_ID) {
-		Token tmpToken;
-		PRELOAD_NEXT_TOKEN(&tmpToken);
+		Token prelaod_token;
+		PRELOAD_NEXT_TOKEN(&prelaod_token);
 		if (
-			tmpToken.type == TK_MINUS ||
-			tmpToken.type == TK_PLUS ||
-			tmpToken.type == TK_MULT ||
-			tmpToken.type == TK_DIV ||
-			tmpToken.type == TK_DIV_DIV) {
-			
+			prelaod_token.type == TK_MINUS ||
+			prelaod_token.type == TK_PLUS ||
+			prelaod_token.type == TK_MULT ||
+			prelaod_token.type == TK_DIV ||
+			prelaod_token.type == TK_DIV_DIV
+			) {
 			if((returnValue = callExpression(token)) == OK) {
-				return OK;
+				if(!isRelational) {
+					return OK;
+				} else {
+					return SYNTAX_ERROR;
+				}
+			} else {
+				return returnValue;
 			}
-		} else {
-			//TODO implementovat after_id
+		} else if (
+				prelaod_token.type == TK_EOL || 
+				prelaod_token.type == TK_BRACKET_L ||
+				prelaod_token.type == TK_ASSIGN
+			) {
+			GET_NEXT_TOKEN(token);
 			return after_id(token);
 		}
-	} //TODO porierišiť ešte chyby a expr..
+	/*
+		26:  <func-nested-stat> -> expr
+		35:  <nested-stat> -> expr
+		6:  <stat> -> expr
+	*/
+	} else if (
+		token->type == TK_FLOAT ||
+		token->type == TK_STRING ||
+		token->type == TK_INT ||
+		(token->type == TK_KW && strcmp(token->attribute, "None") == 0)
+		) {
+		if((returnValue = callExpression(token)) == OK) {
+			if(!isRelational) {
+				return OK;
+			} else {
+				return SYNTAX_ERROR;
+			}
+		} else {
+			return returnValue;
+		}	
+	}
+	return SYNTAX_ERROR;
 }
 
 /*
@@ -324,13 +385,12 @@ int params_next(Token *token) {
 15:  <arg-params> -> <value> <arg-next-params>
 */
 int arg_params(Token *token) {
-	// TODO mozno pridat GET_NEXT_TOKEN(token);
 	int returnValue = 0;
 	if (token->type == TK_FLOAT || 
 		token->type == TK_STRING || 
 		token->type == TK_INT ||
 		token->type == TK_ID ||
-		(token->type == TK_KW && strcmp(token->attribute, "None"))
+		(token->type == TK_KW && strcmp(token->attribute, "None") == 0)
 		) {
 			returnValue = value(token);
 			if (returnValue == OK) {
@@ -359,7 +419,7 @@ int arg_next_params(Token *token) {
 			token->type == TK_STRING || 
 			token->type == TK_INT ||
 			token->type == TK_ID ||
-			(token->type == TK_KW && strcmp(token->attribute, "None"))
+			(token->type == TK_KW && strcmp(token->attribute, "None") == 0)
 		) {
 			GET_NEXT_TOKEN(token);
 			returnValue = value(token);
@@ -388,7 +448,7 @@ int assign(Token *token) {
 		token->type == TK_FLOAT ||
 		token->type == TK_INT ||
 		token->type == TK_STRING ||
-		(token->type == TK_KW && strcmp(token->attribute, "None"))
+		(token->type == TK_KW && strcmp(token->attribute, "None") == 0)
 		){
 		if((returnValue = callExpression(token)) == OK) {
 			if(!isRelational) {
