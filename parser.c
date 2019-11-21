@@ -283,37 +283,206 @@ int stat(Token *token) {
 			//TODO implementovat after_id
 			return after_id(token);
 		}
+	} //TODO porierišiť ešte chyby a expr..
+}
+
+/*
+10:  <params> -> )
+11:  <params> -> id <next-param>
+*/
+int params(Token *token) {
+	//TODO spracovávanie kontrolovanie a generovanie funkcie
+	GET_NEXT_TOKEN(token);
+	if (token->type == TK_BRACKET_R) {
+		return OK;
+	} else if (token->type == TK_ID) {
+		GET_NEXT_TOKEN(token);
+		return params_next(token);
+	} else {
+		return SYNTAX_ERROR;
 	}
 }
 
-int params(Token *token) {
-	;
-}
-
+/*
+12:  <next-param> -> , <params>
+13:  <next-param> -> )
+*/
 int params_next(Token *token) {
-	;
+	//TODO pridat generovanie atd..
+	if (token->type == TK_COMMA) {
+		GET_NEXT_TOKEN(token);
+		return params(token);
+	} else if (token->type == TK_BRACKET_R) {
+		return OK;
+	} else {
+		return SYNTAX_ERROR;
+	}
 }
 
+/*
+14:  <arg-params> -> )
+15:  <arg-params> -> <value> <arg-next-params>
+*/
 int arg_params(Token *token) {
-	;
+	// TODO mozno pridat GET_NEXT_TOKEN(token);
+	int returnValue = 0;
+	if (token->type == TK_FLOAT || 
+		token->type == TK_STRING || 
+		token->type == TK_INT ||
+		token->type == TK_ID ||
+		(token->type == TK_KW && strcmp(token->attribute, "None"))
+		) {
+			returnValue = value(token);
+			if (returnValue == OK) {
+				GET_NEXT_TOKEN(token);
+				return arg_next_params(token);
+			} else {
+				return returnValue;
+			}
+	} else if (token->type == TK_BRACKET_R) {
+		return OK;
+	} else {
+		return SYNTAX_ERROR;
+	}
 }
 
+/*
+16:  <arg-next-params> -> , <value> <arg-next-params>
+17:  <arg-next-params> -> )
+*/
 int arg_next_params(Token *token) {
-	;
+	//TODO pridat generovanie a kontrolovanie atd..
+	int returnValue = 0;
+	if (token->type == TK_COMMA) {
+		GET_NEXT_TOKEN(token);
+		if (token->type == TK_FLOAT || 
+			token->type == TK_STRING || 
+			token->type == TK_INT ||
+			token->type == TK_ID ||
+			(token->type == TK_KW && strcmp(token->attribute, "None"))
+		) {
+			GET_NEXT_TOKEN(token);
+			returnValue = value(token);
+			if (returnValue == OK) {
+				GET_NEXT_TOKEN(token);
+				return arg_next_params(token);
+			} else {
+				return OK;
+			}
+		}
+	} else if (token->type == TK_BRACKET_R) {
+		return OK;
+	} else {
+		return SYNTAX_ERROR;
+	}
 }
 
+/*
+42:  <assign> -> expr
+43:  <assign> -> id <def-id>
+*/
 int assign(Token *token) {
-	;
+	// TODO pridat generovanie, kontrolovanie atd...
+	int returnValue = 0;
+	if (token->type == TK_BRACKET_L ||
+		token->type == TK_FLOAT ||
+		token->type == TK_INT ||
+		token->type == TK_STRING ||
+		(token->type == TK_KW && strcmp(token->attribute, "None"))
+		){
+		if((returnValue = callExpression(token)) == OK) {
+			if(!isRelational) {
+				return OK;
+			} else {
+				return SYNTAX_ERROR;
+			}
+		} else {
+			return returnValue;
+		}
+	} else if (token->type == TK_ID) {
+		Token preload_token;
+		PRELOAD_NEXT_TOKEN(&preload_token);
+		if (preload_token.type == TK_BRACKET_L || preload_token.type == TK_EOL) {
+			return def_id(token);
+		} else if (
+			preload_token.type == TK_PLUS ||
+			preload_token.type == TK_MINUS ||
+			preload_token.type == TK_MULT ||
+			preload_token.type == TK_DIV ||
+			preload_token.type == TK_DIV_DIV
+		) {
+			if((returnValue = callExpression(token)) == OK) {
+				if(!isRelational) {
+					return OK;
+				} else {
+					return SYNTAX_ERROR;
+				}
+			} else {
+				return returnValue;
+			}
+		} 
+	} 
+	return SYNTAX_ERROR;
 }
 
+/*
+40:  <after_id> -> = <assign>
+41:  <after_id> -> <def-id>
+*/
 int after_id(Token *token) {
-	;
+	// TODO pridat generovanie atd..
+	if(token->type == TK_ASSIGN) {
+		GET_NEXT_TOKEN(token);
+		return assign(token);
+	} else if (token->type == EOL || token->type == TK_BRACKET_L) {
+		return def_id(token);
+	}
 }
 
+/*
+44:  <def-id> -> ( <arg-params>
+45:  <def-id> -> EOL
+*/
 int def_id(Token *token) {
-	;
+	//TODO pridat generovanie atd...
+	if (token->type == TK_BRACKET_L) {
+		GET_NEXT_TOKEN(token);
+		return arg_params(token);
+	} else if (token->type == TK_EOL) {
+		return OK;
+	} else {
+		return SYNTAX_ERROR;
+	}
 }
 
+
+/*
+18:  <value> -> none
+19:  <value> -> float
+20:  <value> -> string
+21:  <value> -> int
+22:  <value> -> id
+*/
 int value(Token *token) {
-	;
+	switch(token->type) {
+		//TODO spracovanie každeho parametru pri volaní funkcie.. 
+		case TK_KW:
+			return OK;
+			break;
+		case TK_FLOAT:
+			return OK;
+			break;
+		case TK_STRING:
+			return OK;
+			break;
+		case TK_INT:
+			return OK;
+			break;
+		case TK_ID:
+			return OK;
+			break;
+		default:
+			return SYNTAX_ERROR;
+			break;
+	}
 }
