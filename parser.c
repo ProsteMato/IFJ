@@ -11,8 +11,8 @@
 #include "parser.h"
 
 
-#define GET_NEXT_TOKEN(token) if (get_next_token(0, token) == LEX_ERROR) return LEX_ERROR
-#define PRELOAD_NEXT_TOKEN(token) if (get_next_token(1, token) == LEX_ERROR) return LEX_ERROR
+#define GET_NEXT_TOKEN(token) if (get_next_token(token, 0) == LEX_ERROR) return LEX_ERROR
+#define PRELOAD_NEXT_TOKEN(token) if (get_next_token(token, 1) == LEX_ERROR) return LEX_ERROR
 
 bool in_function = false;
 bool in_if_while = false;
@@ -116,6 +116,8 @@ int st_list(Token *token) {
 				} else {
 					return next_st_list(token);
 				}
+			} else {
+				return SYNTAX_ERROR;
 			}
 		}
 	}
@@ -123,7 +125,7 @@ int st_list(Token *token) {
 	/*
 		3: <st-list> -> EOF
 	*/
-	 else if (token->type == EOF) {
+	 else if (token->type == TK_EOF) {
 		// TODO možno bude treba ešte upraviť teraz som si neni istý
 		return OK;
 	} else if (token->type == TK_ID || token->type == TK_STRING || 
@@ -164,6 +166,7 @@ int next_st_list(Token *token) {
 	} else {
 		return st_list(token);
 	}
+	return SYNTAX_ERROR;
 }
 
 int stat(Token *token) {
@@ -209,7 +212,7 @@ int stat(Token *token) {
 			//TODO priprava na generovanie...ziskat lables for if and else
 			//TODO urobit samotne generovanie...
 			//if ((returnValue = callExpression(token)) == OK) {
-			if ((returnValue = expresstion(token)) == OK) {
+			if ((returnValue = expression(token)) == OK) {
 				GET_NEXT_TOKEN(token);
 				if (token->type == TK_COLON) {
 					GET_NEXT_TOKEN(token);
@@ -253,7 +256,7 @@ int stat(Token *token) {
 		} else if (strcmp(token->attribute, "while") == 0) {
 			//TODO generovanie while ziskavanie uniq lable...
 			//if ((returnValue = callExpression(token)) == OK) {
-			if ((returnValue = expresstion(token)) == OK) {
+			if ((returnValue = expression(token)) == OK) {
 				GET_NEXT_TOKEN(token);
 				if (token->type == TK_COLON) {
 					GET_NEXT_TOKEN(token);
@@ -283,7 +286,7 @@ int stat(Token *token) {
 		} else if (strcmp(token->attribute, "return") == 0 && in_function) {
 			GET_NEXT_TOKEN(token);
 			//if((returnValue = callExpression(token)) == OK) {
-			if ((returnValue = expresstion(token)) == OK) {
+			if ((returnValue = expression(token)) == OK) {
 				if (!isRelational) {
 					return OK;
 				} else {
@@ -312,7 +315,7 @@ int stat(Token *token) {
 			prelaod_token.type == TK_DIV_DIV
 			) {
 			//if((returnValue = callExpression(token)) == OK) {
-			if ((returnValue = expresstion(token)) == OK) {
+			if ((returnValue = expression(token)) == OK) {
 				if(!isRelational) {
 					return OK;
 				} else {
@@ -341,7 +344,7 @@ int stat(Token *token) {
 		(token->type == TK_KW && strcmp(token->attribute, "None") == 0)
 		) {
 		//if((returnValue = callExpression(token)) == OK) {
-		if ((returnValue = expresstion(token)) == OK) {
+		if ((returnValue = expression(token)) == OK) {
 			if(!isRelational) {
 				return OK;
 			} else {
@@ -439,9 +442,8 @@ int arg_next_params(Token *token) {
 		}
 	} else if (token->type == TK_BRACKET_R) {
 		return OK;
-	} else {
-		return SYNTAX_ERROR;
 	}
+	return SYNTAX_ERROR;
 }
 
 /*
@@ -458,7 +460,7 @@ int assign(Token *token) {
 		(token->type == TK_KW && strcmp(token->attribute, "None") == 0)
 		){
 		//if((returnValue = callExpression(token)) == OK) {
-		if ((returnValue = expresstion(token)) == OK) {
+		if ((returnValue = expression(token)) == OK) {
 			if(!isRelational) {
 				return OK;
 			} else {
@@ -471,6 +473,7 @@ int assign(Token *token) {
 		Token preload_token;
 		PRELOAD_NEXT_TOKEN(&preload_token);
 		if (preload_token.type == TK_BRACKET_L || preload_token.type == TK_EOL) {
+			GET_NEXT_TOKEN(token);
 			return def_id(token);
 		} else if (
 			preload_token.type == TK_PLUS ||
@@ -480,7 +483,7 @@ int assign(Token *token) {
 			preload_token.type == TK_DIV_DIV
 		) {
 			//if((returnValue = callExpression(token)) == OK) {
-			if ((returnValue = expresstion(token)) == OK) {
+			if ((returnValue = expression(token)) == OK) {
 				if(!isRelational) {
 					return OK;
 				} else {
@@ -503,9 +506,10 @@ int after_id(Token *token) {
 	if(token->type == TK_ASSIGN) {
 		GET_NEXT_TOKEN(token);
 		return assign(token);
-	} else if (token->type == EOL || token->type == TK_BRACKET_L) {
+	} else if (token->type == TK_EOL || token->type == TK_BRACKET_L) {
 		return def_id(token);
 	}
+	return SYNTAX_ERROR;
 }
 
 /*
@@ -556,7 +560,7 @@ int value(Token *token) {
 	}
 }
 
-int expresstion(Token *token) {
+int expression(Token *token) {
 	while(
 		token->type != TK_EOL ||
 		token->type != TK_COLON
