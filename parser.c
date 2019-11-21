@@ -193,6 +193,8 @@ int stat(Token *token) {
 								}
 							}
 						}
+					} else {
+						return returnValue;
 					}
 				}
 			}
