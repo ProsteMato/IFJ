@@ -208,7 +208,8 @@ int stat(Token *token) {
 			GET_NEXT_TOKEN(token);
 			//TODO priprava na generovanie...ziskat lables for if and else
 			//TODO urobit samotne generovanie...
-			if ((returnValue = callExpression(token)) == OK) {
+			//if ((returnValue = callExpression(token)) == OK) {
+			if ((returnValue = expresstion(token)) == OK) {
 				GET_NEXT_TOKEN(token);
 				if (token->type == TK_COLON) {
 					GET_NEXT_TOKEN(token);
@@ -251,7 +252,8 @@ int stat(Token *token) {
 		*/
 		} else if (strcmp(token->attribute, "while") == 0) {
 			//TODO generovanie while ziskavanie uniq lable...
-			if ((returnValue = callExpression(token)) == OK) {
+			//if ((returnValue = callExpression(token)) == OK) {
+			if ((returnValue = expresstion(token)) == OK) {
 				GET_NEXT_TOKEN(token);
 				if (token->type == TK_COLON) {
 					GET_NEXT_TOKEN(token);
@@ -280,7 +282,8 @@ int stat(Token *token) {
 		*/
 		} else if (strcmp(token->attribute, "return") == 0 && in_function) {
 			GET_NEXT_TOKEN(token);
-			if((returnValue = callExpression(token)) == OK) {
+			//if((returnValue = callExpression(token)) == OK) {
+			if ((returnValue = expresstion(token)) == OK) {
 				if (!isRelational) {
 					return OK;
 				} else {
@@ -308,7 +311,8 @@ int stat(Token *token) {
 			prelaod_token.type == TK_DIV ||
 			prelaod_token.type == TK_DIV_DIV
 			) {
-			if((returnValue = callExpression(token)) == OK) {
+			//if((returnValue = callExpression(token)) == OK) {
+			if ((returnValue = expresstion(token)) == OK) {
 				if(!isRelational) {
 					return OK;
 				} else {
@@ -336,7 +340,8 @@ int stat(Token *token) {
 		token->type == TK_INT ||
 		(token->type == TK_KW && strcmp(token->attribute, "None") == 0)
 		) {
-		if((returnValue = callExpression(token)) == OK) {
+		//if((returnValue = callExpression(token)) == OK) {
+		if ((returnValue = expresstion(token)) == OK) {
 			if(!isRelational) {
 				return OK;
 			} else {
@@ -452,7 +457,8 @@ int assign(Token *token) {
 		token->type == TK_STRING ||
 		(token->type == TK_KW && strcmp(token->attribute, "None") == 0)
 		){
-		if((returnValue = callExpression(token)) == OK) {
+		//if((returnValue = callExpression(token)) == OK) {
+		if ((returnValue = expresstion(token)) == OK) {
 			if(!isRelational) {
 				return OK;
 			} else {
@@ -473,7 +479,8 @@ int assign(Token *token) {
 			preload_token.type == TK_DIV ||
 			preload_token.type == TK_DIV_DIV
 		) {
-			if((returnValue = callExpression(token)) == OK) {
+			//if((returnValue = callExpression(token)) == OK) {
+			if ((returnValue = expresstion(token)) == OK) {
 				if(!isRelational) {
 					return OK;
 				} else {
@@ -547,4 +554,14 @@ int value(Token *token) {
 			return SYNTAX_ERROR;
 			break;
 	}
+}
+
+int expresstion(Token *token) {
+	while(
+		token->type != TK_EOL ||
+		token->type != TK_COLON
+		) {
+			GET_NEXT_TOKEN(token);
+	}
+	return OK;
 }

@@ -142,4 +142,7 @@ int def_id(Token *token);
  * @return      Error code
  */
 int next_st_list(Token *token);
+
+
+int expression(Token *token);
 #endif
