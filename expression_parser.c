@@ -176,6 +176,8 @@ int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3
             }
       }
 
+      // TODO ostatné pravidlá 
+
 }
 
 
