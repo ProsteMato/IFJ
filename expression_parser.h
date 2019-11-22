@@ -17,6 +17,7 @@
 #include <stdlib.h>
 #include <stdbool.h> 
 #include "symtable.h"
+#include "expression_stack.h"
 
 
 #define tableSize 19 
@@ -49,9 +50,25 @@ typedef enum {
 } pTable;
 
 typedef enum {
-
-
-} rules;
+  PR_EPLUSE,   // E-> E + E 
+  PR_EMINUSE, // E-> E - E 
+  PR_EMULTE,  // E-> E * E
+  PR_EDIVE,   // E-> E / E 
+  PR_EDIVDIVE, // E-> E // E 
+  PR_ELESSE,   // E-> E < E 
+  PR_ELESSEQE, // E-> E <= E 
+  PR_EGREATE,  // E-> E > E 
+  PR_EGREATEQE, // E-> E >= E 
+  PR_EEQE,     // E-> E == E 
+  PR_ENOTEQE,  // E-> E != E 
+  PR_BIB,     // E-> (i)
+  PR_OPERAND, // E-> i 
+  PR_INT,     // E-> int 
+  PR_FLOAT,   // E-> float
+  PR_STRING,  // E-> string 
+  PR_NONE,    // E-> None 
+  PR_NOTARULE, // not a rule 
+} pRules;
 
 /**
  * @brief Function return an index in precedence table of token 
@@ -74,6 +91,19 @@ int getIndex(Token *token) ;
  *         TYPE_NONE if it wasn't defined or called function when it shouldnt 
  */
 data_type getDataType(Token *token);
+
+/**
+ * @brief Function checks data type of operands
+ * 
+ * @param pRules in which we are 
+ * @param sym1 symbol on stack -- operand 1 (the newer on stack)
+ * @param sym2 symbol on stack -- operator 
+ * @param sym3 symbol on stack -- operand 2 (the older on stack )
+ * 
+ * @return OK if everything is okay 
+ *          SEMATIC_ERROR if there was some sematic error
+ */
+int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3 );
 
 /**
  * @brief Check if after / or // isnt next token 0 
