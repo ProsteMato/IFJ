@@ -18,6 +18,67 @@
 #include "stack.h"
 
 /**
+ * @enum Tokens for syntax analysis
+ */
+typedef enum{
+	TK_EOF,		    // 0
+	TK_EOL,		    // 1
+	TK_ID,		    // 2
+	TK_KW, 		    // 3
+	TK_COMMA, 		// 4 
+	TK_BRACKET_L,   // 5
+	TK_BRACKET_R,   // 6
+	TK_PLUS,        // 7
+	TK_MINUS, 		// 8
+	TK_MULT, 		// 9
+	TK_DIV, 		// 10
+	TK_DIV_DIV, 	// 11
+	TK_EQUAL, 		// 12
+	TK_NOT_EQUAL, 	// 13
+	TK_NEG, 		// 14
+	TK_ASSIGN, 		// 15
+	TK_LESSER, 		// 16
+	TK_LESSER_EQUAL,// 17
+	TK_GREATER, 	// 18
+	TK_GREATER_EQUAL,// 19
+	TK_COLON, 		// 20
+	TK_STRING, 		// 21
+	TK_INT, 		// 22
+	TK_FLOAT, 		// 23
+	TK_DEDENT, 		// 24
+	TK_INDENT, 		// 25
+	TK_SQR_L_BRACKET, // 26
+	TK_SQR_R_BRACKET, // 27
+} Tokens;
+
+/**
+ * @struct Token representation.
+ */
+typedef struct{
+	Tokens type;
+	char *attribute;
+} Token;
+
+typedef struct QToken QToken;
+
+/**
+ * @brief      Structure representing element in token queue
+ */
+struct QToken{
+	Token *token;
+	int ret_val;
+	QToken *behind;
+};
+
+/**
+ * @struct Token queue
+ */
+typedef struct{
+	QToken *last;
+	QToken *first;
+} TKQueue;
+
+/**
  * @enum States in finite deterministic automata
  */
 typedef enum{
@@ -84,60 +145,15 @@ typedef enum{
 } Keywords;
 
 /**
- * @enum Tokens for syntax analysis
- */
-typedef enum{
-	TK_EOF,		    // 0
-	TK_EOL,		    // 1
-	TK_ID,		    // 2
-	TK_KW, 		    // 3
-	TK_COMMA, 		// 4 
-	TK_BRACKET_L,   // 5
-	TK_BRACKET_R,   // 6
-	TK_PLUS,        // 7
-	TK_MINUS, 		// 8
-	TK_MULT, 		// 9
-	TK_DIV, 		// 10
-	TK_DIV_DIV, 	// 11
-	TK_EQUAL, 		// 12
-	TK_NOT_EQUAL, 	// 13
-	TK_NEG, 		// 14
-	TK_ASSIGN, 		// 15
-	TK_LESSER, 		// 16
-	TK_LESSER_EQUAL,// 17
-	TK_GREATER, 	// 18
-	TK_GREATER_EQUAL,// 19
-	TK_COLON, 		// 20
-	TK_STRING, 		// 21
-	TK_INT, 		// 22
-	TK_FLOAT, 		// 23
-	TK_DEDENT, 		// 24
-	TK_INDENT, 		// 25
-	TK_SQR_L_BRACKET, // 26
-	TK_SQR_R_BRACKET, // 27
-} Tokens;
-
-/**
- * @struct Token representation.
- */
-typedef struct{
-	Tokens type;
-	char *attribute;
-} Token;
-
-
-/**
- * @brief      Runs the scanner and returns the next token, if preload is set to
- *             true then preloads the next token
+ * @brief      Return the next token
  *
- * @param      token    Pointer to the allocated token struct
- * @param[in]  preload  The preload
- * @param      source  The source stream
+ * @param      token  Pointer to the allocated token struct
+ * @param      q      Pointer to the token queue
  *
  * @return     OK-token is returned successfully, INTERNAL_ERROR-internal error,
  *             LEX_ERROR lex error
  */
-int get_next_token(Token *token, int preload);
+int get_next_token(Token *token, TKQueue *q);
 
 /**
  * @brief      Determines whether the string is keyword
@@ -148,18 +164,6 @@ int get_next_token(Token *token, int preload);
  * @return     Type of keyword, -1 in case the string is not keyword
  */
 Keywords is_keyword (char* s, unsigned len);
-
-/**
- * @brief      Saves a preload.
- *
- * @param      preloaded    The preloaded
- * @param      dest         The destination
- * @param[in]  return_val   The return value
- * @param      dest_return  The destination return
- *
- * @return     return_val
- */
-int save_preload(Token *preloaded, Token *dest, int return_val, int *dest_return);
 
 /**
  * @brief      Destroys the stack, deallocates the string and returns
@@ -174,10 +178,83 @@ int internal_error_exit(Stack *s, char *str);
 
 
 /**
- * @brief      Returns the token back to input, token attribute is pushed to stream
+ * @brief      Pushes the token to the token queue
  *
- * @param      atr  Pointer to the string representing attribute of token
+ * @param      token  The token
+ * @param      q      Pointer to the token queue
+ *
+ * @return     OK-token is returned successfully, INTERNAL_ERROR-internal error,
+ *             LEX_ERROR lex error
  */
-void unget_token(char *atr);
+int unget_token(Token *token, TKQueue *q);
+
+/**
+ * @brief      Scans the input and finds the token
+ *
+ * @param      token  Pointer to the token struct
+ *
+ * @return     OK-token is returned successfully, INTERNAL_ERROR-internal error,
+ *             LEX_ERROR lex error
+ */
+int scan(Token *token);
+
+/**
+ * @brief      Preloads the next token
+ *
+ * @param      token  The pointer to the token
+ * @param      q      The pointer to the token queue
+ *
+ * @return      OK-token is returned successfully, INTERNAL_ERROR-internal error,
+ *             LEX_ERROR lex error
+ */
+int preload_token(Token *token, TKQueue *q);
+
+/**
+ * @brief      Inicializes the token queue
+ *
+ * @param      q     Pointer to the token queue
+ */
+void tkq_init(TKQueue *q);
+
+/**
+ * @brief      Adds token to the back of the queue
+ *
+ * @param      q        The queue
+ * @param      token    The token
+ * @param[in]  ret_val  The ret value
+ *
+ * @return     OK- token is added successfully, INTERNAL_ERROR-internal error
+ */
+int tkq_queue(TKQueue *q, Token *token, int ret_val);
+
+/**
+ * @brief      Removes the first token from the queue and returns it
+ *
+ * @param      q      The queue pointer
+ * @param      token  The token pointer
+ *
+ * @return     ret_value of First token in queue, OK-token is returned
+ *             successfully, INTERNAL_ERROR-internal error, LEX_ERROR lex error
+ */
+int tkq_dequeue(TKQueue *q, Token* token);
+
+/**
+ * @brief      Returns the first token in queue, doesnt remove it from queue
+ *
+ * @param      q      The queue pointer
+ * @param      token  The token pointer
+ *
+ * @return     ret_value of First token in queue, OK-token is returned
+ *             successfully, INTERNAL_ERROR-internal error, LEX_ERROR lex error
+ */
+int tkq_first(TKQueue *q, Token *token);
+
+/**
+ * @brief      Deallocates memory of queue
+ *
+ * @param      q     Pointer to he queue
+ */
+void q_destroy(TKQueue *q);
+
 
 #endif //_SCANNER_H
