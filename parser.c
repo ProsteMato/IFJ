@@ -522,6 +522,7 @@ int def_id(Token *token) {
 		GET_NEXT_TOKEN(token);
 		return arg_params(token);
 	} else if (token->type == TK_EOL) {
+		unget_token(token->attribute);
 		return OK;
 	} else {
 		return SYNTAX_ERROR;
