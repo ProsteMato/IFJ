@@ -1,0 +1,25 @@
+Syntaxové chyby vo výraze 
+
+- nerovnaký počet pravých a ľavých zátvoriek
+- pravá zátvorka skôr ako ľavá -- výraz typu napr: b = a) * (...
+- )( hneď po sebe 
+- ) a (  -- kde a je identifikátor / int / float / string / None 
+- iné zátvorky, prípadne namiesto a == b iba a = b ?? ale toto neviem ako overiť 
+
+- delenie nulou, po / a  po // 
+
+- zlé kombinácie operátorov napr a = b +* c 
+
+Iné syntaxové chyby: 
+- relačné operátory použité vo výraze (je možné iba vo while a if) 
+
+
+Sématická chyba 
+- string * string  a iné aritmetické operácie so stringom 
+- delenie // a nedostane dva int ale float / string 
+- rôzne typy dátových operátorov ( niečo viem chytiť a odchytám už ja, niečo sa odchytá pri generovaní kódu)
+	 najmä štýlom a = 0.5 + "abc" 
+		      a = 1 + "abc" 
+- relačné operátory >, <, >=, <=  iba so stejným typom (nemôžeš int a string, float a string a podobne) 
+		-- ak je ale int a float, int je pretypovaný na float 
+- == a != porovnávajú rôzne typy, vrátane None
