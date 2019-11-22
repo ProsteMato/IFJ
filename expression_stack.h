@@ -30,6 +30,7 @@ typedef struct stack {
     struct stack *next; 
 } exprStack; 
 
+
 /**
  * @struct Structure, that represent the top symbol on stack 
  * 
@@ -37,7 +38,7 @@ typedef struct stack {
  */
 typedef struct {
     exprStack *top; 
-}stackTop;
+} stackTop;
 
 /** 
  * @brief Initialization of stack 

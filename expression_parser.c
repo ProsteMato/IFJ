@@ -143,6 +143,42 @@ data_type getDataType(Token *token)
       
 }
 
+int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3 )
+{
+      bool retypeSym1 = false;
+      bool retypeSym3 = false; 
+
+      if ( rule == PR_OPERAND)
+      {
+            if ( sym1->dType == TYPE_NONE ) 
+            {
+                  return SEM_TYPE_ERROR;
+            }
+      }
+      
+      if ( rule == PR_BIB)
+      {
+            if (sym2->dType == TYPE_NONE)
+            {
+                  return SEM_TYPE_ERROR;
+            }
+      }
+
+      if ( rule != PR_OPERAND || rule !=PR_BIB)
+      {
+            if (sym1->dType == TYPE_NONE )
+            {
+                  return SEM_TYPE_ERROR;
+            }
+            if (sym3->dType == TYPE_NONE)
+            {
+                  return SEM_TYPE_ERROR;
+            }
+      }
+
+}
+
+
 int checkDivisionByZero(Token *token)
 {
   Token *nextToken;
@@ -150,7 +186,7 @@ int checkDivisionByZero(Token *token)
 
   if ( (strcmp(nextToken -> attribute, "0")) == 0)
   {
-    return SYNTAX_ERROR;
+    return DIVISION_BY_ZERO_ERROR;
   }
 
   return OK;
@@ -209,7 +245,7 @@ int callExpression(Token *token)
       if (token->type == TK_DIV)
       {
             int div = checkDivisionByZero(token);
-            if ( div == SYNTAX_ERROR)
+            if ( div == DIVISION_BY_ZERO_ERROR)
             { 
                   listDispose(eList);
                   fprintf(stderr, "Div with zero.");
@@ -220,7 +256,7 @@ int callExpression(Token *token)
       if (token->type == TK_DIV_DIV)
       {
             int div = checkDivisionByZero(token);
-            if ( div == SYNTAX_ERROR)
+            if ( div == DIVISION_BY_ZERO_ERROR)
             { 
                   listDispose(eList);
                   fprintf(stderr, "Div Div with zero.");
@@ -239,16 +275,18 @@ int callExpression(Token *token)
       return SYNTAX_ERROR;
   }
 
-
+  // TODO into a while 
   // index to the table  
   int indexStack=getIndex(token);
   if ( indexStack == -1)
   {
-    return INTERNAL_ERROR;
+      listDispose(eList);
+      return INTERNAL_ERROR;
   }
   if ( indexStack == -2)
   {
-    return SYNTAX_ERROR;
+      listDispose(eList);
+      return SYNTAX_ERROR;
   }
   // TODO save token the stack
 
@@ -257,11 +295,13 @@ int callExpression(Token *token)
   int indexInput=getIndex(token);
   if ( indexInput == -1)
   {
-    return INTERNAL_ERROR;
+      listDispose(eList);  
+      return INTERNAL_ERROR;
   }
   if ( indexInput == -2)
   {
-    return SYNTAX_ERROR;
+      listDispose(eList);
+      return SYNTAX_ERROR;
   }
   
   // check the symbol in precedence table 
@@ -269,13 +309,8 @@ int callExpression(Token *token)
   // # not defined sequence of operands and operators in expression, so syntax error
   if ( (strcmp(symbol, "#") )== 0)
   {
-    return SYNTAX_ERROR;
+      return SYNTAX_ERROR;
   }
-
-
-  // after while, when all the tokens are loaded to stack 
-  // check if the brackets are even and there is the same number 
-  // of left brackets and right brackets 
 
   // TODO get the rule and push it to the stack
   // TODO continue with other tokens 
