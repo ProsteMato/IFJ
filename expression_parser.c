@@ -103,13 +103,8 @@ int getIndex(Token *token)
     case (TK_STRING):
           return PT_STRING;
           break; 
-    case (TK_KW): 
-          if ((strcmp(token->attribute, "None")) == 0)
-          { 
-            return PT_NONE;
-            break;
-          }
-          return -2;
+    case (TK_KW):
+          return PT_NONE;
           break;
     case (TK_EOL):
           return PT_EOL;
@@ -147,7 +142,8 @@ int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3
 {
       bool retypeSym1 = false;
       bool retypeSym3 = false; 
-
+      // TODO prípadne upraviť to NONE na iné, ak to Zuzka zmení
+      // ošetriť to aj pre "dátový typ" pre kľúčové slovo None (asi TYPE_NONE)
       if ( rule == PR_OPERAND)
       {
             if ( sym1->dType == TYPE_NONE ) 
@@ -176,8 +172,163 @@ int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3
             }
       }
 
-      // TODO ostatné pravidlá 
+      switch (rule) 
+      {
+            case (PR_EPLUSE): 
+                  if (sym1->dType == TYPE_STRING && (sym3->dType == TYPE_INT || sym3->dType == TYPE_FLOAT ))
+                  {
+                        return SEM_TYPE_ERROR;
+                  }
 
+                  if ((sym1->dType == TYPE_INT || sym1->dType == TYPE_FLOAT ) && sym3->dType == TYPE_STRING)
+                  {
+                        return SEM_TYPE_ERROR;
+                  }
+
+                  if (sym1->dType == TYPE_INT && sym3->dType == TYPE_FLOAT)
+                  {
+                        retypeSym1 = true; 
+                  }
+
+                  if (sym1->dType == TYPE_FLOAT && sym3->dType == TYPE_INT)
+                  {
+                        retypeSym3 = true; 
+                  }
+                  break;
+
+            case (PR_EMINUSE): 
+                  if (sym1->dType == TYPE_STRING || sym3->dType == TYPE_STRING)
+                  {
+                        return SEM_TYPE_ERROR;
+                  }
+                  
+                  if (sym1->dType == TYPE_INT && sym3->dType == TYPE_FLOAT)
+                  {
+                        retypeSym1 = true; 
+                  }
+
+                  if (sym1->dType == TYPE_FLOAT && sym3->dType == TYPE_INT)
+                  {
+                        retypeSym3 = true; 
+                  }
+                  break;
+
+            case (PR_EMULTE):
+                  if (sym1->dType == TYPE_STRING || sym3->dType == TYPE_STRING)
+                  {
+                        return SEM_TYPE_ERROR;
+                  }
+                  
+                  if (sym1->dType == TYPE_INT && sym3->dType == TYPE_FLOAT)
+                  {
+                        retypeSym1 = true; 
+                  }
+
+                  if (sym1->dType == TYPE_FLOAT && sym3->dType == TYPE_INT)
+                  {
+                        retypeSym3 = true; 
+                  }
+                  break;
+
+            case (PR_EDIVE): 
+                  if (sym1->dType == TYPE_STRING || sym3->dType == TYPE_STRING)
+                  {
+                        return SEM_TYPE_ERROR;
+                  }
+                  
+                  if (sym1->dType == TYPE_INT && sym3->dType == TYPE_FLOAT)
+                  {
+                        retypeSym1 = true; 
+                  }
+
+                  if (sym1->dType == TYPE_FLOAT && sym3->dType == TYPE_INT)
+                  {
+                        retypeSym3 = true; 
+                  }
+                  break;
+            
+            case (PR_EDIVDIVE): 
+                  if (sym1->dType == TYPE_STRING || sym3->dType == TYPE_STRING)
+                  {
+                        return SEM_TYPE_ERROR;
+                  }
+
+                  if (sym1->dType == TYPE_FLOAT || sym3->dType == TYPE_FLOAT)
+                  {
+                        return SEM_TYPE_ERROR;
+                  }
+                  break;
+            
+            case (PR_ELESSE):
+                  if (sym1->dType == TYPE_INT && sym3->dType == TYPE_FLOAT)
+                  {
+                        retypeSym1 = true; 
+                  } 
+                  else if (sym1->dType == TYPE_FLOAT && sym3->dType == TYPE_INT)
+                  {
+                        retypeSym3 = true; 
+                  }
+                  else if ( sym1->dType != sym3->dType )
+                  {
+                        return SEM_TYPE_ERROR;
+                  }
+                  break;
+
+            case (PR_ELESSEQE):
+                  if (sym1->dType == TYPE_INT && sym3->dType == TYPE_FLOAT)
+                  {
+                        retypeSym1 = true; 
+                  } 
+                  else if (sym1->dType == TYPE_FLOAT && sym3->dType == TYPE_INT)
+                  {
+                        retypeSym3 = true; 
+                  }
+                  else if ( sym1->dType != sym3->dType )
+                  {
+                        return SEM_TYPE_ERROR;
+                  }
+                  break;
+            
+            case (PR_EGREATE):
+                  if (sym1->dType == TYPE_INT && sym3->dType == TYPE_FLOAT)
+                  {
+                        retypeSym1 = true; 
+                  } 
+                  else if (sym1->dType == TYPE_FLOAT && sym3->dType == TYPE_INT)
+                  {
+                        retypeSym3 = true; 
+                  }
+                  else if ( sym1->dType != sym3->dType )
+                  {
+                        return SEM_TYPE_ERROR;
+                  }
+                  break;
+
+            case (PR_EGREATEQE): 
+                  if (sym1->dType == TYPE_INT && sym3->dType == TYPE_FLOAT)
+                  {
+                        retypeSym1 = true; 
+                  } 
+                  else if (sym1->dType == TYPE_FLOAT && sym3->dType == TYPE_INT)
+                  {
+                        retypeSym3 = true; 
+                  }
+                  else if ( sym1->dType != sym3->dType )
+                  {
+                        return SEM_TYPE_ERROR;
+                  }
+                  break;
+            //TODO == a != 
+            //case (PR_EEQE):
+            // case (PR_ENEQE):     
+            default: 
+                  break;
+      }
+
+      //TODO 
+      // generovanie kódu a vrámci toho pretypovanie 
+
+      return OK;
 }
 
 
@@ -203,11 +354,20 @@ int callExpression(Token *token)
   int rightBracket =0; 
   exprList *eList;
   listInsertFirst(eList,token);
-
+  
   // Load tokens into list 
   do 
   {
       token=get_next_token(token,0); 
+
+      if (token->type == TK_KW)
+      {
+            if ((strcmp(token->attribute, "None")) != 0)
+            { 
+                  listDispose(eList);
+                  return SYNTAX_ERROR;
+            }
+      }
       //count number of brackets - must be even
       if (token->type == TK_BRACKET_L)
       {
@@ -285,11 +445,7 @@ int callExpression(Token *token)
       listDispose(eList);
       return INTERNAL_ERROR;
   }
-  if ( indexStack == -2)
-  {
-      listDispose(eList);
-      return SYNTAX_ERROR;
-  }
+
   // TODO save token the stack
 
   // index of another token
@@ -300,11 +456,7 @@ int callExpression(Token *token)
       listDispose(eList);  
       return INTERNAL_ERROR;
   }
-  if ( indexInput == -2)
-  {
-      listDispose(eList);
-      return SYNTAX_ERROR;
-  }
+  
   
   // check the symbol in precedence table 
   char symbol = precedenceTable[indexStack][indexInput];
