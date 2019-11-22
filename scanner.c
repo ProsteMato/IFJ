@@ -44,6 +44,13 @@ Keywords is_keyword(char* s, unsigned len){
 	}
 }
 
+void unget_token(char *atr){
+	size_t len = strlen(atr);
+	for (int i = len -1; i >= 0; i--){
+		ungetc(atr[i],stdin);
+	}
+}
+
 int internal_error_exit(Stack *s, char *str){
 	free(str);
 	s_destroy(s);
