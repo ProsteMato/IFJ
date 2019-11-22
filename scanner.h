@@ -113,6 +113,8 @@ typedef enum{
 	TK_FLOAT, 		// 23
 	TK_DEDENT, 		// 24
 	TK_INDENT, 		// 25
+	TK_SQR_L_BRACKET, // 26
+	TK_SQR_R_BRACKET, // 27
 } Tokens;
 
 /**
@@ -169,5 +171,13 @@ int save_preload(Token *preloaded, Token *dest, int return_val, int *dest_return
  * @return     INTERNAL_ERROR
  */
 int internal_error_exit(Stack *s, char *str);
+
+
+/**
+ * @brief      Returns the token back to input, token attribute is pushed to stream
+ *
+ * @param      atr  Pointer to the string representing attribute of token
+ */
+void unget_token(char *atr);
 
 #endif //_SCANNER_H
