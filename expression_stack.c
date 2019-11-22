@@ -21,7 +21,7 @@ int sInit(stackTop* eStack)
     return OK;
 }
 
-exprStack* sTop(stackTop* eStack);
+exprStack* sTop(stackTop* eStack)
 {
     return eStack->top;
 }
