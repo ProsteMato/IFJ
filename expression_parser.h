@@ -16,6 +16,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h> 
+#include "symtable.h"
 
 
 #define tableSize 19 
@@ -47,6 +48,11 @@ typedef enum {
   PT_ERROR, //22 #
 } pTable;
 
+typedef enum {
+
+
+} rules;
+
 /**
  * @brief Function return an index in precedence table of token 
  * 
@@ -56,6 +62,18 @@ typedef enum {
  *          error code 
  */
 int getIndex(Token *token) ;
+
+/**
+ * @brief Function to find data type of token 
+ * 
+ * @param token token, which data type we want to know 
+ * 
+ * @return TYPE_INT if it was integer number
+ *         TYPE_FLOAT if it was float number
+ *         TYPE_STRING if it was string 
+ *         TYPE_NONE if it wasn't defined or called function when it shouldnt 
+ */
+data_type getDataType(Token *token);
 
 /**
  * @brief Check if after / or // isnt next token 0 
