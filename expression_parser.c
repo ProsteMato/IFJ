@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "expression_list.h"
+#include "symtable.h"
 
 const char precedenceTable[tableSize][tableSize] = {
   // 0  , 1 ,  2,   3,   4,   5.   6,   7,   8,   9,  10,  11,  12,  13,   14,  15,   16, 17, 18
@@ -52,83 +53,107 @@ int getIndex(Token *token)
   switch (token->type)
   {
     case (TK_ID): 
-          return 13;
+          return PT_ID;
           break;
     case (TK_PLUS):
-          return 0;
+          return PT_PLUS;
           break;
     case (TK_MINUS):
-          return 1;
+          return PT_MINUS;
           break;
     case (TK_MULT):
-          return 2; 
+          return PT_MULT; 
           break;
     case (TK_DIV):
-          return 3;
+          return PT_DIV;
           break;
     case (TK_DIV_DIV):
-          return 4;
+          return PT_DIV_DIV;
           break; 
     case (TK_EQUAL):
-          return 9;
+          return PT_EQ;
           break;
     case (TK_NOT_EQUAL):
-          return 10;
+          return PT_NOT_EQ;
           break;
     case (TK_LESSER):
-          return 5;
+          return PT_LESS;
           break; 
     case (TK_LESSER_EQUAL):
-          return 6;
+          return PT_LESS_EQ;
           break;
     case (TK_GREATER):
-          return 7;
+          return PT_GREAT;
           break;
     case (TK_GREATER_EQUAL):
-          return 8;
+          return PT_GREAT_EQ;
           break;
     case (TK_BRACKET_L):
-          return 11;
+          return PT_LEFT_BRACK;
           break;
     case (TK_BRACKET_R):
-          return 12;
+          return PT_RIGHT_BRACK;
           break;
     case (TK_INT):
-          return 14;
+          return PT_INT;
           break;
     case (TK_FLOAT):
-          return 15;
+          return PT_FLOAT;
           break;
     case (TK_STRING):
-          return 16;
+          return PT_STRING;
           break; 
     case (TK_KW): 
           if ((strcmp(token->attribute, "None")) == 0)
           { 
-            return 17;
+            return PT_NONE;
             break;
           }
           return -2;
           break;
     case (TK_EOL):
-          return 18;
+          return PT_EOL;
           break; 
     default: 
           return -2;     
   }
 }
+ 
+data_type getDataType(Token *token)
+{
+      if (token->type == TK_INT)
+      {
+            return TYPE_INT;
+      }
+      else if ( token->type == TK_FLOAT)
+      {
+            return TYPE_FLOAT;
+      }
+      else if (token->type == TK_STRING)
+      {
+            return TYPE_STRING;
+      } else if (token->type == TK_ID)
+      {
+        tData* identifier; 
+        // zavolanie funkcie SymTableSearch - a overenie čo vrátila 
+      
+      }
+      // TODO možno NONE zmenené na iné, skontrolovať s tab. symbolov
+      return TYPE_NONE; 
+      
+}
 
-
-// TODO what if token was already next token? 
 int checkDivisionByZero(Token *token)
 {
   Token *nextToken;
   get_next_token(nextToken,1);
 
-  if (!strcmp(nextToken -> attribute, "0"))
+  if ( (strcmp(nextToken -> attribute, "0")) == 0)
   {
     return SYNTAX_ERROR;
   }
+
+  return OK;
 
 }
 
@@ -181,6 +206,27 @@ int callExpression(Token *token)
             isRelational = true;
       }
 
+      if (token->type == TK_DIV)
+      {
+            int div = checkDivisionByZero(token);
+            if ( div == SYNTAX_ERROR)
+            { 
+                  listDispose(eList);
+                  fprintf(stderr, "Div with zero.");
+                  return SYNTAX_ERROR;
+            }
+      } 
+      
+      if (token->type == TK_DIV_DIV)
+      {
+            int div = checkDivisionByZero(token);
+            if ( div == SYNTAX_ERROR)
+            { 
+                  listDispose(eList);
+                  fprintf(stderr, "Div Div with zero.");
+                  return SYNTAX_ERROR;
+            }
+      }
       listInsertAct(eList,token);
       
   }
@@ -189,6 +235,7 @@ int callExpression(Token *token)
   if ( leftBracket != rightBracket) 
   {
       fprintf(stderr, "Number of left brackets doesnt match number of right brackets");
+      listDispose(eList);
       return SYNTAX_ERROR;
   }
 
