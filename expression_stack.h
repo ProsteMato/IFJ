@@ -21,10 +21,12 @@
  * @struct Structure to represent a stack
  * 
  * @param symbol represents symbol on the stack 
+ * @param dType data type of symbol on stack (NONE if operand )
  * @param next next symbol on stack 
  */
 typedef struct stack {
     pTable symbol;
+    data_type dType; 
     struct stack *next; 
 } exprStack; 
 
