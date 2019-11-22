@@ -24,7 +24,7 @@ int listInsertFirst(exprList *eList, Token* token)
     item newItem = (struct listItem*) malloc (sizeof(struct listItem));
     if (newItem == NULL)
     {
-        sprintf(stderr, "Error while malloc");
+        fprintf(stderr, "Error while malloc");
         return INTERNAL_ERROR;
     }
 
@@ -52,7 +52,7 @@ int listInsertAct(exprList *eList, Token* token)
     item newItem = (struct listItem*) malloc (sizeof(struct listItem));
     if (newItem == NULL)
     {
-        sprintf(stderr, "Error while malloc");
+        fprintf(stderr, "Error while malloc");
         return INTERNAL_ERROR;
     }
 
