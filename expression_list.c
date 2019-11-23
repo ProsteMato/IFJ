@@ -10,6 +10,7 @@
 
 #include "expression_list.h"
 #include "error.h"
+#include "expression_parser.h"
 
 
 void listInitialize(exprList *eList)
@@ -19,7 +20,7 @@ void listInitialize(exprList *eList)
     eList->last = NULL;
 }
 
-int listInsertFirst(exprList *eList, Token* token)
+int listInsertFirst(exprList *eList, pTable symbol, data_type dType)
 {
     item newItem = (struct listItem*) malloc (sizeof(struct listItem));
     if (newItem == NULL)
@@ -30,11 +31,12 @@ int listInsertFirst(exprList *eList, Token* token)
 
     newItem->lptr= NULL;
     newItem->rptr = NULL;
-    newItem->token=token;
+    newItem->symbol = symbol;
+    newItem->dType = dType;
 
     if (eList->first != NULL)
     {
-        return OTHER_ERROR;
+        return INTERNAL_ERROR;
     }
     eList->first = newItem;
     eList->act = newItem;
@@ -42,11 +44,11 @@ int listInsertFirst(exprList *eList, Token* token)
     return OK;
 }
 
-int listInsertAct(exprList *eList, Token* token)
+int listInsertAct(exprList *eList, pTable symbol, data_type dType)
 {
     if (eList->act == NULL)
     {
-        return OTHER_ERROR;
+        return INTERNAL_ERROR;
     }
 
     item newItem = (struct listItem*) malloc (sizeof(struct listItem));
@@ -56,14 +58,15 @@ int listInsertAct(exprList *eList, Token* token)
         return INTERNAL_ERROR;
     }
 
-    newItem->token=token;
+    newItem->symbol = symbol;
+    newItem->dType = dType;
     newItem->lptr = eList->act;
     newItem->rptr= NULL;
     eList->last = newItem;
     eList->act = newItem;
 }
 
-
+/**
 Token* copyAct(exprList *eList)
 {
     if (eList->act != NULL)
@@ -73,7 +76,7 @@ Token* copyAct(exprList *eList)
         return tokenReturn;
     }
 }
-
+*/
 
 void listDispose(exprList *eList)
 {

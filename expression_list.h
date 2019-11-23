@@ -13,8 +13,9 @@
 
  #include "scanner.h"
 
-typedef struct listItem {          
-        Token *token;                                          
+typedef struct listItem {           
+        pTable symbol; 
+        data_type dType;                                       
         struct listItem *lptr;          
         struct listItem *rptr;        
 } *item;
@@ -39,11 +40,10 @@ void listInitialize(exprList *eList);
  * @param eList list to insert 
  * @param token token to insert into a list 
  * 
- * @return INTERNAL ERROR when somethng goes wrong with malloc
+ * @return INTERNAL ERROR when somethng goes wrong with list
  *          OK if everything was OKAY
- *          OTHER_ERRROR when list isnt empty
  */
-int listInsertFirst(exprList *eList, Token* token);
+int listInsertFirst(exprList *eList, pTable symbol, data_type dType);
 
 /**
  * @brief Insert token after active one and new token becomes active one 
@@ -51,18 +51,17 @@ int listInsertFirst(exprList *eList, Token* token);
  * @param eList list to insert 
  * @param token token to insert 
  * 
- * @return INTERNAL_ERROR when something goes wrong with malloc 
- *          OTHER_ERROR no active item in list 
+ * @return INTERNAL_ERROR when something goes wrong with list 
  *          OK everything OKAY  
  **/
-int listInsertAct(exprList *eList, Token* token);
+int listInsertAct(exprList *eList, pTable symbol, data_type dType);
 
 /**
  * @brief Function returns token from active item and next item becomes active
  * 
  * @param eList list of tokens 
  */
-Token* copyAct(exprList *eList);
+//Token* copyAct(exprList *eList);
 
 /**
  * @brief Delete all items on the list 
