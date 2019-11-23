@@ -11,10 +11,10 @@
 #ifndef _EXPRESSION_LIST_H
 #define _EXPRESSION_LIST_H
 
- #include "scanner.h"
+ #include "expression_parser.h"
 
 typedef struct listItem {           
-        pTable symbol; 
+        pTable symbol;  
         data_type dType;                                       
         struct listItem *lptr;          
         struct listItem *rptr;        

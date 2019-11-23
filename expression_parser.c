@@ -32,7 +32,7 @@ const char precedenceTable[tableSize][tableSize] = {
   { '>', '>', '>', '>', '>', '>', '>', '>', '>', '>', '>', '#', '>', '#', '#', '#', '#', '#', '>'}, // int    14
   { '>', '>', '>', '>', '>', '>', '>', '>', '>', '>', '>', '#', '>', '#', '#', '#', '#', '#', '>'}, // float  15
   { '>', '#', '#', '#', '#', '>', '>', '>', '>', '>', '>', '#', '>', '#', '#', '#', '#', '#', '>'}, // string 16 
-  { '#', '#', '#', '#', '#', '#', '#', '#', '#', '>', '>', '#', '#', '>', '#', '#', '#', '#',' >'}, // none   17
+  { '#', '#', '#', '#', '#', '#', '#', '#', '#', '>', '>', '#', '#', '>', '#', '#', '#', '#', '>'}, // none   17
   { '<', '<', '<', '<', '<', '<', '<', '<', '<', '<', '<', '<', '#', '<', '<', '<', '<', '<', '#'}, // $      18
 };
 
@@ -109,7 +109,7 @@ data_type getDataType(Token *token)
       }
       else if (token->type == TK_ID)
       {
-        tData* identifier; 
+        //tData* identifier; 
         // zavolanie funkcie SymTableSearch - a overenie čo vrátila 
         return TYPE_UNDEFINED;
       }
@@ -373,19 +373,19 @@ int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3
 
       //TODO 
       // generovanie kódu a vrámci toho pretypovanie 
-      /** 
-       * 
-       * if (retypeSym1)
-       * {
-       * 
-       * }
-       * 
-       * if (retypeSym3)
-       * {
-       * 
-       * 
-       * }
-       */
+      
+       
+      if (retypeSym1)
+      {
+            printf("Retyping sym1 to float\n");
+      }
+       
+      if (retypeSym3)
+      {
+      
+            printf("Retyping sym3 to float\n");
+      }
+       
 
       return OK;
 }
