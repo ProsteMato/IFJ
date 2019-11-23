@@ -7,6 +7,7 @@
  * 
  */
 
+// TODO scanner bol upravený, uprav get token !!! 
 
 #include "expression_parser.h"
 #include "error.h"
@@ -40,6 +41,8 @@ const char precedenceTable[tableSize][tableSize] = {
   { '<', '<', '<', '<', '<', '<', '<', '<', '<', '<', '<', '<', '#', '<', '<', '<', '<', '<', '#'}, // $      18
 };
 
+stackTop stack;
+
 int getIndex(Token *token)
 {
   // zisti error
@@ -47,8 +50,6 @@ int getIndex(Token *token)
    {
      return -1;
    }
-
-  isRelational = false;
 
   switch (token->type)
   {
@@ -107,7 +108,7 @@ int getIndex(Token *token)
           return PT_NONE;
           break;
     case (TK_EOL):
-          return PT_EOL;
+          return PT_DOLLAR;
           break; 
     default: 
           return -2;     
@@ -131,10 +132,11 @@ data_type getDataType(Token *token)
       {
         tData* identifier; 
         // zavolanie funkcie SymTableSearch - a overenie čo vrátila 
-      
+        return TYPE_UNDEFINED;
       }
+      // zistiť dátový typ pre kľúčové slovo None 
       // TODO možno NONE zmenené na iné, skontrolovať s tab. symbolov
-      return TYPE_NONE; 
+      return TYPE_UNDEFINED; 
       
 }
 
@@ -143,10 +145,10 @@ int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3
       bool retypeSym1 = false;
       bool retypeSym3 = false; 
       // TODO prípadne upraviť to NONE na iné, ak to Zuzka zmení
-      // ošetriť to aj pre "dátový typ" pre kľúčové slovo None (asi TYPE_NONE)
+      // ošetriť to aj pre "dátový typ" pre kľúčové slovo None (asi TYPE_UNDEFINED)
       if ( rule == PR_OPERAND)
       {
-            if ( sym1->dType == TYPE_NONE ) 
+            if ( sym1->dType == TYPE_UNDEFINED ) 
             {
                   return SEM_TYPE_ERROR;
             }
@@ -154,7 +156,7 @@ int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3
       
       if ( rule == PR_BIB)
       {
-            if (sym2->dType == TYPE_NONE)
+            if (sym2->dType == TYPE_UNDEFINED)
             {
                   return SEM_TYPE_ERROR;
             }
@@ -162,11 +164,11 @@ int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3
 
       if ( rule != PR_OPERAND || rule !=PR_BIB)
       {
-            if (sym1->dType == TYPE_NONE )
+            if (sym1->dType == TYPE_UNDEFINED )
             {
                   return SEM_TYPE_ERROR;
             }
-            if (sym3->dType == TYPE_NONE)
+            if (sym3->dType == TYPE_UNDEFINED)
             {
                   return SEM_TYPE_ERROR;
             }
@@ -346,26 +348,36 @@ int checkDivisionByZero(Token *token)
 
 }
 
-int callExpression(Token *token)
+
+exprList* createList(Token* token, int* error)
 {
-  // so far, we don't know if the operand is relational 
-  isRelational = false;
   int leftBracket = 0;
   int rightBracket =0; 
-  exprList *eList;
-  listInsertFirst(eList,token);
+  exprList* eList;
+  pTable symbol= getIndex(token);
+  data_type dType= getDataType(token);
+  listInsertFirst(eList,symbol,dType);
   
+  // maybe insert this to function eList createList(eList* eList, Token* token, int* error)
   // Load tokens into list 
   do 
   {
       token=get_next_token(token,0); 
-
+      pTable symbol= getIndex(token);
+      if (symbol == -1 )
+      {
+            listDispose(eList);
+            error= INTERNAL_ERROR;
+            return NULL;
+      }
+      data_type dType= getDataType(token);
       if (token->type == TK_KW)
       {
             if ((strcmp(token->attribute, "None")) != 0)
             { 
                   listDispose(eList);
-                  return SYNTAX_ERROR;
+                  error = SYNTAX_ERROR;
+                  return NULL;
             }
       }
       //count number of brackets - must be even
@@ -411,7 +423,8 @@ int callExpression(Token *token)
             { 
                   listDispose(eList);
                   fprintf(stderr, "Div with zero.");
-                  return SYNTAX_ERROR;
+                  error= SYNTAX_ERROR;
+                  return NULL;
             }
       } 
       
@@ -422,10 +435,11 @@ int callExpression(Token *token)
             { 
                   listDispose(eList);
                   fprintf(stderr, "Div Div with zero.");
-                  return SYNTAX_ERROR;
+                  error = SYNTAX_ERROR;
+                  return NULL;
             }
       }
-      listInsertAct(eList,token);
+      listInsertAct(eList,symbol, dType);
       
   }
   while ( token->attribute != TK_EOL);
@@ -434,23 +448,65 @@ int callExpression(Token *token)
   {
       fprintf(stderr, "Number of left brackets doesnt match number of right brackets");
       listDispose(eList);
-      return SYNTAX_ERROR;
+      error = SYNTAX_ERROR;
+      return NULL;
   }
+  return OK;
+}
 
-  // TODO into a while 
+int callExpression(Token *token)
+{
+  // so far, we don't know if the operand is relational 
+  isRelational = false;
+  int error =0;
+  // creating the list - loading tokens from input
+  exprList* eList= createList(token, error);
+
+  sInit(&stack);
+
+  sPush(&stack, PT_DOLLAR, TYPE_UNDEFINED);
+  int indexStack = PT_DOLLAR;
+  int indexInput = -1 ; // no symbol in precedence table 
+  exprStack* symbol;
+  
+ do 
+ {
+      if (symbol == NULL )
+      {
+            listDispose(eList);
+            return INTERNAL_ERROR;
+      }
+      
+      indexInput = eList->act->symbol;
+
+      switch(precedenceTable[indexStack][indexInput])
+      {
+            case ('='):
+                  sPush(&stack, indexInput, eList->act->dType);
+                  eList->act=eList->act->rptr;
+                  break;
+            //case ('<'):
+                  //s
+            default: 
+                  break;
+      }
+
+
+
+
+
+ } while (eList->act->rptr != NULL);
+  
   // index to the table  
-  int indexStack=getIndex(token);
+  /** int indexStack=getIndex(eList);
   if ( indexStack == -1)
   {
       listDispose(eList);
       return INTERNAL_ERROR;
   }
 
-  // TODO save token the stack
-
-  // index of another token
-  token = get_next_token(token,0);
-  int indexInput=getIndex(token);
+  eList->act= eList->act->rptr;
+  int indexInput=getIndex(eList);
   if ( indexInput == -1)
   {
       listDispose(eList);  
@@ -463,9 +519,10 @@ int callExpression(Token *token)
   // # not defined sequence of operands and operators in expression, so syntax error
   if ( (strcmp(symbol, "#") )== 0)
   {
+      listDispose(eList);
       return SYNTAX_ERROR;
   }
-
+*/
   // TODO get the rule and push it to the stack
   // TODO continue with other tokens 
 }
