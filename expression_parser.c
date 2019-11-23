@@ -10,12 +10,7 @@
 // TODO scanner bol upravený, uprav get token !!! 
 
 #include "expression_parser.h"
-#include "error.h"
-#include "scanner.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include "expression_list.h"
-#include "symtable.h"
+
 
 const char precedenceTable[tableSize][tableSize] = {
   // 0  , 1 ,  2,   3,   4,   5.   6,   7,   8,   9,  10,  11,  12,  13,   14,  15,   16, 17, 18
@@ -41,7 +36,6 @@ const char precedenceTable[tableSize][tableSize] = {
   { '<', '<', '<', '<', '<', '<', '<', '<', '<', '<', '<', '<', '#', '<', '<', '<', '<', '<', '#'}, // $      18
 };
 
-stackTop stack;
 
 int getIndex(Token *token)
 {
@@ -401,7 +395,7 @@ int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3
 int checkDivisionByZero(Token *token)
 {
   Token *nextToken;
-  get_next_token(nextToken,1);
+  preload_token(nextToken);
 
   if ( (strcmp(nextToken -> attribute, "0")) == 0)
   {
@@ -420,13 +414,17 @@ exprList* createList(Token* token, int* error)
   exprList* eList;
   pTable symbol= getIndex(token);
   data_type dType= getDataType(token);
+  if (symbol == -1 )
+  {
+      return INTERNAL_ERROR;
+  }
   listInsertFirst(eList,symbol,dType);
   
   // maybe insert this to function eList createList(eList* eList, Token* token, int* error)
   // Load tokens into list 
   do 
   {
-      token=get_next_token(token,0); 
+      token=get_next_token(token); 
       pTable symbol= getIndex(token);
       if (symbol == -1 )
       {
@@ -617,13 +615,17 @@ pRules findRule(int num, exprStack* sym1, exprStack* sym2, exprStack* sym3)
 int symbolsToReduce()
 {
       exprStack* top= sTop(&stack);
-      int num = 0; 
-
-      while (top->symbol != PT_SHIFT)
+      int num = 0;
+      if ( top->symbol != PT_SHIFT)
       {
-            num += 1; 
-            top= top->next; 
+            num = 1; 
       }
+      do
+      {
+            top= top->next; 
+            num += 1;  
+      } while (top->symbol != PT_SHIFT);
+
       return num; 
 }
 
@@ -636,13 +638,13 @@ int callExpression(Token *token)
   exprList* eList;
   listInitialize(eList);
   eList=createList(token, error);
-  if ( error = SYNTAX_ERROR)
+  if ( error == SYNTAX_ERROR)
   {
       listDispose(eList);
       return SYNTAX_ERROR;
   }
 
-  if ( error = INTERNAL_ERROR)
+  if ( error == INTERNAL_ERROR)
   {
       listDispose(eList);
       return INTERNAL_ERROR;
@@ -652,7 +654,7 @@ int callExpression(Token *token)
 
   sPush(&stack, PT_DOLLAR, TYPE_UNDEFINED);
   pTable indexStack = PT_DOLLAR;
-  pTable indexInput = -1 ; // no symbol in precedence table 
+  pTable indexInput; 
   exprStack* symbol;
   
  do 
@@ -682,7 +684,7 @@ int callExpression(Token *token)
                   sPop(&stack);
                   sPush(&stack,PT_SHIFT, TYPE_UNDEFINED);
                   sPush(&stack,PT_E, TYPE_UNDEFINED);
-
+                  eList->act = eList->act->rptr;
                   break;
             // reduce
             case('>'):
@@ -720,6 +722,5 @@ int callExpression(Token *token)
             default: 
                   break;
       }
-      eList->act=eList->act->rptr;
- } while (eList->act != NULL);
+ } while (stack.top->symbol != PT_DOLLAR && indexInput != PT_DOLLAR);
 }
