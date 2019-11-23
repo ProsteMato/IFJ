@@ -42,7 +42,7 @@ typedef enum {
   PT_FLOAT, // 15
   PT_STRING, // 16 
   PT_NONE, // 17 
-  PT_EOL, // 18 
+  PT_DOLLAR, // 18  //changed from PT_EOL
   PT_SHIFT, //19 <
   PT_REDUCE, // 20 >  
   PT_EQUAL, // 21 = 
@@ -78,7 +78,7 @@ typedef enum {
  * @return index in precedence table  
  *          error code 
  */
-int getIndex(Token *token) ;
+int getIndex(Token* token) ;
 
 /**
  * @brief Function to find data type of token 
@@ -114,6 +114,16 @@ int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3
  *         DIVISION_BY_ZERO_ERROR error if division by zero 
  */
 int checkDivisionByZero(Token *token);
+
+/** 
+ * @brief Function loads tokens into list and does some controls 
+ * 
+ * @param token first token 
+ * @param error pointer to error, if there was some, there is SYNTAX_ERROR
+ * 
+ * @return eList list with loaded tokens
+ */
+exprList* createList(Token* token, int* error);
 
 /**
  * @brief Function that covers expression parser 
