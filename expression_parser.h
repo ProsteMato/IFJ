@@ -126,6 +126,25 @@ int checkDivisionByZero(Token *token);
 exprList* createList(Token* token, int* error);
 
 /**
+ * @brief Functions finds rule for reducing 
+ * 
+ * @param num number of symbol to reduce on stack 
+ * @param sym1 oldest symbol on stack 
+ * @param sym2 next symbol on stack
+ * @param sym3 next symbol on stack - top  
+ * 
+ * @return rule or PR_NOTARULE if there was none found 
+ */
+pRules findRule(int num, exprStack* sym1, exprStack* sym2, exprStack* sym3);
+
+/**
+ * @brief Function counts number of symbols to reduce by some rule
+ * 
+ * @return Numbers of symbol to reduce on stack (1 or 3)
+ */
+int symbolsToReduce()
+
+/**
  * @brief Function that covers expression parser 
  * 
  * @param token token, that is handed to this function 
