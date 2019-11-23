@@ -26,7 +26,7 @@ exprStack* sTop(stackTop* eStack)
     return eStack->top;
 }
 
-int sPush(stackTop* eStack, pTable symbol)
+int sPush(stackTop* eStack, pTable symbol, data_type dType)
 {
     exprStack* new; 
     new = (exprStack*) malloc(sizeof(exprStack));
@@ -37,6 +37,7 @@ int sPush(stackTop* eStack, pTable symbol)
 
     new->next = eStack->top;
     new->symbol = symbol; 
+    new->dType = dType;
 
     eStack->top = new;
     return OK; 
