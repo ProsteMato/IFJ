@@ -47,6 +47,7 @@ typedef enum {
   PT_REDUCE, // 20 >  
   PT_EQUAL, // 21 = 
   PT_ERROR, //22 #
+  PT_E,
 } pTable;
 
 typedef enum {
