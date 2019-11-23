@@ -74,7 +74,14 @@ int sPush(stackTop* eStack, pTable symbol, data_type dType);
  */
 int sPop(stackTop* eStack);
 
-// možno funkcia na zmazanie celého stacku?
+
+/** 
+ * @brief Function deletes stack
+ * 
+ * @param eStack stack to delete 
+ * 
+ */
+void disposeStack(stackTop* eStack);
 
 
 
