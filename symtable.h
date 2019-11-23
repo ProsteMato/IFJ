@@ -14,7 +14,8 @@ typedef enum {
   TYPE_INT,
   TYPE_FLOAT,
   TYPE_STRING,
-  TYPE_NONE, //nedefinovany
+  TYPE_NONE,
+  TYPE_UNDEFINED,
 } data_type;
 
 
@@ -41,19 +42,39 @@ typedef struct par { //pareametry fce, ulozeny v seznamu
     struct par * next;	//dalsi parametr
 } params;
 
-
 // prototypy funkcí - binarni strom
 
 //inicializace tabulky symbolu
-void SymTabInit (tBSTNodePtr *); 
-int SymTabSearch (tBSTNodePtr, char, tData **); //hledani symbolu podle klice
-int SymTabInsert (tBSTNodePtr *, char, tData *); //vlozeni noveho symbolu
-void SymTabDelete (tBSTNodePtr *, char); //vymazani symbolu
-void SymTabDispose(tBSTNodePtr *); //zruseni tabulky symbolu
+//@param tBSTNodePtr - ukazatel na tabulku symbolu
+void SymTabInit (tBSTNodePtr *);
+
+/** hledani symbolu podle klice
+@param tBSTNodePtr - tabulka symbolu
+@param char - klic (id) hledaneho symbolu (bude upraveno na ukazatel klůli delce)
+@param tData - misto kam se ulozi najdena data
+@return vraci false pokud je hledani neuspesne */
+int SymTabSearch (tBSTNodePtr, char, tData **);
+
+/** vlozeni noveho symbolu
+@param tBSTNodePtr - ukazatel na sym.tab. 
+@param char - klic (id) vlozeneho symbolu (bude upraveno na ukazatel klůli delce) 
+@param tData - ukazatel na data 
+@return v pripade neuspech alokace vraci chybu INTERNAL_ERROR */
+int SymTabInsert (tBSTNodePtr *, char, tData *);
+
+/** vymazani symbolu
+@param tBSTNodePtr - ukazatel na sym.tab.
+@param char - klic (id) symbolu který má být smazán (bude upraveno na ukazatel klůli delce) */
+void SymTabDelete (tBSTNodePtr *, char);
+
+/** zruseni tabulky symbolu
+@param tBSTNodePtr - ukazatel na tabulku symbolu */
+void SymTabDispose(tBSTNodePtr *);
 
 ///// TO DO ///
 
-//maloc chyba vracim chybu z chyb
+// vsechny funkce budou rozděleny na globalni a lokalni, parametry by meli pro většinu zustat stejne
+
 //predelat id (klic) na ukazovatel
 //funkce pro paramentry
 //rozdelit na globalni a lokalni
