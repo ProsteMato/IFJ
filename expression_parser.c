@@ -370,8 +370,7 @@ int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3
             default: 
                   break;
       }
-      // dočasne 
-      return OK;
+
       //TODO 
       // generovanie kódu a vrámci toho pretypovanie 
       /** 
@@ -662,6 +661,7 @@ int callExpression(Token *token)
       if (symbol == NULL )
       {
             listDispose(eList);
+            disposeStack(&stack);
             return INTERNAL_ERROR;
       }
 
@@ -695,20 +695,21 @@ int callExpression(Token *token)
                   if ( num != 1 && num != 3 )
                   {
                         listDispose(eList);
-                        // TODO destroy stack
+                        disposeStack(&stack);
                         return OTHER_ERROR;
                   }
                   pRules rule = findRule(num, sym1, sym2, sym3);
                   if ( rule == PR_NOTARULE)
                   {
                         listDispose(eList); 
-                        // TODO destroy stack   
+                        disposeStack(&stack);
                         return SYNTAX_ERROR;
                   }
                   int checkSem = checkSematics(rule,sym1,sym2,sym3);
                   if ( checkSem == SEM_TYPE_ERROR)
                   {
                         listDispose(eList);
+                        disposeStack(&stack);
                         return SEM_TYPE_ERROR;
                   }
                   do 
@@ -718,9 +719,15 @@ int callExpression(Token *token)
                   sPush(&stack, PT_E, TYPE_UNDEFINED);
                   break;
             case ('#'): 
+                  listDispose(eList);
+                  disposeStack(&stack);
                   return SYNTAX_ERROR;
             default: 
                   break;
       }
  } while (stack.top->symbol != PT_DOLLAR && indexInput != PT_DOLLAR);
+
+ listDispose(eList);
+ disposeStack(&stack);
+ return OK;
 }
