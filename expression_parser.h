@@ -17,11 +17,13 @@
 #include <stdlib.h>
 #include <stdbool.h> 
 #include "symtable.h"
+#include "expression_list.h"
 #include "expression_stack.h"
 
 
 #define tableSize 19 
 bool isRelational;  //is operator relational? <, <=, >, >=, ==, != 
+stackTop stack;
 
 typedef enum {
   PT_PLUS,  // 0
@@ -143,7 +145,7 @@ pRules findRule(int num, exprStack* sym1, exprStack* sym2, exprStack* sym3);
  * 
  * @return Numbers of symbol to reduce on stack (1 or 3)
  */
-int symbolsToReduce()
+int symbolsToReduce();
 
 /**
  * @brief Function that covers expression parser 
