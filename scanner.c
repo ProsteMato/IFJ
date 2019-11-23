@@ -44,12 +44,12 @@ Keywords is_keyword(char* s, unsigned len){
 	}
 }
 
-void tkq_init(TKQueue *q){
-	q->first = NULL;
-	q->last = NULL;
+void tkq_init(){
+	q.first = NULL;
+	q.last = NULL;
 }
 
-int tkq_queue(TKQueue *q, Token *token, int ret_val){
+int tkq_queue(Token *token, int ret_val){
 	QToken *qtk = (QToken*) malloc(sizeof(QToken));
 	if (qtk == NULL){
 		// internal ERROR
@@ -59,44 +59,44 @@ int tkq_queue(TKQueue *q, Token *token, int ret_val){
 	qtk->ret_val = ret_val;
 	qtk->behind = NULL;
 	// no token in queue
-	if (q->last == NULL && q->first == NULL){
-		q->last = qtk;
-		q->first = qtk;
+	if (q.last == NULL && q.first == NULL){
+		q.last = qtk;
+		q.first = qtk;
 	} else {
-		q->last->behind = qtk;
-		q->last = qtk;
+		q.last->behind = qtk;
+		q.last = qtk;
 	}
 	return OK;
 }
 
-int tkq_dequeue(TKQueue *q, Token* token){
-	token = q->first->token;
-	int ret_val = q->first->ret_val;
-	QToken *tmp = q->first;
+int tkq_dequeue(Token* token){
+	token = q.first->token;
+	int ret_val = q.first->ret_val;
+	QToken *tmp = q.first;
 	// jeden element v queue
-	if (q->first == q->last){
-		q->first = NULL;
-		q->last = NULL;
+	if (q.first == q.last){
+		q.first = NULL;
+		q.last = NULL;
 	} else {
-		q->first = q->first->behind;
+		q.first = q.first->behind;
 	}
 	free(tmp);
 	return ret_val;
 }
 
-int tkq_first(TKQueue *q, Token *token){
-	token = q->first->token;
-	return q->first->ret_val;
+int tkq_first(Token *token){
+	token = q.first->token;
+	return q.first->ret_val;
 }
 
-void q_destroy(TKQueue *q){
+void q_destroy(){
 	QToken *tmp;
-	while (q->first != NULL){
-		tmp = q->first->behind;
-		free(q->first);
-		q->first = tmp;
+	while (q.first != NULL){
+		tmp = q.first->behind;
+		free(q.first);
+		q.first = tmp;
 	}
-	q->last = NULL;
+	q.last = NULL;
 }
 
 int internal_error_exit(Stack *s, char *str){
@@ -105,44 +105,44 @@ int internal_error_exit(Stack *s, char *str){
 	return INTERNAL_ERROR;
 }
 
-int unget_token(Token *token, TKQueue *q){
+int unget_token(Token *token){
 	// kontrola parametrov
-	if (token == NULL || q == NULL){
+	if (token == NULL){
 		return INTERNAL_ERROR;
 	}
-	return tkq_queue(q, token, OK);
+	return tkq_queue(token, OK);
 }
 
-int preload_token(Token *token, TKQueue *q){
+int preload_token(Token *token){
 	// kontrola parametrov
-	if (token == NULL || q == NULL){
+	if (token == NULL){
 		return INTERNAL_ERROR;
 	}
 	// queue je prazdna
-	if (q->first == NULL){
+	if (q.first == NULL){
 		int ret_val = scan(token);
-		if (tkq_queue(q, token, ret_val) == INTERNAL_ERROR){
+		if (tkq_queue(token, ret_val) == INTERNAL_ERROR){
 			return INTERNAL_ERROR;
 		} else {
 			return ret_val;
 		}
 	// queue nie je prazdna
 	} else {
-		return tkq_first(q, token);
+		return tkq_first(token);
 	}
 }
 
-int get_next_token(Token *token, TKQueue *q){
+int get_next_token(Token *token){
 	// kontrola parametrov
-	if (token == NULL || q == NULL){
+	if (token == NULL){
 		return INTERNAL_ERROR;
 	}
 	// queue je prazdna
-	if (q->first == NULL){
+	if (q.first == NULL){
 		return scan(token);
 	// queue nie je prazdna
 	} else {
-		return tkq_dequeue(q, token);
+		return tkq_dequeue(token);
 	}
 }
 
