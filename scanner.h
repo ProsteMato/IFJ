@@ -79,6 +79,11 @@ typedef struct{
 } TKQueue;
 
 /**
+ * @brief      Global variable for token queue
+ */
+TKQueue q;
+
+/**
  * @enum States in finite deterministic automata
  */
 typedef enum{
@@ -153,7 +158,7 @@ typedef enum{
  * @return     OK-token is returned successfully, INTERNAL_ERROR-internal error,
  *             LEX_ERROR lex error
  */
-int get_next_token(Token *token, TKQueue *q);
+int get_next_token(Token *token);
 
 /**
  * @brief      Determines whether the string is keyword
@@ -186,7 +191,7 @@ int internal_error_exit(Stack *s, char *str);
  * @return     OK-token is returned successfully, INTERNAL_ERROR-internal error,
  *             LEX_ERROR lex error
  */
-int unget_token(Token *token, TKQueue *q);
+int unget_token(Token *token);
 
 /**
  * @brief      Scans the input and finds the token
@@ -202,59 +207,51 @@ int scan(Token *token);
  * @brief      Preloads the next token
  *
  * @param      token  The pointer to the token
- * @param      q      The pointer to the token queue
  *
  * @return      OK-token is returned successfully, INTERNAL_ERROR-internal error,
  *             LEX_ERROR lex error
  */
-int preload_token(Token *token, TKQueue *q);
+int preload_token(Token *token);
 
 /**
  * @brief      Inicializes the token queue
- *
- * @param      q     Pointer to the token queue
  */
-void tkq_init(TKQueue *q);
+void tkq_init();
 
 /**
  * @brief      Adds token to the back of the queue
  *
- * @param      q        The queue
  * @param      token    The token
  * @param[in]  ret_val  The ret value
  *
  * @return     OK- token is added successfully, INTERNAL_ERROR-internal error
  */
-int tkq_queue(TKQueue *q, Token *token, int ret_val);
+int tkq_queue(Token *token, int ret_val);
 
 /**
  * @brief      Removes the first token from the queue and returns it
  *
- * @param      q      The queue pointer
  * @param      token  The token pointer
  *
  * @return     ret_value of First token in queue, OK-token is returned
  *             successfully, INTERNAL_ERROR-internal error, LEX_ERROR lex error
  */
-int tkq_dequeue(TKQueue *q, Token* token);
+int tkq_dequeue(Token* token);
 
 /**
  * @brief      Returns the first token in queue, doesnt remove it from queue
  *
- * @param      q      The queue pointer
  * @param      token  The token pointer
  *
  * @return     ret_value of First token in queue, OK-token is returned
  *             successfully, INTERNAL_ERROR-internal error, LEX_ERROR lex error
  */
-int tkq_first(TKQueue *q, Token *token);
+int tkq_first(Token *token);
 
 /**
  * @brief      Deallocates memory of queue
- *
- * @param      q     Pointer to he queue
  */
-void q_destroy(TKQueue *q);
+void q_destroy();
 
 
 #endif //_SCANNER_H
