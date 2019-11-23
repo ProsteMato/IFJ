@@ -55,58 +55,40 @@ int getIndex(Token *token)
   {
     case (TK_ID): 
           return PT_ID;
-          break;
     case (TK_PLUS):
           return PT_PLUS;
-          break;
     case (TK_MINUS):
           return PT_MINUS;
-          break;
     case (TK_MULT):
-          return PT_MULT; 
-          break;
+          return PT_MULT;
     case (TK_DIV):
           return PT_DIV;
-          break;
     case (TK_DIV_DIV):
           return PT_DIV_DIV;
-          break; 
     case (TK_EQUAL):
           return PT_EQ;
-          break;
     case (TK_NOT_EQUAL):
           return PT_NOT_EQ;
-          break;
     case (TK_LESSER):
           return PT_LESS;
-          break; 
     case (TK_LESSER_EQUAL):
           return PT_LESS_EQ;
-          break;
     case (TK_GREATER):
           return PT_GREAT;
-          break;
     case (TK_GREATER_EQUAL):
           return PT_GREAT_EQ;
-          break;
     case (TK_BRACKET_L):
           return PT_LEFT_BRACK;
-          break;
     case (TK_BRACKET_R):
           return PT_RIGHT_BRACK;
-          break;
     case (TK_INT):
           return PT_INT;
-          break;
     case (TK_FLOAT):
           return PT_FLOAT;
-          break;
     case (TK_STRING):
           return PT_STRING;
-          break; 
     case (TK_KW):
           return PT_NONE;
-          break; 
     default: 
           return PT_DOLLAR; 
           break;    
@@ -654,6 +636,17 @@ int callExpression(Token *token)
   exprList* eList;
   listInitialize(eList);
   eList=createList(token, error);
+  if ( error = SYNTAX_ERROR)
+  {
+      listDispose(eList);
+      return SYNTAX_ERROR;
+  }
+
+  if ( error = INTERNAL_ERROR)
+  {
+      listDispose(eList);
+      return INTERNAL_ERROR;
+  }
 
   sInit(&stack);
 
@@ -669,7 +662,7 @@ int callExpression(Token *token)
             listDispose(eList);
             return INTERNAL_ERROR;
       }
-      
+
       indexInput = eList->act->symbol;
 
       switch(precedenceTable[indexStack][indexInput])
@@ -681,21 +674,52 @@ int callExpression(Token *token)
                   break;
             // shift
             case ('<'):
-                  if (indexStack == PT_DOLLAR)
+                  if (indexStack == PT_DOLLAR || indexStack != PT_E)
                   {
                         sPush(&stack, PT_SHIFT, TYPE_UNDEFINED);
                         sPush(&stack, indexInput, eList->act->dType);
                   }
-                  
+                  sPop(&stack);
+                  sPush(&stack,PT_SHIFT, TYPE_UNDEFINED);
+                  sPush(&stack,PT_E, TYPE_UNDEFINED);
+
                   break;
             // reduce
             case('>'):
+                  exprStack* sym1 = stack.top->next->next;
+                  exprStack* sym2 = stack.top->next;
+                  exprStack* sym3 = stack.top;
+                  int num = symbolsToReduce();
+                  if ( num != 1 && num != 3 )
+                  {
+                        listDispose(eList);
+                        // TODO destroy stack
+                        return OTHER_ERROR;
+                  }
+                  pRules rule = findRule(num, sym1, sym2, sym3);
+                  if ( rule == PR_NOTARULE)
+                  {
+                        listDispose(eList); 
+                        // TODO destroy stack   
+                        return SYNTAX_ERROR;
+                  }
+                  int checkSem = checkSematics(rule,sym1,sym2,sym3);
+                  if ( checkSem == SEM_TYPE_ERROR)
+                  {
+                        listDispose(eList);
+                        return SEM_TYPE_ERROR;
+                  }
+                  do 
+                  {
+                        sPop(&stack);
+                  } while (stack.top->symbol != PT_SHIFT);
+                  sPush(&stack, PT_E, TYPE_UNDEFINED);
                   break;
             case ('#'): 
                   return SYNTAX_ERROR;
             default: 
                   break;
       }
-
- } while (eList->act->rptr != NULL);
+      eList->act=eList->act->rptr;
+ } while (eList->act != NULL);
 }
