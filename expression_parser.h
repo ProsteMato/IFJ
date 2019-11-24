@@ -24,6 +24,7 @@
 #define tableSize 19 
 bool isRelational;  //is operator relational? <, <=, >, >=, ==, != 
 stackTop stack;
+int error;
 
 typedef enum {
   PT_PLUS,  // 0
@@ -122,11 +123,10 @@ int checkDivisionByZero(Token *token);
  * @brief Function loads tokens into list and does some controls 
  * 
  * @param token first token 
- * @param error pointer to error, if there was some, there is SYNTAX_ERROR
  * 
  * @return eList list with loaded tokens
  */
-exprList* createList(Token* token, int* error);
+exprList* createList(Token* token);
 
 /**
  * @brief Functions finds rule for reducing 

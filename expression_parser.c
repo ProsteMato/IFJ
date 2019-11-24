@@ -406,7 +406,7 @@ int checkDivisionByZero(Token *token)
 }
 
 
-exprList* createList(Token* token, int* error)
+exprList* createList(Token* token)
 {
   int leftBracket = 0;
   int rightBracket =0; 
@@ -415,7 +415,8 @@ exprList* createList(Token* token, int* error)
   data_type dType= getDataType(token);
   if (symbol == -1 )
   {
-      return INTERNAL_ERROR;
+      error = INTERNAL_ERROR;
+      return NULL;
   }
   listInsertFirst(eList,symbol,dType);
   
@@ -423,7 +424,7 @@ exprList* createList(Token* token, int* error)
   // Load tokens into list 
   do 
   {
-      token=get_next_token(token); 
+      get_next_token(token); 
       pTable symbol= getIndex(token);
       if (symbol == -1 )
       {
@@ -504,7 +505,7 @@ exprList* createList(Token* token, int* error)
       listInsertAct(eList,symbol, dType);
       
   }
-  while ( token->attribute != TK_EOL);
+  while ( token->type != TK_EOL);
 
   if ( leftBracket != rightBracket) 
   {
@@ -632,11 +633,10 @@ int callExpression(Token *token)
 {
   // so far, we don't know if the operand is relational 
   isRelational = false;
-  int error =0;
   // creating the list - loading tokens from input
   exprList* eList;
   listInitialize(eList);
-  eList=createList(token, error);
+  eList=createList(token);
   if ( error == SYNTAX_ERROR)
   {
       listDispose(eList);
@@ -656,6 +656,10 @@ int callExpression(Token *token)
   pTable indexInput; 
   exprStack* symbol;
   
+  exprStack* sym1 = NULL;
+  exprStack* sym2 = NULL;
+  exprStack* sym3 = NULL;
+
  do 
  {
       if (symbol == NULL )
@@ -688,9 +692,9 @@ int callExpression(Token *token)
                   break;
             // reduce
             case('>'):
-                  exprStack* sym1 = stack.top->next->next;
-                  exprStack* sym2 = stack.top->next;
-                  exprStack* sym3 = stack.top;
+                  sym1 = stack.top->next->next;
+                  sym2 = stack.top->next;
+                  sym3 = stack.top;
                   int num = symbolsToReduce();
                   if ( num != 1 && num != 3 )
                   {
