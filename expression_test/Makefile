@@ -1,21 +1,20 @@
 CC = gcc
 CFLAGS = -std=c99 -Wall -Werror -pedantic 
-
 all: test
 
 #run:
 #	./test <input
 
-test:  expression_parser.o expression_parser.h expr_test.c exprstack.o exprlist.o stack.o string.o scanner.o expression_parser.h
-	${CC} ${CFLAGS} expr_test.c -o $@
+test:  expression_parser.o ../expression_parser.h expr_test.c expression_stack.o expression_list.o stack.o string.o 
+	${CC} ${CFLAGS}  $^ -o $@
 
 expression_parser.o: ../expression_parser.c ../expression_parser.h 
 	${CC} ${CFLAGS} $< -c -o $@
 
-exprstack.o: ../expression_stack.c ../expression_stack.h 
+expression_stack.o: ../expression_stack.c ../expression_stack.h 
 	${CC} ${CFLAGS} $< -c -o $@
 
-exprlist.o: ../expression_list.c ../expression_list.h ../expression_parser.h
+expression_list.o: ../expression_list.c ../expression_list.h ../expression_parser.h
 	${CC} ${CFLAGS} $< -c -o $@
 
 scanner.o: ../scanner.c ../scanner.h

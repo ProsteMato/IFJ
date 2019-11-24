@@ -13,26 +13,12 @@
 
  #include "expression_parser.h"
 
-typedef struct listItem {           
-        pTable symbol;  
-        data_type dType;                                       
-        struct listItem *lptr;          
-        struct listItem *rptr;        
-} *item;
-
-typedef struct {
-    item first;
-    item act;
-    item last;
-} exprList;
-
-
 /**
  * @brief Initialization of list 
  * 
  * @param eList to initialize 
  */
-void listInitialize(exprList *eList);
+void listInitialize(exprList* eList);
 
 /**
  * @brief Insert first token 

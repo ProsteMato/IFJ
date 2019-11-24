@@ -10,12 +10,7 @@
 #ifndef _EXPRESSION_STACK_H
 #define _EXPRESSION_STACK_H
 
-#include "scanner.h"
 #include "expression_parser.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include "error.h"
 
 /**
  * @struct Structure to represent a stack
@@ -23,14 +18,13 @@
  * @param symbol represents symbol on the stack 
  * @param dType data type of symbol on stack (NONE if operand )
  * @param next next symbol on stack 
- */
+ 
 typedef struct stack {
     pTable symbol;
     data_type dType; 
     struct stack *next; 
 } exprStack; 
-
-
+*/
 /**
  * @struct Structure, that represent the top symbol on stack 
  * 
@@ -39,6 +33,8 @@ typedef struct stack {
 typedef struct {
     exprStack *top; 
 } stackTop;
+
+
 
 /** 
  * @brief Initialization of stack 

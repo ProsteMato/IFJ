@@ -64,6 +64,7 @@ int listInsertAct(exprList *eList, pTable symbol, data_type dType)
     newItem->rptr= NULL;
     eList->last = newItem;
     eList->act = newItem;
+    return OK;
 }
 
 /**

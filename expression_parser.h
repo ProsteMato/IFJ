@@ -12,18 +12,14 @@
 #define _EXPRESSION_PARSER_H
 
 #include "scanner.h"
-#include "error.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h> 
 #include "symtable.h"
-#include "expression_list.h"
-#include "expression_stack.h"
 
 
 #define tableSize 19 
 bool isRelational;  //is operator relational? <, <=, >, >=, ==, != 
-stackTop stack;
 int error;
 
 typedef enum {
@@ -53,6 +49,38 @@ typedef enum {
   PT_E, // 23
 } pTable;
 
+// Obviously, it has to be here even when it's stack 
+//because my header files are making mess and if it was in 
+// stack's header file it was making mess 
+
+/**
+ * @struct Structure to represent a stack
+ * 
+ * @param symbol represents symbol on the stack 
+ * @param dType data type of symbol on stack (NONE if operand )
+ * @param next next symbol on stack 
+ */
+typedef struct stack {
+    pTable symbol;
+    data_type dType; 
+    struct stack *next; 
+} exprStack; 
+
+typedef struct listItem {           
+        pTable symbol;  
+        data_type dType;                                       
+        struct listItem *lptr;          
+        struct listItem *rptr;        
+} *item;
+
+typedef struct {
+    item first;
+    item act;
+    item last;
+} exprList;
+
+
+
 typedef enum {
   PR_EPLUSE,   // E-> E + E 
   PR_EMINUSE, // E-> E - E 
@@ -73,6 +101,10 @@ typedef enum {
   PR_NONE,    // E-> None 
   PR_NOTARULE, // not a rule 
 } pRules;
+
+
+#include "expression_list.h"
+#include "expression_stack.h"
 
 /**
  * @brief Function return an index in precedence table of token 

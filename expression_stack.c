@@ -14,7 +14,7 @@ int sInit(stackTop* eStack)
 {
     if ( eStack == NULL)
     {
-        sprintf(stderr, "Wrong parameter.");
+        fprintf(stderr, "Wrong parameter.");
         return INTERNAL_ERROR;
     }
     eStack->top = NULL;

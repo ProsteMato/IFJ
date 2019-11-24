@@ -10,6 +10,7 @@
 // TODO scanner bol upravený, uprav get token !!! 
 
 #include "expression_parser.h"
+#include "error.h"
 
 
 const char precedenceTable[tableSize][tableSize] = {
@@ -36,6 +37,7 @@ const char precedenceTable[tableSize][tableSize] = {
   { '<', '<', '<', '<', '<', '<', '<', '<', '<', '<', '<', '<', '#', '<', '<', '<', '<', '<', '#'}, // $      18
 };
 
+stackTop stack;
 
 int getIndex(Token *token)
 {
@@ -393,10 +395,11 @@ int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3
 
 int checkDivisionByZero(Token *token)
 {
-  Token *nextToken;
-  preload_token(nextToken);
+  //Token *nextToken;
+  //preload_token(nextToken);
+  preload_token(token);
 
-  if ( (strcmp(nextToken -> attribute, "0")) == 0)
+  if ( (strcmp(token -> attribute, "0")) == 0)
   {
     return DIVISION_BY_ZERO_ERROR;
   }
@@ -410,7 +413,6 @@ exprList* createList(Token* token)
 {
   int leftBracket = 0;
   int rightBracket =0; 
-  exprList* eList;
   pTable symbol= getIndex(token);
   data_type dType= getDataType(token);
   if (symbol == -1 )
@@ -418,6 +420,8 @@ exprList* createList(Token* token)
       error = INTERNAL_ERROR;
       return NULL;
   }
+  exprList* eList=NULL;
+  listInitialize(eList);
   listInsertFirst(eList,symbol,dType);
   
   // maybe insert this to function eList createList(eList* eList, Token* token, int* error)
@@ -425,7 +429,7 @@ exprList* createList(Token* token)
   do 
   {
       get_next_token(token); 
-      pTable symbol= getIndex(token);
+      symbol= getIndex(token);
       if (symbol == -1 )
       {
             listDispose(eList);
@@ -631,10 +635,11 @@ int symbolsToReduce()
 
 int callExpression(Token *token)
 {
+  void tkq_init();
   // so far, we don't know if the operand is relational 
   isRelational = false;
   // creating the list - loading tokens from input
-  exprList* eList;
+  exprList* eList = NULL;
   listInitialize(eList);
   eList=createList(token);
   if ( error == SYNTAX_ERROR)
@@ -654,21 +659,21 @@ int callExpression(Token *token)
   sPush(&stack, PT_DOLLAR, TYPE_UNDEFINED);
   pTable indexStack = PT_DOLLAR;
   pTable indexInput; 
-  exprStack* symbol;
+ // exprStack* symbol;
   
   exprStack* sym1 = NULL;
   exprStack* sym2 = NULL;
   exprStack* sym3 = NULL;
 
  do 
- {
+ {    /**
       if (symbol == NULL )
       {
             listDispose(eList);
             disposeStack(&stack);
             return INTERNAL_ERROR;
       }
-
+*/
       indexInput = eList->act->symbol;
 
       switch(precedenceTable[indexStack][indexInput])

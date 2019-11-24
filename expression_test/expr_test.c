@@ -4,13 +4,15 @@
  * 
  */
 
-#include <stdio.h>
-#include "expression_parser.h"
+#include <stdlib.h>
+#include "../expression_parser.h"
 
 Token* testToken; 
 
 int main()
 {
+    void tkq_init();    
+
     printf("FIRST TOKEN \n");
     printf("token: 12 \n");
     printf("token type is TK_INT, so number 22 \n"); 
