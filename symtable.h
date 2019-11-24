@@ -1,11 +1,7 @@
-/**
- * Project: Implementace prekladača imperatívneho jazýka IFJ19
- * 
- * @brief Tabulka symbolu, implementována pomocí binárního stromu
- * 
- * @author Zuzana Hradilova <xhradi16@stud.fit.vutbr.cz>
- * 
- */
+/** Project: Implementace prekladace imperativniho jazyka IFJ19
+
+ @brief Tabulka symbolu, implementovana pomoci binarniho stromu
+ @author Zuzana Hradilova <xhradi16@stud.fit.vutbr.cz> */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,12 +22,12 @@ typedef enum {
 
 
 // definice pro binarni strom
-typedef struct tBSTNode { // struktura definujici symbol
+typedef struct SymTabNode { // struktura definujici symbol
 	char * Key; //id
 	tData * Data;
-	struct tBSTNode * LPtr; //levy podstrom
-	struct tBSTNode * RPtr; //pravy podstrom
-} *tBSTNodePtr;
+	struct SymTabNode * LPtr; //levy podstrom
+	struct SymTabNode * RPtr; //pravy podstrom
+} * SymTabNodePtr;
 
 typedef struct tData{
 data_type Type; //typ symbolu
@@ -39,74 +35,74 @@ bool Define;
 bool Global; //globalni promenna
 bool Funkce; //funkce
   int pocet_par; //pouze u fce
-  params *first; //0. parametr (pouze u fce)
+  param * first; //0. parametr (pouze u fce)
 }tData;
 
-/** bude upraveno
-typedef struct par { //pareametry fce, ulozeny v seznamu
-    char* nazev;	//ukazatel na id
-		int poradi;		//poradi parametru
-    struct par * next;	//dalsi parametr
-} params; */
+// ulozeni paramentru funkce
+typedef struct param {
+    char * nazev;	//ukazatel na id
+    struct param * before; //predchozi paramentr
+    struct param * next;	//dalsi parametr
+} param;
 
               //prototypy funkcí - globalni tabulka symbolu
 
 //inicializace globalni tabulky symbolu
-//@param tBSTNodePtr - ukazatel na tabulku symbolu
-void GlobalSymTabInit (tBSTNodePtr *);
+//@param SymTabNodePtr - ukazatel na tabulku symbolu
+void GlobalSymTabInit (SymTabNodePtr *);
 
 /** hledani symbolu podle klice
-@param tBSTNodePtr - tabulka symbolu
+@param SymTabNodePtr - tabulka symbolu
 @param char - klic (id) hledaneho symbolu
 @param tData - misto kam se ulozi najdena data
 @return vraci false pokud je hledani neuspesne */
-int GlobalSymTabSearch (tBSTNodePtr, char *, tData **);
+int GlobalSymTabSearch (SymTabNodePtr, char *, tData **);
 
 /** vlozeni noveho symbolu
-@param tBSTNodePtr - ukazatel na sym.tab. 
+@param SymTabNodePtr - ukazatel na sym.tab. 
 @param char - klic (id) vlozeneho symbolu 
 @param tData - ukazatel na data 
 @return v pripade neuspech alokace vraci chybu INTERNAL_ERROR */
-int GlobalSymTabInsert (tBSTNodePtr *, char *, tData *);
+int GlobalSymTabInsert (SymTabNodePtr *, char *, tData *);
 
 /** vymazani symbolu
-@param tBSTNodePtr - ukazatel na sym.tab.
+@param SymTabNodePtr - ukazatel na sym.tab.
 @param char - klic (id) symbolu který má být smazán */
-void GlobalSymTabDelete (tBSTNodePtr *, char *);
+void GlobalSymTabDelete (SymTabNodePtr *, char *);
 
 /** zruseni tabulky symbolu
-@param tBSTNodePtr - ukazatel na tabulku symbolu */
-void GlobalSymTabDispose(tBSTNodePtr *);
+@param SymTabNodePtr - ukazatel na tabulku symbolu */
+void GlobalSymTabDispose (SymTabNodePtr *);
 
               //prototypy funkcí - lokalni tabulka symbolu
 
 //inicializace lokalni tabulky symbolu
-//@param tBSTNodePtr - ukazatel na tabulku symbolu
-void LocalSymTabInit (tBSTNodePtr *);
+//@param SymTabNodePtr - ukazatel na tabulku symbolu
+void LocalSymTabInit (SymTabNodePtr *);
 
 /** hledani symbolu podle klice
-@param tBSTNodePtr - tabulka symbolu
+@param SymTabNodePtr - tabulka symbolu
 @param char - klic (id) hledaneho symbolu
 @param tData - misto kam se ulozi najdena data
 @return vraci false pokud je hledani neuspesne */
-int LocalSymTabSearch (tBSTNodePtr, char *, tData **);
+int LocalSymTabSearch (SymTabNodePtr, char *, tData **);
 
 /** vlozeni noveho symbolu
-@param tBSTNodePtr - ukazatel na sym.tab. 
+@param SymTabNodePtr - ukazatel na sym.tab. 
 @param char - klic (id) vlozeneho symbolu 
 @param tData - ukazatel na data 
 @return v pripade neuspech alokace vraci chybu INTERNAL_ERROR */
-int LocalSymTabInsert (tBSTNodePtr *, char *, tData *);
+int LocalSymTabInsert (SymTabNodePtr *, char *, tData *);
 
 /** vymazani symbolu
-@param tBSTNodePtr - ukazatel na sym.tab.
+@param SymTabNodePtr - ukazatel na sym.tab.
 @param char - klic (id) symbolu který má být smazán */
-void LocalSymTabDelete (tBSTNodePtr *, char *);
+void LocalSymTabDelete (SymTabNodePtr *, char *);
 
 /** zruseni tabulky symbolu
-@param tBSTNodePtr - ukazatel na tabulku symbolu */
-void LocalSymTabDispose(tBSTNodePtr *);
+@param SymTabNodePtr - ukazatel na tabulku symbolu */
+void LocalSymTabDispose (SymTabNodePtr *);
 
 
 ///// TO DO ///
-//funkce pro paramentry funkci
+//funkce pro paramentry
