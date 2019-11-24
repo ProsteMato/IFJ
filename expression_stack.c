@@ -54,3 +54,11 @@ int sPop(stackTop* eStack)
     }
     return INTERNAL_ERROR;
 }
+
+void disposeStack(stackTop* eStack)
+{
+    while (eStack != NULL )
+    {
+        sPop(eStack);
+    }
+}

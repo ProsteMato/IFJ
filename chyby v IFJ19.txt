@@ -22,4 +22,4 @@ Sématická chyba
 		      a = 1 + "abc" 
 - relačné operátory >, <, >=, <=  iba so stejným typom (nemôžeš int a string, float a string a podobne) 
 		-- ak je ale int a float, int je pretypovaný na float 
-- == a != porovnávajú rôzne typy, vrátane None
+- == a != porovnávajú rôzne typy, vrátane None, čiže otestovať že pri <, <=, >, >= vyhodí s None chybu 

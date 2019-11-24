@@ -17,11 +17,14 @@
 #include <stdlib.h>
 #include <stdbool.h> 
 #include "symtable.h"
+#include "expression_list.h"
 #include "expression_stack.h"
 
 
 #define tableSize 19 
 bool isRelational;  //is operator relational? <, <=, >, >=, ==, != 
+stackTop stack;
+int error;
 
 typedef enum {
   PT_PLUS,  // 0
@@ -47,6 +50,7 @@ typedef enum {
   PT_REDUCE, // 20 >  
   PT_EQUAL, // 21 = 
   PT_ERROR, //22 #
+  PT_E, // 23
 } pTable;
 
 typedef enum {
@@ -119,11 +123,29 @@ int checkDivisionByZero(Token *token);
  * @brief Function loads tokens into list and does some controls 
  * 
  * @param token first token 
- * @param error pointer to error, if there was some, there is SYNTAX_ERROR
  * 
  * @return eList list with loaded tokens
  */
-exprList* createList(Token* token, int* error);
+exprList* createList(Token* token);
+
+/**
+ * @brief Functions finds rule for reducing 
+ * 
+ * @param num number of symbol to reduce on stack 
+ * @param sym1 oldest symbol on stack 
+ * @param sym2 next symbol on stack
+ * @param sym3 next symbol on stack - top  
+ * 
+ * @return rule or PR_NOTARULE if there was none found 
+ */
+pRules findRule(int num, exprStack* sym1, exprStack* sym2, exprStack* sym3);
+
+/**
+ * @brief Function counts number of symbols to reduce by some rule
+ * 
+ * @return Numbers of symbol to reduce on stack (1 or 3)
+ */
+int symbolsToReduce();
 
 /**
  * @brief Function that covers expression parser 
