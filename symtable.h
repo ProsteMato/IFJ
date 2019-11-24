@@ -20,14 +20,12 @@ typedef enum {
   TYPE_UNDEFINED,
 } data_type;
 
-
-// definice pro binarni strom
-typedef struct SymTabNode { // struktura definujici symbol
-	char * Key; //id
-	tData * Data;
-	struct SymTabNode * LPtr; //levy podstrom
-	struct SymTabNode * RPtr; //pravy podstrom
-} * SymTabNodePtr;
+// ulozeni paramentru funkce
+typedef struct param {
+    char * nazev;	//ukazatel na id
+    struct param * before; //predchozi paramentr
+    struct param * next;	//dalsi parametr
+} param;
 
 typedef struct tData{
 data_type Type; //typ symbolu
@@ -38,12 +36,15 @@ bool Funkce; //funkce
   param * first; //0. parametr (pouze u fce)
 }tData;
 
-// ulozeni paramentru funkce
-typedef struct param {
-    char * nazev;	//ukazatel na id
-    struct param * before; //predchozi paramentr
-    struct param * next;	//dalsi parametr
-} param;
+// definice pro binarni strom
+typedef struct SymTabNode { // struktura definujici symbol
+	char * Key; //id
+	tData * Data;
+	struct SymTabNode * LPtr; //levy podstrom
+	struct SymTabNode * RPtr; //pravy podstrom
+} * SymTabNodePtr;
+
+
 
               //prototypy funkcí - globalni tabulka symbolu
 

@@ -9,10 +9,20 @@
  */
 
 #include "parser.h"
+#define UNGET_TOKEN(token) \
+		int token_return_value = 0; \
+		if ((token_return_value = unget_token((token))) != OK) \
+			return token_return_value
 
+#define PRELOAD_TOKEN(token) \
+		int token_return_value = 0; \
+		if ((token_return_value = preload_token(token)) != OK) \
+			return token_return_value
 
-#define GET_NEXT_TOKEN(token) if (get_next_token(token, 0) == LEX_ERROR) return LEX_ERROR
-#define PRELOAD_NEXT_TOKEN(token) if (get_next_token(token, 1) == LEX_ERROR) return LEX_ERROR
+#define GET_NEXT_TOKEN(token) \
+		int token_return_value = 0; \
+		if ((token_return_value = get_next_token((token))) != OK) \
+			return token_return_value
 
 bool in_function = false;
 bool in_if_while = false;
@@ -127,8 +137,9 @@ int st_list(Token *token) {
 	*/
 	 else if (token->type == TK_EOF) {
 		// TODO možno bude treba ešte upraviť teraz som si neni istý
+		printf("všetko skončilo spravne!\n");
 		return OK;
-	} else if (token->type == TK_ID || token->type == TK_STRING || 
+	} else if (token->type == TK_STRING || 
 			   token->type == TK_FLOAT || token->type == TK_INT || 
 			   token->type == TK_BRACKET_L) {
 
@@ -161,6 +172,7 @@ int next_st_list(Token *token) {
 			/* TODO bude treba opravit este pre dogenerovanie funkcie následne
 			bude treba pridat asi lepšie kontrolu na dedent pre funckiu.
 			*/
+			printf("všetko spravne skončilo\n");
 			return OK;
 		}
 	} else {
@@ -305,17 +317,18 @@ int stat(Token *token) {
 		6:  <stat> -> expr
 	*/
 	} else if (token->type == TK_ID) {
-		Token prelaod_token;
-		PRELOAD_NEXT_TOKEN(&prelaod_token);
+		Token *savedToken = token;
+		GET_NEXT_TOKEN(token);
 		if (
-			prelaod_token.type == TK_MINUS ||
-			prelaod_token.type == TK_PLUS ||
-			prelaod_token.type == TK_MULT ||
-			prelaod_token.type == TK_DIV ||
-			prelaod_token.type == TK_DIV_DIV
+			token->type == TK_MINUS ||
+			token->type == TK_PLUS ||
+			token->type == TK_MULT ||
+			token->type == TK_DIV ||
+			token->type == TK_DIV_DIV
 			) {
+			UNGET_TOKEN(token);
 			//if((returnValue = callExpression(token)) == OK) {
-			if ((returnValue = expression(token)) == OK) {
+			if ((returnValue = expression(savedToken)) == OK) {
 				if(!isRelational) {
 					return OK;
 				} else {
@@ -325,11 +338,10 @@ int stat(Token *token) {
 				return returnValue;
 			}
 		} else if (
-				prelaod_token.type == TK_EOL || 
-				prelaod_token.type == TK_BRACKET_L ||
-				prelaod_token.type == TK_ASSIGN
+				token->type == TK_EOL || 
+				token->type == TK_BRACKET_L ||
+				token->type == TK_ASSIGN
 			) {
-			GET_NEXT_TOKEN(token);
 			return after_id(token);
 		}
 	/*
@@ -470,17 +482,18 @@ int assign(Token *token) {
 			return returnValue;
 		}
 	} else if (token->type == TK_ID) {
-		Token preload_token;
-		PRELOAD_NEXT_TOKEN(&preload_token);
-		if (preload_token.type == TK_BRACKET_L || preload_token.type == TK_EOL) {
+		Token preloaded_token;
+		//TODO prepisat preloadtoken na getnexttoken
+		PRELOAD_TOKEN(&preloaded_token);
+		if (preloaded_token.type == TK_BRACKET_L || preloaded_token.type == TK_EOL) {
 			GET_NEXT_TOKEN(token);
 			return def_id(token);
 		} else if (
-			preload_token.type == TK_PLUS ||
-			preload_token.type == TK_MINUS ||
-			preload_token.type == TK_MULT ||
-			preload_token.type == TK_DIV ||
-			preload_token.type == TK_DIV_DIV
+			preloaded_token.type == TK_PLUS ||
+			preloaded_token.type == TK_MINUS ||
+			preloaded_token.type == TK_MULT ||
+			preloaded_token.type == TK_DIV ||
+			preloaded_token.type == TK_DIV_DIV
 		) {
 			//if((returnValue = callExpression(token)) == OK) {
 			if ((returnValue = expression(token)) == OK) {
@@ -522,7 +535,7 @@ int def_id(Token *token) {
 		GET_NEXT_TOKEN(token);
 		return arg_params(token);
 	} else if (token->type == TK_EOL) {
-		unget_token(token->attribute);
+		UNGET_TOKEN(token);
 		return OK;
 	} else {
 		return SYNTAX_ERROR;
