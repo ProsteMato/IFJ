@@ -10,16 +10,10 @@ int main(int argc, char const *argv[])
     tkq_init();
     Token token;
     int token_return_value = 0;
-    //int i = 0;
+    
     GET_NEXT_TOKEN(&token);
-    // printf("%d\n", token.type);
-    // GET_NEXT_TOKEN(&token);
-    // printf("%d\n", token.type);
-    // unget_token(&token);
-    // GET_NEXT_TOKEN(&token);
-    // printf("%d\n", token.type);
-    // GET_NEXT_TOKEN(&token);
-    // printf("%d\n", token.type);
+
+    //int i = 0;
     // while(token.type != TK_EOF) {
     // 	printf("token %d: type: %d attribute: %s \n", i, token.type, token.attribute);
     // 	if (get_next_token(&token, 0) == LEX_ERROR){
@@ -28,6 +22,7 @@ int main(int argc, char const *argv[])
     // 	}
     // 	i++;
     // }
+    
     int returnType = prog(&token);
     printf("Return code: %d\n",  returnType);
 

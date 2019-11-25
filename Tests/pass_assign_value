@@ -1,1 +1,10 @@
-a
+a = b + a
+a = (b + f)
+a = t()
+a = t(a, """string""", 'ahoj')
+a = 5.5
+if ( a = b ) :
+    pass
+     asda
+else :
+    asdad
