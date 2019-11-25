@@ -2,17 +2,17 @@
 LL-grammer pre IFJ19
 -----------------------------------------------------------------------------------------------
  1:  <prog> -> <st-list>
- 2:  <st-list> -> <stat> EOL <st-list>
+ 2:  <st-list> -> <stat> <st-list>
  3:  <st-list> -> EOF
  4:  <stat> -> def id ( <params> : EOL INDENT <func-nested-st-list>
  5:  <stat> -> id <after_id>
- 6:  <stat> -> expr
- 7:  <stat> -> pass
+ 6:  <stat> -> expr EOL
+ 7:  <stat> -> pass EOL
  8:  <stat> -> while expr : EOL INDENT <nested-st-list>
  9:  <stat> -> if expr : EOL INDENT <nested-st-list> else : EOL INDENT <nested-st-list>
 10:  <params> -> )
 11:  <params> -> id <next-param>
-12:  <next-param> -> , <params>
+12:  <next-param> -> , id <next-param>
 13:  <next-param> -> )
 14:  <arg-params> -> )
 15:  <arg-params> -> <value> <arg-next-params>
@@ -23,28 +23,28 @@ LL-grammer pre IFJ19
 20:  <value> -> string
 21:  <value> -> int
 22:  <value> -> id
-23:  <func-nested-st-list> -> <func-nested-stat> EOL <next-func-nested-st-list>
-24:  <func-nested-stat> -> pass
+23:  <func-nested-st-list> -> <func-nested-stat> <next-func-nested-st-list>
+24:  <func-nested-stat> -> pass EOL
 25:  <func-nested-stat> -> if expr : EOL INDENT <func-nested-st-list> else : EOL INDENT <func-nested-st-list>
-26:  <func-nested-stat> -> expr
+26:  <func-nested-stat> -> expr EOL
 27:  <func-nested-stat> -> while expr : EOL INDENT <func-nested-st-list>
 28:  <func-nested-stat> -> id <after_id>
-29:  <func-nested-stat> -> return expr
+29:  <func-nested-stat> -> return expr EOL
 30:  <next-func-nested-st-list> -> DEDENT
 31:  <next-func-nested-st-list> -> <func-nested-st-list>
-32:  <nested-st-list> -> <nested-stat> EOL <next-nested-st-list>
-33:  <nested-stat> -> pass
+32:  <nested-st-list> -> <nested-stat> <next-nested-st-list>
+33:  <nested-stat> -> pass EOL
 34:  <nested-stat> -> if expr : EOL INDENT <nested-st-list> else : EOL INDENT <nested-st-list>
-35:  <nested-stat> -> expr
+35:  <nested-stat> -> expr EOL
 36:  <nested-stat> -> while expr : EOL INDENT <nested-st-list>
 37:  <nested-stat> -> id <after_id>
 38:  <next-nested-st-list> -> DEDENT
 39:  <next-nested-st-list> -> <nested-st-list>
 40:  <after_id> -> = <assign>
 41:  <after_id> -> <def-id>
-42:  <assign> -> expr
+42:  <assign> -> expr EOL
 43:  <assign> -> id <def-id>
-44:  <def-id> -> ( <arg-params>
+44:  <def-id> -> ( <arg-params> EOL
 45:  <def-id> -> EOL
 
 
