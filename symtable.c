@@ -12,7 +12,7 @@ void GlobalSymTabInit (SymTabNodePtr *RootPtr) {
 	*RootPtr = NULL;
 }
 
-//vyhledani promenne podle jejiho id -- melo by byt hotove
+//vyhledani promenne podle jejiho id
 int GlobalSymTabSearch (SymTabNodePtr RootPtr, char * K, tData **Obsah)	{
 
 	if (RootPtr == NULL) return FALSE; //neuspesne hledani
@@ -170,4 +170,68 @@ void LocalSymTabDispose (SymTabNodePtr *RootPtr) {
 		free (*RootPtr);
 		*RootPtr = NULL;
 	}
+}
+
+		//funkce pro seznam parametru
+
+void ParamInit (ParamList * L) {
+	L->first = NULL;
+	L->act = NULL;
+}
+
+int ParamInsert(ParamList *L, char * id) {
+  param * tmp = malloc (sizeof(struct param));
+  param * last;
+
+	if (tmp == NULL || L == NULL) return INTERNAL_ERROR;
+	else {
+	  	last = L->last;
+		tmp->nazev = id;
+		tmp->before = last;
+		tmp->next = NULL;
+		if (last != NULL) last->next = tmp;
+		else L->first = tmp;
+		L->last = tmp;
+	}
+}
+
+void DLDisposeList (ParamList *L) {
+  if (L != NULL) {
+    param * tmp;
+    param * next;
+
+    tmp = L->first;
+  	while (tmp != NULL) {
+      next = tmp->next;
+  		free (tmp);
+  		tmp = next;
+  	}
+    ParamInit (L);
+  }
+}
+
+void ParamFirst (ParamList *L){
+	L->act = L->first;
+}
+
+void DLSucc (ParamList *L) {
+  if (L != NULL && L->act != NULL) {
+    if (L->act != L->last) {
+      L->act = L->act->next; //presunu aktivitu na nasledujici
+    } else {
+      L->act = NULL; //pokud byl aktivni posledni prvek -> neaktivni
+    }
+  }
+}
+
+char *ParamListGetActive(ParamList *L) {
+    if (L != NULL) {
+        if (L->act != NULL)
+            return L->act->nazev;
+        else
+            return NULL;
+    }
+    else {
+        return NULL;
+    }
 }

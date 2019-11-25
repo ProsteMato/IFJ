@@ -104,6 +104,45 @@ void LocalSymTabDelete (SymTabNodePtr *, char *);
 @param SymTabNodePtr - ukazatel na tabulku symbolu */
 void LocalSymTabDispose (SymTabNodePtr *);
 
+/*
+// ulozeni paramentru funkce
+typedef struct param {
+    char * nazev;	//ukazatel na id
+    struct param * before; //predchozi paramentr
+    struct param * next;	//dalsi parametr
+} param; */
 
-///// TO DO ///
-//funkce pro paramentry
+typedef struct paramlist {
+        param *first;
+        param *act;
+        param *last;
+    } ParamList;
+
+              //prototypy funkcí - seznam parametru funkce
+
+/** inicializace seznamu parametru
+@param param - ukazatel seznam parametru */
+void ParamInit (ParamList *);
+
+/** vlozeni parametru na seznam, parametr bude vlozen na konec 
+@param param - ukazatel na seznam parametru
+@param char - klic (id) paramentru 
+@return v pripade neupechu alokace vraci chybu 99 */
+int ParamInsert (ParamList *, char *);
+
+/** zruseni seznamu parametru
+@param param - ukazatel seznam parametru */
+void ParamDispose (ParamList *);
+
+/** nastaveni aktivity na 1. prvek seznamu parametru
+@param param - ukazatel seznam parametru */
+void ParamFirst (ParamList *);
+
+/** posune aktivitu na nasledujici prvek seznamu parametru
+@param param - ukazatel seznam parametru */
+void ParamSucc (ParamList *);
+
+/** vraci id aktivniho prvku
+@param param - ukazatel seznam parametru 
+@return vraci id aktivniho prvku nebo NULL pokud neni aktivni */
+char *ParamGetActive(ParamList *);
