@@ -85,17 +85,19 @@ int prog(Token *token) {
 int st_list(Token *token) {
 	
 	/* TODO opravit podľa novej LL tabulky a gramatiky
-		2: <st-list> -> <stat> EOL <st-list>
-		23: <func-nested-st-list> -> <func-nested-stat> EOL <next-func-nested-st-list>
-		32:  <nested-st-list> -> <nested-stat> EOL <next-nested-st-list>
+		2: <st-list> -> <stat> <st-list>
+		23: <func-nested-st-list> -> <func-nested-stat> <next-func-nested-st-list>
+		32:  <nested-st-list> -> <nested-stat> <next-nested-st-list>
 	*/
-	int returnValue = SYNTAX_ERROR;
+	int returnValue = 0;
 	if (token->type == TK_KW && !(strcmp(token->attribute, "None") == 0)) {
 		if (strcmp(token->attribute, "def") == 0 && !in_function && !in_if_while) {
 			returnValue = stat(token);
 			if (returnValue == OK) {
 				GET_NEXT_TOKEN(token);
 				return st_list(token);
+			} else {
+				return returnValue;
 			}
 		} else if (strcmp(token->attribute, "if") == 0) {
 			returnValue = stat(token);
@@ -106,6 +108,8 @@ int st_list(Token *token) {
 				} else {
 					return next_st_list(token);
 				}
+			} else {
+				return returnValue;
 			}
 		} else if (strcmp(token->attribute, "while") == 0) {
 			returnValue = stat(token);
@@ -116,39 +120,12 @@ int st_list(Token *token) {
 				} else {
 					return next_st_list(token);
 				}
+			} else {
+				return returnValue;
 			}
 		} else if (strcmp(token->attribute, "pass") == 0) {
 			returnValue = stat(token);
 			if (returnValue == OK) {
-				GET_NEXT_TOKEN(token);
-				if (token->type == TK_EOL) {
-					GET_NEXT_TOKEN(token);
-					if (!in_function && !in_if_while) {
-						return st_list(token);
-					} else {
-						return next_st_list(token);
-					}
-				}
-			}
-		} else if (strcmp(token->attribute, "return") == 0 && in_function) {
-			returnValue = stat(token);
-			if (returnValue == OK) {
-				GET_NEXT_TOKEN(token);
-				if (token->type == TK_EOL) {
-					GET_NEXT_TOKEN(token);
-					if (!in_function && !in_if_while) {
-						return st_list(token);
-					} else {
-						return next_st_list(token);
-					}
-				}
-			}
-		}
-	} else if (token->type == TK_ID) {
-		returnValue = stat(token);
-		if (returnValue == OK) {
-			GET_NEXT_TOKEN(token);
-			if (token->type == TK_EOL) {
 				GET_NEXT_TOKEN(token);
 				if (!in_function && !in_if_while) {
 					return st_list(token);
@@ -156,8 +133,32 @@ int st_list(Token *token) {
 					return next_st_list(token);
 				}
 			} else {
-				return SYNTAX_ERROR;
+				return returnValue;
 			}
+		} else if (strcmp(token->attribute, "return") == 0 && in_function) {
+			returnValue = stat(token);
+			if (returnValue == OK) {
+				GET_NEXT_TOKEN(token);
+				if (!in_function && !in_if_while) {
+					return st_list(token);
+				} else {
+					return next_st_list(token);
+				}
+			} else {
+				return returnValue;
+			}
+		}
+	} else if (token->type == TK_ID) {
+		returnValue = stat(token);
+		if (returnValue == OK) {
+			GET_NEXT_TOKEN(token);
+			if (!in_function && !in_if_while) {
+				return st_list(token);
+			} else {
+				return next_st_list(token);
+			}
+		} else {
+			return returnValue;
 		}
 	}
 
@@ -174,7 +175,7 @@ int st_list(Token *token) {
 
 		return stat(token);
 	}
-	return returnValue;
+	return SYNTAX_ERROR;
 }
 
 int next_st_list(Token *token) {
@@ -317,21 +318,27 @@ int stat(Token *token) {
 				return returnValue;
 			}
 		/*
-			7:  <stat> -> pass
-			24:  <func-nested-stat> -> pass
-			33:  <nested-stat> -> pass
+			7:  <stat> -> pass EOL
+			24:  <func-nested-stat> -> pass EOL
+			33:  <nested-stat> -> pass EOL
 		*/
 		} else if (strcmp(token->attribute, "pass") == 0) {
-			return OK;
+			GET_NEXT_TOKEN(token);
+			if (token->type == TK_EOL) {
+				return OK;
+			}
 		/*
-			29:  <func-nested-stat> -> return expr
+			29:  <func-nested-stat> -> return expr EOL
 		*/
 		} else if (strcmp(token->attribute, "return") == 0 && in_function) {
 			GET_NEXT_TOKEN(token);
 			//if((returnValue = callExpression(token)) == OK) {
 			if ((returnValue = expression(token)) == OK) {
 				if (!isRelational) {
-					return OK;
+					GET_NEXT_TOKEN(token);
+					if (token->type == TK_EOL) {
+						return OK;
+					}
 				} else {
 					return SYNTAX_ERROR;
 				}
@@ -343,9 +350,9 @@ int stat(Token *token) {
 		5:  <stat> -> id <after_id>
 		28:  <func-nested-stat> -> id <after_id>
 		37:  <nested-stat> -> id <after_id>
-		26:  <func-nested-stat> -> expr
-		35:  <nested-stat> -> expr
-		6:  <stat> -> expr
+		26:  <func-nested-stat> -> expr EOL
+		35:  <nested-stat> -> expr EOL
+		6:  <stat> -> expr EOL
 	*/
 	} else if (token->type == TK_ID) {
 		Token *savedToken = token;
@@ -361,7 +368,10 @@ int stat(Token *token) {
 			//if((returnValue = callExpression(token)) == OK) {
 			if ((returnValue = expression(savedToken)) == OK) {
 				if(!isRelational) {
-					return OK;
+					GET_NEXT_TOKEN(token);
+					if (token->type == TK_EOL) {
+						return OK;
+					}
 				} else {
 					return SYNTAX_ERROR;
 				}
@@ -376,9 +386,9 @@ int stat(Token *token) {
 			return after_id(token);
 		}
 	/*
-		26:  <func-nested-stat> -> expr
-		35:  <nested-stat> -> expr
-		6:  <stat> -> expr
+		26:  <func-nested-stat> -> expr	EOL
+		35:  <nested-stat> -> expr EOL
+		6:  <stat> -> expr EOL
 	*/
 	} else if (
 		token->type == TK_FLOAT ||
@@ -389,7 +399,10 @@ int stat(Token *token) {
 		//if((returnValue = callExpression(token)) == OK) {
 		if ((returnValue = expression(token)) == OK) {
 			if(!isRelational) {
-				return OK;
+				GET_NEXT_TOKEN(token);
+				if (token->type == TK_EOL) {
+					return OK;
+				}
 			} else {
 				return SYNTAX_ERROR;
 			}
@@ -491,7 +504,7 @@ int arg_next_params(Token *token) {
 }
 
 /*
-42:  <assign> -> expr
+42:  <assign> -> expr EOL
 43:  <assign> -> id <def-id>
 */
 int assign(Token *token) {
@@ -506,7 +519,10 @@ int assign(Token *token) {
 		//if((returnValue = callExpression(token)) == OK) {
 		if ((returnValue = expression(token)) == OK) {
 			if(!isRelational) {
-				return OK;
+				GET_NEXT_TOKEN(token);
+				if (token->type == TK_EOL) {
+					return OK;
+				}
 			} else {
 				return SYNTAX_ERROR;
 			}
@@ -529,7 +545,10 @@ int assign(Token *token) {
 			//if((returnValue = callExpression(savedToken)) == OK) {
 			if ((returnValue = expression(savedToken)) == OK) {
 				if(!isRelational) {
-					return OK;
+					GET_NEXT_TOKEN(token);
+					if (token->type == TK_EOL) {
+						return OK;
+					}
 				} else {
 					return SYNTAX_ERROR;
 				}
@@ -557,20 +576,23 @@ int after_id(Token *token) {
 }
 
 /*
-44:  <def-id> -> ( <arg-params>
+44:  <def-id> -> ( <arg-params> EOL
 45:  <def-id> -> EOL
 */
 int def_id(Token *token) {
 	//TODO pridat generovanie atd...
 	if (token->type == TK_BRACKET_L) {
 		GET_NEXT_TOKEN(token);
-		return arg_params(token);
+		if (arg_params(token) == OK) {
+			GET_NEXT_TOKEN(token);
+			if (token->type == TK_EOL) {
+				return OK;
+			}
+		}
 	} else if (token->type == TK_EOL) {
-		UNGET_TOKEN(token);
 		return OK;
-	} else {
-		return SYNTAX_ERROR;
-	}
+	} 
+	return SYNTAX_ERROR;
 }
 
 

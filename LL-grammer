@@ -52,12 +52,12 @@ LL-grammer pre IFJ19
 Pre program na tvorenie LL tabulky pre iný dovod to tu nieje
 -----------------------------------------------------------------------------------------------
  1:   PROG  →  ST-LIST
- 2:   ST-LIST  →  STAT eol ST-LIST
+ 2:   ST-LIST  →  STAT ST-LIST
  3:   ST-LIST -> eof
  4:   STAT → def id ( PARAMS : eol indent NESTED-ST-LIST
  5:   STAT → id AFTED_ID
- 6:   STAT → expr
- 7:   STAT → pass
+ 6:   STAT → expr eol
+ 7:   STAT → pass eol
  8:   STAT → while expr : eol indent NESTED-ST-LIST
  9:   STAT → if expr : eol indent NESTED-ST-LIST else : eol indent NESTED-ST-LIST
 10:   PARAMS → )
@@ -73,27 +73,27 @@ Pre program na tvorenie LL tabulky pre iný dovod to tu nieje
 20:   VALUE → string
 21:   VALUE → int
 22:   VALUE → id
-23:   FUNC-NESTED-ST-LIST -> FUNC-NESTED-STAT eol NEXT-FUNC-NESTED-ST-LIST
-24:   FUNC-NESTED-STAT -> pass
+23:   FUNC-NESTED-ST-LIST -> FUNC-NESTED-STAT NEXT-FUNC-NESTED-ST-LIST
+24:   FUNC-NESTED-STAT -> pass eol
 25:   FUNC-NESTED-STAT -> if expr : eol indent FUNC-NESTED-STAT else : eol indent FUNC-NESTED-STAT
-26:   FUNC-NESTED-STAT -> expr
+26:   FUNC-NESTED-STAT -> expr eol
 27:   FUNC-NESTED-STAT -> while expr : eol indent FUNC-NESTED-STAT
 28:   FUNC-NESTED-STAT -> id AFTED_ID
-29:   FUNC-NESTED-STAT -> return expr
+29:   FUNC-NESTED-STAT -> return expr eol
 30:   NEXT-FUNC-NESTED-ST-LIST -> dedent
 31:   NEXT-FUNC-NESTED-ST-LIST -> FUNC-NESTED-ST-LIST
-32:   NESTED-ST-LIST → NESTED-STAT eol NEXT-NESTED-ST-LIST
-33:   NESTED-STAT → pass
+32:   NESTED-ST-LIST → NESTED-STAT NEXT-NESTED-ST-LIST
+33:   NESTED-STAT → pass eol
 34:   NESTED-STAT → if expr : eol indent NESTED-ST-LIST else : eol indent NESTED-ST-LIST
-35:   NESTED-STAT → expr
+35:   NESTED-STAT → expr eol
 36:   NESTED-STAT → while expr : eol indent NESTED-ST-LIST
 37:   NESTED-STAT → id AFTED_ID
 38:   NEXT-NESTED-ST-LIST -> dedent
 39:   NEXT-NESTED-ST-LIST -> NESTED-ST-LIST
 40:   AFTED_ID -> = ASSIGN
 41:   AFTED_ID -> DEF-ID
-42:   ASSIGN → expr
+42:   ASSIGN → expr eol
 43:   ASSIGN -> id DEF-ID
-44:   DEF-ID -> ( ARG-PARAMS
+44:   DEF-ID -> ( ARG-PARAMS eol
 45:   DEF-ID -> eol
 -----------------------------------------------------------------------------------------------

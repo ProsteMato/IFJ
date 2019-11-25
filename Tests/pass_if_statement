@@ -6,11 +6,11 @@ if (a == b) :
         pass
 else :
     pass
-while a = b :
+while a == b :
     ahoj
-    while a = c :
+    while a == c :
         ahoj
-        while a = c:
+        while a == c:
             ahoj
     ahoj
 ahoj
