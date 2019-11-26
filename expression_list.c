@@ -62,6 +62,7 @@ int listInsertAct(exprList *eList, pTable symbol, data_type dType)
     newItem->dType = dType;
     newItem->lptr = eList->act;
     newItem->rptr= NULL;
+    eList->act->rptr = newItem;
     eList->last = newItem;
     eList->act = newItem;
     return OK;

@@ -20,7 +20,7 @@
 
 #define tableSize 19 
 bool isRelational;  //is operator relational? <, <=, >, >=, ==, != 
-int error;
+data_type finalType; // final type of expression 
 
 typedef enum {
   PT_PLUS,  // 0
@@ -114,7 +114,7 @@ typedef enum {
  * @return index in precedence table  
  *          error code 
  */
-int getIndex(Token* token) ;
+int getIndex(Token *token) ;
 
 /**
  * @brief Function to find data type of token 
@@ -156,9 +156,10 @@ int checkDivisionByZero(Token *token);
  * 
  * @param token first token 
  * 
- * @return eList list with loaded tokens
+ * @return OK if everything was okay
+ *        CODE_ERROR if there was error
  */
-exprList* createList(Token* token);
+//int createList(Token *token, exprList *eList);
 
 /**
  * @brief Functions finds rule for reducing 

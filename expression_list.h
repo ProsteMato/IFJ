@@ -18,7 +18,7 @@
  * 
  * @param eList to initialize 
  */
-void listInitialize(exprList* eList);
+void listInitialize(exprList *eList);
 
 /**
  * @brief Insert first token 
