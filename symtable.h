@@ -98,30 +98,30 @@ void GlobalSymTabDispose (SymTabNodePtr *);
 
 //inicializace lokalni tabulky symbolu
 //@param SymTabNodePtr - ukazatel na tabulku symbolu
-void LocalSymTabInit (SymTabNodePtr *);
+void LocalSymTabInit (LocalTableNode *);
 
 /** hledani symbolu podle klice
 @param SymTabNodePtr - tabulka symbolu
 @param char - klic (id) hledaneho symbolu
 @param tData - misto kam se ulozi najdena data
 @return vraci false pokud je hledani neuspesne */
-int LocalSymTabSearch (SymTabNodePtr, char *, LocalTableData **);
+int LocalSymTabSearch (LocalTableNode, char *, LocalTableData **);
 
 /** vlozeni noveho symbolu
 @param SymTabNodePtr - ukazatel na sym.tab. 
 @param char - klic (id) vlozeneho symbolu 
 @param tData - ukazatel na data 
 @return v pripade neuspech alokace vraci chybu INTERNAL_ERROR */
-int LocalSymTabInsert (SymTabNodePtr *, char *, LocalTableData *);
+int LocalSymTabInsert (LocalTableNode *, char *, LocalTableData *);
 
 /** vymazani symbolu
 @param SymTabNodePtr - ukazatel na sym.tab.
 @param char - klic (id) symbolu který má být smazán */
-void LocalSymTabDelete (SymTabNodePtr *, char *);
+void LocalSymTabDelete (LocalTableNode *, char *);
 
 /** zruseni tabulky symbolu
 @param SymTabNodePtr - ukazatel na tabulku symbolu */
-void LocalSymTabDispose (SymTabNodePtr *);
+void LocalSymTabDispose (LocalTableNode *);
 
 /*
 // ulozeni paramentru funkce
