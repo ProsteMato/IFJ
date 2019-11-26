@@ -1,0 +1,21 @@
+if (a == b) :
+    if (a == b) :
+        pass
+        pass
+    else :
+        pass
+else :
+    pass
+while a == b :
+    ahoj
+    while a == c :
+        ahoj
+        while a == c:
+            ahoj
+    ahoj
+ahoj
+ahoj
+def id (a, a, b) :
+    pass
+    return,
+ahoj
