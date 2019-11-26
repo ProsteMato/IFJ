@@ -23,19 +23,16 @@ typedef enum {
 
 // ulozeni paramentru funkce
 typedef struct param {
-    char * nazev;	//ukazatel na id
+    char * id;	//ukazatel na id
     struct param * before; //predchozi paramentr
     struct param * next;	//dalsi parametr
 } param;
 
-typedef struct GlobalTableData{
-  Data_type type; //typ symbolu
-  bool define;
-  bool funkce; //funkce
-  int pocet_par; //pouze u fce
-  LocalTableNode *localTableNode;
-  ParamList *paramList; //0. parametr (pouze u fce)
-} GlobalTableData;
+typedef struct paramlist {
+  param *first;
+  param *act;
+  param *last;
+} ParamList;
 
 typedef struct LocalTableData {
   bool define;
@@ -49,6 +46,15 @@ typedef struct LocalTableNode {
   struct LocalTableNode *RPtr;
 } LocalTableNode;
 
+typedef struct GlobalTableData{
+  Data_type type; //typ symbolu
+  bool define;
+  bool funkce; //funkce
+  int pocet_par; //pouze u fce
+  LocalTableNode *localTableNode;
+  ParamList *paramList; //0. parametr (pouze u fce)
+} GlobalTableData;
+
 // definice pro binarni strom
 typedef struct SymTabNode { // struktura definujici symbol
 	char * Key; //id
@@ -56,14 +62,6 @@ typedef struct SymTabNode { // struktura definujici symbol
 	struct SymTabNode * LPtr; //levy podstrom
 	struct SymTabNode * RPtr; //pravy podstrom
 } * SymTabNodePtr;
-
-
-typedef struct paramlist {
-  param *first;
-  param *act;
-  param *last;
-} ParamList;
-
 
 //prototypy funkcí - globalni tabulka symbolu
 
