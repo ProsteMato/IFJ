@@ -18,7 +18,8 @@ typedef enum {
   TYPE_STRING,
   TYPE_NONE,
   TYPE_UNDEFINED,
-} data_type;
+  TYPE_PARAM,
+} Data_type;
 
 // ulozeni paramentru funkce
 typedef struct param {
@@ -27,26 +28,44 @@ typedef struct param {
     struct param * next;	//dalsi parametr
 } param;
 
-typedef struct tData{
-data_type Type; //typ symbolu
-bool Define;
-bool Global; //globalni promenna
-bool Funkce; //funkce
+typedef struct GlobalTableData{
+  Data_type type; //typ symbolu
+  bool define;
+  bool funkce; //funkce
   int pocet_par; //pouze u fce
-  param * first; //0. parametr (pouze u fce)
-}tData;
+  LocalTableNode *localTableNode;
+  ParamList *paramList; //0. parametr (pouze u fce)
+} GlobalTableData;
+
+typedef struct LocalTableData {
+  bool define;
+  Data_type type;
+} LocalTableData;
+
+typedef struct LocalTableNode {
+  char *Key;
+  LocalTableData *localData;
+  struct LocalTableNode *LPtr;
+  struct LocalTableNode *RPtr;
+} LocalTableNode;
 
 // definice pro binarni strom
 typedef struct SymTabNode { // struktura definujici symbol
 	char * Key; //id
-	tData * Data;
+	GlobalTableData * Data;
 	struct SymTabNode * LPtr; //levy podstrom
 	struct SymTabNode * RPtr; //pravy podstrom
 } * SymTabNodePtr;
 
 
+typedef struct paramlist {
+  param *first;
+  param *act;
+  param *last;
+} ParamList;
 
-              //prototypy funkcí - globalni tabulka symbolu
+
+//prototypy funkcí - globalni tabulka symbolu
 
 //inicializace globalni tabulky symbolu
 //@param SymTabNodePtr - ukazatel na tabulku symbolu
@@ -57,14 +76,14 @@ void GlobalSymTabInit (SymTabNodePtr *);
 @param char - klic (id) hledaneho symbolu
 @param tData - misto kam se ulozi najdena data
 @return vraci false pokud je hledani neuspesne */
-int GlobalSymTabSearch (SymTabNodePtr, char *, tData **);
+int GlobalSymTabSearch (SymTabNodePtr, char *, GlobalTableData **);
 
 /** vlozeni noveho symbolu
 @param SymTabNodePtr - ukazatel na sym.tab. 
 @param char - klic (id) vlozeneho symbolu 
 @param tData - ukazatel na data 
 @return v pripade neuspech alokace vraci chybu INTERNAL_ERROR */
-int GlobalSymTabInsert (SymTabNodePtr *, char *, tData *);
+int GlobalSymTabInsert (SymTabNodePtr *, char *, GlobalTableData *);
 
 /** vymazani symbolu
 @param SymTabNodePtr - ukazatel na sym.tab.
@@ -86,14 +105,14 @@ void LocalSymTabInit (SymTabNodePtr *);
 @param char - klic (id) hledaneho symbolu
 @param tData - misto kam se ulozi najdena data
 @return vraci false pokud je hledani neuspesne */
-int LocalSymTabSearch (SymTabNodePtr, char *, tData **);
+int LocalSymTabSearch (SymTabNodePtr, char *, LocalTableData **);
 
 /** vlozeni noveho symbolu
 @param SymTabNodePtr - ukazatel na sym.tab. 
 @param char - klic (id) vlozeneho symbolu 
 @param tData - ukazatel na data 
 @return v pripade neuspech alokace vraci chybu INTERNAL_ERROR */
-int LocalSymTabInsert (SymTabNodePtr *, char *, tData *);
+int LocalSymTabInsert (SymTabNodePtr *, char *, LocalTableData *);
 
 /** vymazani symbolu
 @param SymTabNodePtr - ukazatel na sym.tab.
@@ -111,12 +130,6 @@ typedef struct param {
     struct param * before; //predchozi paramentr
     struct param * next;	//dalsi parametr
 } param; */
-
-typedef struct paramlist {
-        param *first;
-        param *act;
-        param *last;
-    } ParamList;
 
               //prototypy funkcí - seznam parametru funkce
 
