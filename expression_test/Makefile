@@ -5,10 +5,10 @@ all: test
 #run:
 #	./test <input
 
-test:  expression_parser.o ../expression_parser.h expr_test.c expression_stack.o expression_list.o stack.o string.o 
+test:  expression_parser.o ../expression_parser.h expr_test.c expression_stack.o expression_list.o scanner.o stack.o string.o 
 	${CC} ${CFLAGS}  $^ -o $@
 
-expression_parser.o: ../expression_parser.c ../expression_parser.h 
+expression_parser.o: ../expression_parser.c ../expression_parser.h ../scanner.h
 	${CC} ${CFLAGS} $< -c -o $@
 
 expression_stack.o: ../expression_stack.c ../expression_stack.h 

@@ -11,6 +11,7 @@
 
 #include "expression_parser.h"
 #include "error.h"
+#include "scanner.h"
 
 
 const char precedenceTable[tableSize][tableSize] = {
@@ -41,6 +42,7 @@ stackTop stack;
 
 int getIndex(Token *token)
 {
+      void tkq_init(); 
   // zisti error
   if (token == NULL)
    {
@@ -93,6 +95,7 @@ int getIndex(Token *token)
  
 data_type getDataType(Token *token)
 {
+      void tkq_init(); 
       if (token->type == TK_INT)
       {
             return TYPE_INT;
@@ -114,6 +117,10 @@ data_type getDataType(Token *token)
         //tData* identifier; 
         // zavolanie funkcie SymTableSearch - a overenie čo vrátila 
         return TYPE_UNDEFINED;
+      }
+      else if (token->type == TK_EOL || token->type == TK_EOF || token->type == TK_COLON)
+      {
+            return TYPE_UNDEFINED;
       }
       // zistiť dátový typ pre kľúčové slovo None 
       // TODO možno NONE zmenené na iné, skontrolovať s tab. symbolov
@@ -176,11 +183,26 @@ int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3
                   if (sym1->dType == TYPE_INT && sym3->dType == TYPE_FLOAT)
                   {
                         retypeSym1 = true; 
+                        finalType = TYPE_FLOAT;
                   }
 
                   if (sym1->dType == TYPE_FLOAT && sym3->dType == TYPE_INT)
                   {
                         retypeSym3 = true; 
+                        finalType = TYPE_FLOAT;
+                  }
+
+                  if (sym1->dType == TYPE_STRING && sym3->dType == TYPE_STRING)
+                  {
+                        finalType=TYPE_STRING;
+                  }
+                  if (sym1->dType == TYPE_INT && sym3->dType == TYPE_INT)
+                  {
+                        finalType= TYPE_INT;
+                  }
+                  if ( sym1->dType == TYPE_FLOAT && sym3->dType == TYPE_FLOAT)
+                  {
+                        finalType = TYPE_FLOAT;
                   }
                   break;
 
@@ -198,11 +220,21 @@ int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3
                   if (sym1->dType == TYPE_INT && sym3->dType == TYPE_FLOAT)
                   {
                         retypeSym1 = true; 
+                        finalType = TYPE_FLOAT;
                   }
 
                   if (sym1->dType == TYPE_FLOAT && sym3->dType == TYPE_INT)
                   {
                         retypeSym3 = true; 
+                        finalType = TYPE_FLOAT;
+                  }
+                   if (sym1->dType == TYPE_INT && sym3->dType == TYPE_INT)
+                  {
+                        finalType= TYPE_INT;
+                  }
+                  if ( sym1->dType == TYPE_FLOAT && sym3->dType == TYPE_FLOAT)
+                  {
+                        finalType = TYPE_FLOAT;
                   }
                   break;
 
@@ -220,11 +252,21 @@ int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3
                   if (sym1->dType == TYPE_INT && sym3->dType == TYPE_FLOAT)
                   {
                         retypeSym1 = true; 
+                        finalType = TYPE_FLOAT;
                   }
 
                   if (sym1->dType == TYPE_FLOAT && sym3->dType == TYPE_INT)
                   {
                         retypeSym3 = true; 
+                        finalType = TYPE_FLOAT;
+                  }
+                   if (sym1->dType == TYPE_INT && sym3->dType == TYPE_INT)
+                  {
+                        finalType= TYPE_INT;
+                  }
+                  if ( sym1->dType == TYPE_FLOAT && sym3->dType == TYPE_FLOAT)
+                  {
+                        finalType = TYPE_FLOAT;
                   }
                   break;
 
@@ -242,11 +284,21 @@ int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3
                   if (sym1->dType == TYPE_INT && sym3->dType == TYPE_FLOAT)
                   {
                         retypeSym1 = true; 
+                        finalType = TYPE_FLOAT;
                   }
 
                   if (sym1->dType == TYPE_FLOAT && sym3->dType == TYPE_INT)
                   {
                         retypeSym3 = true; 
+                        finalType = TYPE_FLOAT;
+                  }
+                   if (sym1->dType == TYPE_INT && sym3->dType == TYPE_INT)
+                  {
+                        finalType= TYPE_INT;
+                  }
+                  if ( sym1->dType == TYPE_FLOAT && sym3->dType == TYPE_FLOAT)
+                  {
+                        finalType = TYPE_FLOAT;
                   }
                   break;
             
@@ -265,6 +317,7 @@ int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3
                   {
                         return SEM_TYPE_ERROR;
                   }
+                  finalType = TYPE_INT;
                   break;
             
             case (PR_ELESSE):
@@ -285,6 +338,7 @@ int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3
                   {
                         return SEM_TYPE_ERROR;
                   }
+                  finalType = TYPE_UNDEFINED;
                   break;
 
             case (PR_ELESSEQE):
@@ -305,6 +359,7 @@ int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3
                   {
                         return SEM_TYPE_ERROR;
                   }
+                  finalType = TYPE_UNDEFINED;
                   break;
             
             case (PR_EGREATE):
@@ -325,6 +380,7 @@ int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3
                   {
                         return SEM_TYPE_ERROR;
                   }
+                  finalType = TYPE_UNDEFINED;
                   break;
 
             case (PR_EGREATEQE): 
@@ -345,6 +401,7 @@ int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3
                   {
                         return SEM_TYPE_ERROR;
                   }
+                  finalType = TYPE_UNDEFINED;
                   break;
             case (PR_EEQE):
                   if (sym1->dType == TYPE_INT && sym3->dType == TYPE_FLOAT)
@@ -356,6 +413,7 @@ int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3
                   {
                         retypeSym3 = true; 
                   }
+                  finalType = TYPE_UNDEFINED;
                   break;
 
             case (PR_ENOTEQE): 
@@ -368,6 +426,7 @@ int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3
                   {
                         retypeSym3 = true; 
                   }
+                  finalType = TYPE_UNDEFINED;
                   break;    
             default: 
                   break;
@@ -397,7 +456,13 @@ int checkDivisionByZero(Token *token)
 {
   //Token *nextToken;
   //preload_token(nextToken);
-  preload_token(token);
+  void tkq_init(); 
+  int l = preload_token(token);
+  if ( l != OK)
+  {
+      fprintf(stderr,"Error with getting next token.\n");
+      return l; 
+  }
 
   if ( (strcmp(token -> attribute, "0")) == 0)
   {
@@ -408,42 +473,46 @@ int checkDivisionByZero(Token *token)
 
 }
 
-
-exprList* createList(Token* token)
+/**
+int createList(Token *token, exprList *eList)
 {
+  void tkq_init(); 
   int leftBracket = 0;
   int rightBracket =0; 
-  pTable symbol= getIndex(token);
-  data_type dType= getDataType(token);
+  pTable symbol= getIndex(&token);
+  data_type dType= getDataType(&token);
   if (symbol == -1 )
   {
       error = INTERNAL_ERROR;
       return NULL;
   }
-  exprList* eList=NULL;
-  listInitialize(eList);
-  listInsertFirst(eList,symbol,dType);
+  listInitialize(&eList);
+  listInsertFirst(&eList,symbol,dType);
   
-  // maybe insert this to function eList createList(eList* eList, Token* token, int* error)
   // Load tokens into list 
   do 
   {
-      get_next_token(token); 
-      symbol= getIndex(token);
+      int e = get_next_token(&token); 
+      if  (e != OK)
+      {     
+            error= e;
+            return error;
+      }
+      symbol= getIndex(&token);
       if (symbol == -1 )
       {
-            listDispose(eList);
+            listDispose(&eList);
             error= INTERNAL_ERROR;
-            return NULL;
+            return error;
       }
-      data_type dType= getDataType(token);
+      data_type dType= getDataType(&token);
       if (token->type == TK_KW)
       {
             if ((strcmp(token->attribute, "None")) != 0)
             { 
-                  listDispose(eList);
+                  listDispose(&eList);
                   error = SYNTAX_ERROR;
-                  return NULL;
+                  return error;
             }
       }
       //count number of brackets - must be even
@@ -484,29 +553,28 @@ exprList* createList(Token* token)
 
       if (token->type == TK_DIV)
       {
-            int div = checkDivisionByZero(token);
+            int div = checkDivisionByZero(&token);
             if ( div == DIVISION_BY_ZERO_ERROR)
             { 
-                  listDispose(eList);
+                  listDispose(&eList);
                   fprintf(stderr, "Div with zero.");
                   error= SYNTAX_ERROR;
-                  return NULL;
+                  return error;
             }
       } 
       
       if (token->type == TK_DIV_DIV)
       {
-            int div = checkDivisionByZero(token);
+            int div = checkDivisionByZero(&token);
             if ( div == DIVISION_BY_ZERO_ERROR)
             { 
-                  listDispose(eList);
+                  listDispose(&eList);
                   fprintf(stderr, "Div Div with zero.");
                   error = SYNTAX_ERROR;
-                  return NULL;
+                  return error;
             }
       }
-      dType = getDataType(token); 
-      listInsertAct(eList,symbol, dType);
+      listInsertAct(&eList,symbol, dType);
       
   }
   while ( token->type != TK_EOL);
@@ -514,13 +582,13 @@ exprList* createList(Token* token)
   if ( leftBracket != rightBracket) 
   {
       fprintf(stderr, "Number of left brackets doesnt match number of right brackets");
-      listDispose(eList);
+      listDispose(&eList);
       error = SYNTAX_ERROR;
       return NULL;
   }
   return OK;
 }
-
+*/
 
 pRules findRule(int num, exprStack* sym1, exprStack* sym2, exprStack* sym3)
 { 
@@ -635,108 +703,233 @@ int symbolsToReduce()
 
 int callExpression(Token *token)
 {
-  void tkq_init();
-  // so far, we don't know if the operand is relational 
-  isRelational = false;
-  // creating the list - loading tokens from input
-  exprList* eList = NULL;
-  listInitialize(eList);
-  eList=createList(token);
-  if ( error == SYNTAX_ERROR)
+  void tkq_init(); 
+  int leftBracket = 0;
+  int rightBracket =0; 
+  pTable symbol= getIndex(token);
+  exprList eList;
+  data_type dType= getDataType(token);
+  if (symbol == -1 )
   {
-      listDispose(eList);
-      return SYNTAX_ERROR;
-  }
-
-  if ( error == INTERNAL_ERROR)
-  {
-      listDispose(eList);
       return INTERNAL_ERROR;
   }
+  listInitialize(&eList);
+  listInsertFirst(&eList,symbol,dType);
+  int e = get_next_token(token); 
+  if  (e != OK)
+  {     
+      return e;
+  } 
+  // Load tokens into list, count brackets, control division by 0
+   while ( token->type != TK_EOL && token->type != TK_EOF && token->type != TK_COLON)
+  {
+      symbol= getIndex(token);
+      if (symbol == -1 )
+      {
+            listDispose(&eList);
+            return INTERNAL_ERROR;
+      }
+      data_type dType= getDataType(token);
+      if (token->type == TK_KW)
+      {
+            if ((strcmp(token->attribute, "None")) != 0)
+            { 
+                  listDispose(&eList);
+                  return SYNTAX_ERROR;
+            }
+      }
+      //count number of brackets - must be even
+      if (token->type == TK_BRACKET_L)
+      {
+            leftBracket+=1;
+      }
 
-  sInit(&stack);
+      if (token->type == TK_BRACKET_R)
+      {
+            rightBracket+=1;
+      }
+      
+      if (token->type == TK_EQUAL)
+      {
+            isRelational = true; 
+      }
+      else if (token->type == TK_NOT_EQUAL)
+      {
+            isRelational =true; 
+      }
+      else if (token->type == TK_LESSER)
+      {
+            isRelational = true;
+      }
+      else if (token->type == TK_LESSER_EQUAL)
+      {
+            isRelational = true;
+      }
+      else if ( token->type == TK_GREATER)
+      {
+            isRelational = true; 
+      }
+      else if (token->type == TK_GREATER_EQUAL)
+      {
+            isRelational = true;
+      }
 
+      if (token->type == TK_DIV)
+      {
+            int div = checkDivisionByZero(token);
+            if ( div == DIVISION_BY_ZERO_ERROR)
+            { 
+                  listDispose(&eList);
+                  fprintf(stderr, "Div with zero.\n");
+                  return DIVISION_BY_ZERO_ERROR;
+            }
+      } 
+      
+      if (token->type == TK_DIV_DIV)
+      {
+            int div = checkDivisionByZero(token);
+            if ( div == DIVISION_BY_ZERO_ERROR)
+            { 
+                  listDispose(&eList);
+                  fprintf(stderr, "Div Div with zero.\n");
+                  return DIVISION_BY_ZERO_ERROR;
+            }
+      }
+      listInsertAct(&eList,symbol, dType);
+     int e = get_next_token(token); 
+      if  (e != OK)
+      {     
+            return e;
+      } 
+      if (token->type == TK_EOL || token->type == TK_EOF || token->type == TK_COLON )
+      {
+            listInsertAct(&eList, PT_DOLLAR, TYPE_UNDEFINED);
+      }
+      
+  }
+
+  if ( leftBracket != rightBracket) 
+  {
+      fprintf(stderr, "Number of left brackets doesnt match number of right brackets.\n");
+      listDispose(&eList);
+      return SYNTAX_ERROR;
+  }
+ 
+  int sError = sInit(&stack);
+  if (sError != OK)
+  {
+        return sError;
+  }
   sPush(&stack, PT_DOLLAR, TYPE_UNDEFINED);
+  
+
   pTable indexStack = PT_DOLLAR;
   pTable indexInput; 
  // exprStack* symbol;
-  
   exprStack* sym1 = NULL;
   exprStack* sym2 = NULL;
   exprStack* sym3 = NULL;
+  
+  eList.act = eList.first;
 
- do 
- {    /**
-      if (symbol == NULL )
+  
+ //do 
+ //{    
+ for (int i = 0;i <3 ; i++)
+  { 
+      if (eList.act == NULL )
       {
-            listDispose(eList);
+            listDispose(&eList);
             disposeStack(&stack);
             return INTERNAL_ERROR;
       }
-*/
-      indexInput = eList->act->symbol;
-
+      printf("Aktívny symbol v liste je: %d \n ", eList.act->symbol);
+      indexInput = eList.act->symbol;
+      indexStack=stack.top->symbol;
+      printf("IndexInput %d \n ", indexInput);
+      printf("IndexStack %d \n ", indexStack);
+     
+      
       switch(precedenceTable[indexStack][indexInput])
-      {
+      { 
             // equal
             case ('='):
-                  sPush(&stack, indexInput, eList->act->dType);
-                  eList->act=eList->act->rptr;
+                  sPush(&stack, indexInput, eList.act->dType);
+                  eList.act=eList.act->rptr;
+                  printf("Token is of ptable symbol: %d \n", symbol);
+                  printf("Symbol in analysis is ' = ' \n");
                   break;
             // shift
             case ('<'):
+                   printf("token on stack is of ptable symbol %d \n", indexStack); 
+                  printf("Token on input is of ptable symbol: %d \n", indexInput);
+                  printf("Symbol in analysis is ' < ' \n");
                   if (indexStack == PT_DOLLAR || indexStack != PT_E)
                   {
                         sPush(&stack, PT_SHIFT, TYPE_UNDEFINED);
-                        sPush(&stack, indexInput, eList->act->dType);
+                        sPush(&stack, indexInput, eList.act->dType);
                   }
                   sPop(&stack);
                   sPush(&stack,PT_SHIFT, TYPE_UNDEFINED);
+                  indexStack=stack.top->symbol;
+                  printf("Symbol on top of stack is: %d \n", indexStack);
+                  printf("Should be < so, 19 \n");
                   sPush(&stack,PT_E, TYPE_UNDEFINED);
-                  eList->act = eList->act->rptr;
+                  indexStack=stack.top->symbol;
+                  printf("Symbol on top of stack is: %d \n", indexStack);
+                  printf("Should be E, so 23\n");
+                  eList.act = eList.act->rptr;
+                 
                   break;
             // reduce
             case('>'):
-                  sym1 = stack.top->next->next;
-                  sym2 = stack.top->next;
-                  sym3 = stack.top;
+                  
                   int num = symbolsToReduce();
+                  printf("Number of symbols to reduce is: %d \n ", num);
                   if ( num != 1 && num != 3 )
                   {
-                        listDispose(eList);
+                        listDispose(&eList);
                         disposeStack(&stack);
                         return OTHER_ERROR;
                   }
+                  sym1 = stack.top->next->next;
+                  sym2 = stack.top->next;
+                  sym3 = stack.top;
                   pRules rule = findRule(num, sym1, sym2, sym3);
                   if ( rule == PR_NOTARULE)
                   {
-                        listDispose(eList); 
+                        listDispose(&eList); 
                         disposeStack(&stack);
                         return SYNTAX_ERROR;
                   }
                   int checkSem = checkSematics(rule,sym1,sym2,sym3);
                   if ( checkSem == SEM_TYPE_ERROR)
                   {
-                        listDispose(eList);
+                        listDispose(&eList);
                         disposeStack(&stack);
                         return SEM_TYPE_ERROR;
                   }
                   do 
                   {
                         sPop(&stack);
-                  } while (stack.top->symbol != PT_SHIFT);
+                  } while (stack.top->symbol != PT_SHIFT); // shift pravdepodobne ostáva teraz na stacku, treba upraviť 
                   sPush(&stack, PT_E, TYPE_UNDEFINED);
+                  printf("Token is of ptable symbol: %d \n", symbol);
+                  printf("Symbol in analysis is ' > ' \n");
                   break;
             case ('#'): 
-                  listDispose(eList);
+                  printf("Token is of ptable symbol: %d \n", symbol);
+                  printf("Symbol in analysis is ' # ' \n");
+                  listDispose(&eList);
                   disposeStack(&stack);
                   return SYNTAX_ERROR;
             default: 
                   break;
-      }
- } while (stack.top->symbol != PT_DOLLAR && indexInput != PT_DOLLAR);
+      }  
+  }
+ //} while (stack.top->symbol != PT_DOLLAR && indexInput != PT_DOLLAR);
 
- listDispose(eList);
- disposeStack(&stack);
+ //listDispose(&eList);
+ //disposeStack(&stack);
  return OK;
 }
