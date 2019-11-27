@@ -66,7 +66,7 @@ Data_type build_in_function_return_type(char *function_id);
  * @param second_type Type of second operand
  * @return SEM_TYPE_ERROR
  */
-int arithmetic_operation_check(int first_type, int second_type);
+int arithmetic_operation_check(Data_type first_type, Data_type second_type);
 
 /**
  * @brief This function will check if two types are compatible for comparison operation
@@ -75,7 +75,7 @@ int arithmetic_operation_check(int first_type, int second_type);
  * @param second_type Type of second operand
  * @return SEM_TYPE_ERROR
  */
-int comparison_check(int first_type, int second_type);
+int comparison_check(Data_type first_type, Data_type second_type);
 
 /**
  * @brief Function will get return type from given 2 types
@@ -84,7 +84,7 @@ int comparison_check(int first_type, int second_type);
  * @param secod_type Second operand type
  * @return data type
  */
-Data_type arithmetic_operation_return_type(int first_type, int secod_type);
+Data_type arithmetic_operation_return_type(Data_type first_type, Data_type secod_type);
 
 /**
  * @brief Function will give type from token
@@ -104,16 +104,16 @@ Data_type get_type_from_token(int token_type);
 int is_function_defined(SymTabNodePtr root, char *function_id); // doplniť parametre
 
 /**
- * @brief This function will check if the variable is defined.
+ * @brief This function will check if the variable is defined if variable is not defined in local table of function or params
+ *        it will find global table and its local table and try find there.
  * 
- * @param root This is pointer to global sym table.
- * @param function_data If we are in definition of function this is pointer to local sym table otherwise global sym table
- * @param function_params If we are in definition of function this is pointer to a list of parameters otherwise NULL
+ * @param root This is pointer to a global sym table 
+ * @param function_id If we are in definition of function this is Name/ID of this function otherwise NULL
  * @param variable_id Name/ID of variable
  * 
  * @return Error code SEM_FUNCTION_ERROR - if is not defined / OK - is defined
  */
-int is_variable_defined(SymTabNodePtr root, LocalTableNode *function_param, ParamList *function_params, char *variable_id); // doplniť parametre
+int is_variable_defined(SymTabNodePtr root, char *function_id, char *variable_id); // doplniť parametre
 
 /**
  * @brief This function will define function in global sym table
@@ -131,15 +131,16 @@ int define_function(SymTabNodePtr *root, char *function_id);
  * @param local_table if we are in function this is pointer to a local function otherwise pointer to a global sym table
  * @return uniq id
  */
-char * expr_parser_gen_uniq_id(LocalTableNode *local_table);
+char * expr_parser_gen_uniq_id(SymTabNodePtr root);
 
 /**
  * @brief This function will generate uniq id for expr_parser with prefix
  * 
- * @param local_table  if we are in function this is pointer to a local function otherwise pointer to a global sym table
+ * @param root  Pointer to a global sym table.
+ * @param function_id If we are in definition of function this is Name/ID of this function otherwise NULL
  * @param prefix Prefix for uniq id.
  * @return uniq id
  */
-char * expr_parser_gen_uniq_id_with_prefix(LocalTableNode *local_table, char* prefix);
+char * expr_parser_gen_uniq_id_with_prefix(SymTabNodePtr root, char *function_id, char* prefix);
 
 #endif
