@@ -13,6 +13,7 @@
 #include "error.h"
 #include "scanner.h"
 
+// TODO returning rules in array
 
 const char precedenceTable[tableSize][tableSize] = {
   // 0  , 1 ,  2,   3,   4,   5.   6,   7,   8,   9,  10,  11,  12,  13,   14,  15,   16, 17, 18
@@ -132,8 +133,6 @@ int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3
 {
       bool retypeSym1 = false;
       bool retypeSym3 = false; 
-      // TODO prípadne upraviť to NONE na iné, ak to Zuzka zmení
-      // ošetriť to aj pre "dátový typ" pre kľúčové slovo None (asi TYPE_UNDEFINED)
       if ( rule == PR_OPERAND)
       {
             if ( sym1->dType == TYPE_UNDEFINED ) 
@@ -141,6 +140,7 @@ int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3
                   return SEM_TYPE_ERROR;
             }
       }
+      else return OK;
       
       if ( rule == PR_BIB)
       {
@@ -149,6 +149,7 @@ int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3
                   return SEM_TYPE_ERROR;
             }
       }
+      else return OK;
 
       if ( rule != PR_OPERAND || rule !=PR_BIB)
       {
@@ -632,7 +633,7 @@ pRules findRule(int num, exprStack* sym1, exprStack* sym2, exprStack* sym3)
                               return PR_NOTARULE;
                   }
             } 
-            else if ( (sym1->symbol == PT_ID || sym1->symbol == PT_INT || sym1->symbol == PT_FLOAT || sym1->symbol == PT_STRING || sym1->symbol == PT_NONE ) && (sym3->symbol == PT_ID || sym3->symbol == PT_INT || sym3->symbol == PT_FLOAT || sym3->symbol == PT_STRING || sym3->symbol == PT_NONE ) )
+            else if ( (sym1->symbol == PT_ID || sym1->symbol == PT_INT || sym1->symbol == PT_FLOAT || sym1->symbol == PT_STRING || sym1->symbol == PT_NONE || sym1->symbol == PT_E) && (sym3->symbol == PT_ID || sym3->symbol == PT_INT || sym3->symbol == PT_FLOAT || sym3->symbol == PT_STRING || sym3->symbol == PT_NONE || sym3->symbol == PT_E) )
             {     
                   switch (sym2->symbol)
                   {     
@@ -688,15 +689,11 @@ int symbolsToReduce()
 {
       exprStack* top= sTop(&stack);
       int num = 0;
-      if ( top->symbol != PT_SHIFT)
-      {
-            num = 1; 
-      }
-      do
+     while (top->symbol != PT_SHIFT)
       {
             top= top->next; 
             num += 1;  
-      } while (top->symbol != PT_SHIFT);
+      } 
 
       return num; 
 }
@@ -820,114 +817,89 @@ int callExpression(Token *token)
   {
         return sError;
   }
-  sPush(&stack, PT_DOLLAR, TYPE_UNDEFINED);
-  
 
-  pTable indexStack = PT_DOLLAR;
+  pTable indexStack;
   pTable indexInput; 
- // exprStack* symbol;
-  exprStack* sym1 = NULL;
-  exprStack* sym2 = NULL;
-  exprStack* sym3 = NULL;
+  //exprStack* sym1 = NULL;
+  //exprStack* sym2 = NULL;
+  //exprStack* sym3 = NULL;
   
-  eList.act = eList.first;
-
-  
- //do 
- //{    
- for (int i = 0;i <3 ; i++)
-  { 
-      if (eList.act == NULL )
-      {
-            listDispose(&eList);
-            disposeStack(&stack);
-            return INTERNAL_ERROR;
-      }
-      printf("Aktívny symbol v liste je: %d \n ", eList.act->symbol);
+  eList.act=eList.first;
+  sPush(&stack, PT_DOLLAR, TYPE_UNDEFINED);
+  do 
+  {
       indexInput = eList.act->symbol;
-      indexStack=stack.top->symbol;
-      printf("IndexInput %d \n ", indexInput);
-      printf("IndexStack %d \n ", indexStack);
-     
-      
-      switch(precedenceTable[indexStack][indexInput])
-      { 
-            // equal
+      indexStack= stack.top->symbol;
+      switch (precedenceTable[indexStack][indexInput])
+      {
             case ('='):
-                  sPush(&stack, indexInput, eList.act->dType);
-                  eList.act=eList.act->rptr;
-                  printf("Token is of ptable symbol: %d \n", symbol);
-                  printf("Symbol in analysis is ' = ' \n");
+                  sPush(&stack,indexInput,eList.act->dType);
+                  eList.act = eList.act->rptr;
                   break;
-            // shift
             case ('<'):
-                   printf("token on stack is of ptable symbol %d \n", indexStack); 
-                  printf("Token on input is of ptable symbol: %d \n", indexInput);
-                  printf("Symbol in analysis is ' < ' \n");
-                  if (indexStack == PT_DOLLAR || indexStack != PT_E)
+                  if (indexStack == PT_DOLLAR)
                   {
                         sPush(&stack, PT_SHIFT, TYPE_UNDEFINED);
                         sPush(&stack, indexInput, eList.act->dType);
                   }
-                  sPop(&stack);
-                  sPush(&stack,PT_SHIFT, TYPE_UNDEFINED);
-                  indexStack=stack.top->symbol;
-                  printf("Symbol on top of stack is: %d \n", indexStack);
-                  printf("Should be < so, 19 \n");
-                  sPush(&stack,PT_E, TYPE_UNDEFINED);
-                  indexStack=stack.top->symbol;
-                  printf("Symbol on top of stack is: %d \n", indexStack);
-                  printf("Should be E, so 23\n");
-                  eList.act = eList.act->rptr;
-                 
-                  break;
-            // reduce
-            case('>'):
-                  
-                  int num = symbolsToReduce();
-                  printf("Number of symbols to reduce is: %d \n ", num);
-                  if ( num != 1 && num != 3 )
-                  {
-                        listDispose(&eList);
-                        disposeStack(&stack);
-                        return OTHER_ERROR;
-                  }
-                  sym1 = stack.top->next->next;
-                  sym2 = stack.top->next;
-                  sym3 = stack.top;
-                  pRules rule = findRule(num, sym1, sym2, sym3);
-                  if ( rule == PR_NOTARULE)
-                  {
-                        listDispose(&eList); 
-                        disposeStack(&stack);
-                        return SYNTAX_ERROR;
-                  }
-                  int checkSem = checkSematics(rule,sym1,sym2,sym3);
-                  if ( checkSem == SEM_TYPE_ERROR)
-                  {
-                        listDispose(&eList);
-                        disposeStack(&stack);
-                        return SEM_TYPE_ERROR;
-                  }
-                  do 
+                  else 
                   {
                         sPop(&stack);
-                  } while (stack.top->symbol != PT_SHIFT); // shift pravdepodobne ostáva teraz na stacku, treba upraviť 
-                  sPush(&stack, PT_E, TYPE_UNDEFINED);
-                  printf("Token is of ptable symbol: %d \n", symbol);
-                  printf("Symbol in analysis is ' > ' \n");
+                        sPush(&stack, PT_SHIFT, TYPE_UNDEFINED);
+                        sPush(&stack, PT_E, TYPE_UNDEFINED);
+                        sPush(&stack, indexInput, eList.act->dType);
+                  }
+                  eList.act=eList.act->rptr;
                   break;
-            case ('#'): 
-                  printf("Token is of ptable symbol: %d \n", symbol);
-                  printf("Symbol in analysis is ' # ' \n");
-                  listDispose(&eList);
-                  disposeStack(&stack);
+            case ('>'):
+                  ;
+                  int num = symbolsToReduce();
+                  if (num != 1 && num != 3)
+                  {
+                        return SYNTAX_ERROR;
+                  }  
+                  if (num == 1)
+                  {
+                        exprStack* sym1=stack.top;
+                        pRules rule =  findRule(num,sym1, NULL, NULL);
+                        if ( rule == PR_NOTARULE)
+                        {
+                              return SYNTAX_ERROR;
+                        }
+                        else 
+                        {
+                              sPop(&stack);
+                              sPop(&stack);
+                              sPush(&stack, PT_E, TYPE_UNDEFINED);
+                        }
+                  }
+                  if ( num == 3 )
+                  {
+                        exprStack* sym1 = stack.top;
+                        exprStack* sym2 = stack.top->next;
+                        exprStack* sym3 =  stack.top->next->next;
+                        pRules rule  = findRule (num, sym1, sym2, sym3);
+                        if (rule == PR_NOTARULE)
+                        {
+                              return SYNTAX_ERROR;
+                        }
+                        else 
+                        {
+                              sPop(&stack);
+                              sPop(&stack);
+                              sPop(&stack);
+                              sPop(&stack);
+                              sPush(&stack, PT_E, TYPE_UNDEFINED);
+                        }
+                  }
+
+                  break;
+            default:
                   return SYNTAX_ERROR;
-            default: 
                   break;
-      }  
-  }
- //} while (stack.top->symbol != PT_DOLLAR && indexInput != PT_DOLLAR);
+
+            }
+      } while ( stack.top->symbol != PT_DOLLAR && eList.act->symbol != PT_DOLLAR);
 
  //listDispose(&eList);
  //disposeStack(&stack);
