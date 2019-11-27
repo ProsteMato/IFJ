@@ -26,6 +26,18 @@ int GlobalSymTabSearch (SymTabNodePtr RootPtr, char * K, GlobalTableData **Obsah
 	}
 }
 
+int GlobalSymTabSearchMinus (SymTabNodePtr RootPtr, char * K)	{
+
+	if (RootPtr == NULL) return FALSE; //neuspesne hledani
+	else if (K < RootPtr->Key)
+		return GlobalSymTabSearchMinus (RootPtr->LPtr, K); //rekurzivni volani, hledam v levem podstromu
+	else if (K > RootPtr->Key)
+		return GlobalSymTabSearchMinus (RootPtr->RPtr, K); //rekurzivni volani, hledam v pravem podstromu
+	else{ //K=RootPtr->Key, uspesne hledani
+		return TRUE;
+	}
+}
+
 //vlozeni noveho symbolu do tabulky, musi bytint kvuli vraceni chyby
 int GlobalSymTabInsert (SymTabNodePtr* RootPtr, char * K, GlobalTableData *Obsah){
 	if (*RootPtr == NULL){ //pokud nebylo alokovane, alokuju
@@ -246,6 +258,13 @@ char *ParamListGetActive(ParamList *L) {
     else {
         return NULL;
     }
+}
+
+//nove pridane funkce
+void SetDefine(SymTabNodePtr RootPtr, char * K){
+	if (GlobalSymTabSearchMinus (RootPtr, K) == false) return;
+	else RootPtr->Data->define = TRUE;
+	return;
 }
 
 // funkce pro testovani
