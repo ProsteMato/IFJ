@@ -18,7 +18,8 @@ int main()
     {
         printf("Error: %d \n", e);
     }
-    callExpression(&testToken);
+    int result = callExpression(&testToken);
+    printf("Result of callExpression %d \n", result);
     if ( isRelational )
     {
           printf("There was a relational operand.\n");
