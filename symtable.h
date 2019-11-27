@@ -157,3 +157,10 @@ void ParamSucc (ParamList *);
 @param param - ukazatel seznam parametru 
 @return vraci id aktivniho prvku nebo NULL pokud neni aktivni */
 char *ParamGetActive(ParamList *);
+
+//TODO funkce(paramlist, id) je tam
+/** hleda parametr podle klici
+@param ParamList - seznam parametru
+@param char - klic ktery hledam
+@return pokud je nalezeno vraci TRUE */
+bool ParamSerch (ParamList *, char *);
