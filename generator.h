@@ -6,7 +6,8 @@
  * @author Michal Koval <xkoval17@stud.fit.vutbr.cz>
  */
 
-is_global()
+//is_global() -- MISOOO nechcelo mi preloziť kod zakomentoval som ti to tu 
+// a zmenil v Code_line ti upravil jeden parameter aby to prechazalo..
 
 #ifndef _GENERATOR_H
 #define _GENERATOR_H
@@ -26,9 +27,9 @@ typedef struct{
 	size_t len;
 } Code;
 
-typedef struct{
+typedef struct Code_line{
 	Code *code;
-	Code_line *next;
+	struct Code_line *next;
 } Code_line;
 
 typedef struct{

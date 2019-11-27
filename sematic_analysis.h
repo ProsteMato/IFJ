@@ -15,10 +15,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include "symtable.h"
+#include "expression_parser.h"
 #include "scanner.h"
 #include "generator.h"
-#include "expression_parser.h"
-
 /**
  * @brief This function will check if the given function is build-in function.
  * 
