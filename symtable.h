@@ -165,7 +165,6 @@ char *ParamGetActive(ParamList *);
 @return pokud je nalezeno vraci TRUE */
 bool ParamSearch (ParamList *, char *);
 
-//TODO funkce na meneni dat - pocetparam a define
 /** nastavi hodnutu define na true
 @param SymTabNodePtr - tabulka symbolu
 @char - klic symbolu u ktereho mam provest zmenu */

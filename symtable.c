@@ -219,6 +219,15 @@ int ParamInsert(ParamList *L, char * id) {
 	}
 }
 
+//hledani parametru
+bool ParamSearch (ParamList *L, char * id){
+	ParamFirst(L);
+	while ((L->act->id != id)){
+		ParamSucc(L);
+		if (L->act == NULL) return FALSE; //došlo se na konec seznamu
+	} return TRUE;
+}
+
 void DLDisposeList (ParamList *L) {
   if (L != NULL) {
     param * tmp;
