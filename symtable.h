@@ -47,7 +47,7 @@ typedef struct LocalTableNode {
   LocalTableData *localData;
   struct LocalTableNode *LPtr;
   struct LocalTableNode *RPtr;
-} LocalTableNode;
+} * LocalTableNode;
 
 // definice pro binarni strom
 typedef struct SymTabNode { // struktura definujici symbol
