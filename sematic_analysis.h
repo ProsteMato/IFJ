@@ -16,6 +16,7 @@
 #include <string.h>
 #include "symtable.h"
 #include "scanner.h"
+#include "generator.h"
 #include "expression_parser.h"
 
 /**
