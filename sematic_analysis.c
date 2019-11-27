@@ -174,7 +174,7 @@ char * expr_parser_gen_uniq_id(SymTabNodePtr root, LocalTableNode local_table) {
     char *name = "var";
     char *uniq_id = NULL;
     do {
-        char num = id + '0';
+        char *num = int_to_string(id);
         *uniq_id = (char *) malloc(sizeof(char) * strlen(name) + strlen(num) + 1);
         if (uniq_id == NULL) {
             return INTERNAL_ERROR;
@@ -193,7 +193,7 @@ char * expr_parser_gen_uniq_id_with_prefix(SymTabNodePtr root, LocalTableNode lo
     static int id = 1;
     char *uniq_id = NULL;
     do {
-        char num = id + '0';
+        char *num = int_to_string(id);
         *uniq_id = (char *) malloc(sizeof(char) * strlen(num) + strlen(prefix) + 1);
         if (uniq_id == NULL) {
             return INTERNAL_ERROR;
