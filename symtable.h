@@ -171,6 +171,12 @@ bool ParamSearch (ParamList *, char *);
 @char - klic symbolu u ktereho mam provest zmenu */
 void SetDefine(SymTabNodePtr, char *);
 
+/** nastavi pocet paramentru
+@param SymTabNodePtr - tabulka symbolu
+@param char - ukazatel na klic
+@param int - pocet parametru */
+void SetParamCount (SymTabNodePtr, char *, int);
+
 //hledani bez ulozeni dat
 //vraci true, pokud je nalezeno
 int GlobalSymTabSearchMinus (SymTabNodePtr, char *);

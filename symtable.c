@@ -261,9 +261,16 @@ char *ParamListGetActive(ParamList *L) {
 }
 
 //nove pridane funkce
+//nastavi hodnutu define na true
 void SetDefine(SymTabNodePtr RootPtr, char * K){
 	if (GlobalSymTabSearchMinus (RootPtr, K) == false) return;
 	else RootPtr->Data->define = TRUE;
+	return;
+}
+
+void SetParamCount (SymTabNodePtr RootPtr, char * K, int pocet){
+	if (GlobalSymTabSearchMinus (RootPtr, K) == false) return;
+	else RootPtr->Data->pocet_par = pocet;
 	return;
 }
 
