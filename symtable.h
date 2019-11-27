@@ -163,4 +163,7 @@ char *ParamGetActive(ParamList *);
 @param ParamList - seznam parametru
 @param char - klic ktery hledam
 @return pokud je nalezeno vraci TRUE */
-bool ParamSerch (ParamList *, char *);
+bool ParamSearch (ParamList *, char *);
+
+//TODO funkce na meneni dat - pocetparam a define
+
