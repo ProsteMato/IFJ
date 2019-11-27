@@ -13,7 +13,7 @@ void GlobalSymTabInit (SymTabNodePtr *RootPtr) {
 }
 
 //vyhledani promenne podle jejiho id
-int GlobalSymTabSearch (SymTabNodePtr RootPtr, char * K, tData **Obsah)	{
+int GlobalSymTabSearch (SymTabNodePtr RootPtr, char * K, GlobalTableData **Obsah)	{
 
 	if (RootPtr == NULL) return FALSE; //neuspesne hledani
 	else if (K < RootPtr->Key)
@@ -26,8 +26,20 @@ int GlobalSymTabSearch (SymTabNodePtr RootPtr, char * K, tData **Obsah)	{
 	}
 }
 
+int GlobalSymTabSearchMinus (SymTabNodePtr RootPtr, char * K)	{
+
+	if (RootPtr == NULL) return FALSE; //neuspesne hledani
+	else if (K < RootPtr->Key)
+		return GlobalSymTabSearchMinus (RootPtr->LPtr, K); //rekurzivni volani, hledam v levem podstromu
+	else if (K > RootPtr->Key)
+		return GlobalSymTabSearchMinus (RootPtr->RPtr, K); //rekurzivni volani, hledam v pravem podstromu
+	else{ //K=RootPtr->Key, uspesne hledani
+		return TRUE;
+	}
+}
+
 //vlozeni noveho symbolu do tabulky, musi bytint kvuli vraceni chyby
-int GlobalSymTabInsert (SymTabNodePtr* RootPtr, char * K, tData *Obsah){
+int GlobalSymTabInsert (SymTabNodePtr* RootPtr, char * K, GlobalTableData *Obsah){
 	if (*RootPtr == NULL){ //pokud nebylo alokovane, alokuju
 		if ((*RootPtr = malloc (sizeof(struct SymTabNode))) == NULL) return INTERNAL_ERROR; //vratim chybu
 		(*RootPtr)->Key = K;
@@ -50,6 +62,18 @@ void ReplaceByRightmost (SymTabNodePtr PtrReplaced, SymTabNodePtr *RootPtr) {
 		PtrReplaced->Key = (*RootPtr)->Key;
 		PtrReplaced->Data = (*RootPtr)->Data;
 		SymTabNodePtr docasny  = (*RootPtr);
+		(*RootPtr) = (*RootPtr)->LPtr;
+		free(docasny);
+	}
+}
+
+void LocalReplaceByRightmost (LocalTableNode PtrReplaced, LocalTableNode *RootPtr) {
+	if (*RootPtr == NULL || PtrReplaced == NULL) return;
+	if ((*RootPtr)->RPtr != NULL) LocalReplaceByRightmost(PtrReplaced, &(*RootPtr)->RPtr);
+	else{
+		PtrReplaced->Key = (*RootPtr)->Key;
+		PtrReplaced->localData = (*RootPtr)->localData;
+		LocalTableNode docasny  = (*RootPtr);
 		(*RootPtr) = (*RootPtr)->LPtr;
 		free(docasny);
 	}
@@ -97,12 +121,12 @@ void GlobalSymTabDispose (SymTabNodePtr *RootPtr) {
 }
 
 		//funkce pro lokalni tabulku symbolu
-void LocalSymTabInit (SymTabNodePtr *RootPtr) {
+void LocalSymTabInit (LocalTableNode *RootPtr) {
 	*RootPtr = NULL;
 }
 
 //vyhledani promenne podle jejiho id -- melo by byt hotove
-int LocalSymTabSearch (SymTabNodePtr RootPtr, char * K, tData **Obsah)	{
+int LocalSymTabSearch (LocalTableNode RootPtr, char * K, LocalTableData **Obsah)	{
 
 	if (RootPtr == NULL) return FALSE; //neuspesne hledani
 	else if (K < RootPtr->Key)
@@ -110,17 +134,17 @@ int LocalSymTabSearch (SymTabNodePtr RootPtr, char * K, tData **Obsah)	{
 	else if (K > RootPtr->Key)
 		return LocalSymTabSearch (RootPtr->RPtr, K, Obsah); //rekurzivni volani, hledam v pravem podstromu
 	else{ //K=RootPtr->Key, uspesne hledani
-		*Obsah = RootPtr->Data; //vracim data o promenne
+		*Obsah = RootPtr->localData; //vracim data o promenne
 		return TRUE;
 	}
 }
 
 //vlozeni noveho symbolu do tabulky, musi bytint kvuli vraceni chyby
-int LocalSymTabInsert (SymTabNodePtr* RootPtr, char * K, tData *Obsah){
+int LocalSymTabInsert (LocalTableNode* RootPtr, char * K, LocalTableData *Obsah){
 	if (*RootPtr == NULL){ //pokud nebylo alokovane, alokuju
 		if ((*RootPtr = malloc (sizeof(struct SymTabNode))) == NULL) return INTERNAL_ERROR; //vratim chybu
 		(*RootPtr)->Key = K;
-		(*RootPtr)->Data = Obsah;
+		(*RootPtr)->localData = Obsah;
 		(*RootPtr)->LPtr = NULL;
 		(*RootPtr)->RPtr = NULL;
 	}
@@ -128,11 +152,11 @@ int LocalSymTabInsert (SymTabNodePtr* RootPtr, char * K, tData *Obsah){
 	    	LocalSymTabInsert (&(*RootPtr)->LPtr, K, Obsah);
 	else if (K > (*RootPtr)->Key)
 	    	LocalSymTabInsert (&(*RootPtr)->RPtr, K, Obsah);
-	else (*RootPtr)->Data = Obsah; //strom toto id uz obsahuje -> prepisu obsah
+	else (*RootPtr)->localData = Obsah; //strom toto id uz obsahuje -> prepisu obsah
 }
 
 //odstraneni symbolu s klicem k
-void LocalSymTabDelete (SymTabNodePtr *RootPtr, char * K) {
+void LocalSymTabDelete (LocalTableNode *RootPtr, char * K) {
 	if (*RootPtr == NULL) return;
 
 	if ((*RootPtr)->Key < K) LocalSymTabDelete((&(*RootPtr)->RPtr), K);
@@ -144,26 +168,26 @@ void LocalSymTabDelete (SymTabNodePtr *RootPtr, char * K) {
 			*RootPtr = NULL;
 		}
 		else if ((*RootPtr)->LPtr == NULL && (*RootPtr)->RPtr != NULL){
-			SymTabNodePtr docasny;
+			LocalTableNode docasny;
 			docasny = (*RootPtr)->RPtr;
 			free (*RootPtr);
 			*RootPtr = docasny;
 		}
 		else if ((*RootPtr)->LPtr != NULL && (*RootPtr)->RPtr == NULL){
-			SymTabNodePtr docasny;
+			LocalTableNode docasny;
 			docasny = (*RootPtr)->LPtr;
 			free (*RootPtr);
 			*RootPtr = docasny;
 		}
 		else {
-			if ((*RootPtr)->LPtr->RPtr != NULL) ReplaceByRightmost(*RootPtr, &(*RootPtr)->LPtr->RPtr);
-			else ReplaceByRightmost(*RootPtr, &(*RootPtr)->LPtr);
+			if ((*RootPtr)->LPtr->RPtr != NULL) LocalReplaceByRightmost(*RootPtr, &(*RootPtr)->LPtr->RPtr);
+			else LocalReplaceByRightmost(*RootPtr, &(*RootPtr)->LPtr);
 		}
 	}
 }
 
 //zruseni stromu
-void LocalSymTabDispose (SymTabNodePtr *RootPtr) {
+void LocalSymTabDispose (LocalTableNode *RootPtr) {
 	if (*RootPtr != NULL) {
 		LocalSymTabDispose(&(*RootPtr)->LPtr);
 		LocalSymTabDispose(&(*RootPtr)->RPtr);
@@ -186,13 +210,22 @@ int ParamInsert(ParamList *L, char * id) {
 	if (tmp == NULL || L == NULL) return INTERNAL_ERROR;
 	else {
 	  	last = L->last;
-		tmp->nazev = id;
+		tmp->id = id;
 		tmp->before = last;
 		tmp->next = NULL;
 		if (last != NULL) last->next = tmp;
 		else L->first = tmp;
 		L->last = tmp;
 	}
+}
+
+//hledani parametru
+bool ParamSearch (ParamList *L, char * id){
+	ParamFirst(L);
+	while ((L->act->id != id)){
+		ParamSucc(L);
+		if (L->act == NULL) return FALSE; //došlo se na konec seznamu
+	} return TRUE;
 }
 
 void DLDisposeList (ParamList *L) {
@@ -227,11 +260,72 @@ void DLSucc (ParamList *L) {
 char *ParamListGetActive(ParamList *L) {
     if (L != NULL) {
         if (L->act != NULL)
-            return L->act->nazev;
+            return L->act->id;
         else
             return NULL;
     }
     else {
         return NULL;
     }
+}
+
+//nove pridane funkce
+//nastavi hodnutu define na true
+void SetDefine(SymTabNodePtr RootPtr, char * K){
+	if (GlobalSymTabSearchMinus (RootPtr, K) == false) return;
+	else RootPtr->Data->define = TRUE;
+	return;
+}
+
+void SetParamCount (SymTabNodePtr RootPtr, char * K, int pocet){
+	if (GlobalSymTabSearchMinus (RootPtr, K) == false) return;
+	else RootPtr->Data->pocet_par = pocet;
+	return;
+}
+
+// funkce pro testovani
+
+int main(int argc, char *argv[]){
+	printf("Inicialuzuju a vlozim uzel: \n");
+
+	SymTabNodePtr novynode;
+	GlobalTableData nejakadata;
+	
+	char *Key = "nejaky kliiiiiiiiiic";
+	nejakadata.type = TYPE_INT;
+	nejakadata.funkce = TRUE;
+	nejakadata.define = FALSE;
+	
+	char *OtherKey = "nejaky jiny klic";
+
+	GlobalTableData jinadata;
+	jinadata.type = TYPE_STRING;
+	jinadata.funkce = FALSE;
+	jinadata.define = TRUE;
+
+	GlobalTableData *misto;
+
+
+	GlobalSymTabInit(&novynode);
+	GlobalSymTabInsert(&novynode, Key, &nejakadata);
+
+	printf(" Klic: %s \n", novynode->Key);
+	printf(" Data (datovy typ): %d \n", novynode->Data->type);
+	printf(" Data (je funkce): %d \n", novynode->Data->funkce);
+	printf(" Data (je definovano): %d \n \n", novynode->Data->define);
+
+	printf("Vlozim dalsi uzel: \n");
+
+	GlobalSymTabInsert(&novynode, OtherKey, &jinadata);
+	printf(" Klic: %s \n", novynode->RPtr->Key);
+	printf(" Data (datovy typ): %d \n", novynode->RPtr->Data->type);
+	printf(" Data (je funkce): %d \n", novynode->RPtr->Data->funkce);
+	printf(" Data (je definovano): %d \n \n", novynode->RPtr->Data->define);
+
+	printf("zkusim hledat OtherKey: %d \n", (GlobalSymTabSearch(novynode, OtherKey, &misto)));
+	char * NeexistujiciKlic = "nejsem tu";
+	printf("zkusim hledat něco co tam neni: %d \n", (GlobalSymTabSearch(novynode, NeexistujiciKlic, &misto)));
+
+
+	return 0;
 }

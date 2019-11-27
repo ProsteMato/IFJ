@@ -23,19 +23,16 @@ typedef enum {
 
 // ulozeni paramentru funkce
 typedef struct param {
-    char * nazev;	//ukazatel na id
+    char * id;	//ukazatel na id
     struct param * before; //predchozi paramentr
     struct param * next;	//dalsi parametr
 } param;
 
-typedef struct GlobalTableData{
-  Data_type type; //typ symbolu
-  bool define;
-  bool funkce; //funkce
-  int pocet_par; //pouze u fce
-  LocalTableNode *localTableNode;
-  ParamList *paramList; //0. parametr (pouze u fce)
-} GlobalTableData;
+typedef struct paramlist {
+  param *first;
+  param *act;
+  param *last;
+} ParamList;
 
 typedef struct LocalTableData {
   bool define;
@@ -47,7 +44,16 @@ typedef struct LocalTableNode {
   LocalTableData *localData;
   struct LocalTableNode *LPtr;
   struct LocalTableNode *RPtr;
-} LocalTableNode;
+} * LocalTableNode;
+
+typedef struct GlobalTableData{
+  Data_type type; //typ symbolu
+  bool define;
+  bool funkce; //funkce
+  int pocet_par; //pouze u fce
+  LocalTableNode *localTableNode;
+  ParamList *paramList; //0. parametr (pouze u fce)
+} GlobalTableData;
 
 // definice pro binarni strom
 typedef struct SymTabNode { // struktura definujici symbol
@@ -56,14 +62,6 @@ typedef struct SymTabNode { // struktura definujici symbol
 	struct SymTabNode * LPtr; //levy podstrom
 	struct SymTabNode * RPtr; //pravy podstrom
 } * SymTabNodePtr;
-
-
-typedef struct paramlist {
-  param *first;
-  param *act;
-  param *last;
-} ParamList;
-
 
 //prototypy funkcí - globalni tabulka symbolu
 
@@ -159,3 +157,27 @@ void ParamSucc (ParamList *);
 @param param - ukazatel seznam parametru 
 @return vraci id aktivniho prvku nebo NULL pokud neni aktivni */
 char *ParamGetActive(ParamList *);
+
+//TODO funkce(paramlist, id) je tam
+/** hleda parametr podle klici
+@param ParamList - seznam parametru
+@param char - klic ktery hledam
+@return pokud je nalezeno vraci TRUE */
+bool ParamSearch (ParamList *, char *);
+
+/** nastavi hodnutu define na true
+@param SymTabNodePtr - tabulka symbolu
+@char - klic symbolu u ktereho mam provest zmenu */
+void SetDefine(SymTabNodePtr, char *);
+
+/** nastavi pocet paramentru
+@param SymTabNodePtr - tabulka symbolu
+@param char - ukazatel na klic
+@param int - pocet parametru */
+void SetParamCount (SymTabNodePtr, char *, int);
+
+//hledani bez ulozeni dat
+//vraci true, pokud je nalezeno
+int GlobalSymTabSearchMinus (SymTabNodePtr, char *);
+
+
