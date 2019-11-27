@@ -166,4 +166,13 @@ char *ParamGetActive(ParamList *);
 bool ParamSearch (ParamList *, char *);
 
 //TODO funkce na meneni dat - pocetparam a define
+/** nastavi hodnutu define na true
+@param SymTabNodePtr - tabulka symbolu
+@char - klic symbolu u ktereho mam provest zmenu */
+void SetDefine(SymTabNodePtr, char *);
+
+//hledani bez ulozeni dat
+//vraci true, pokud je nalezeno
+int GlobalSymTabSearchMinus (SymTabNodePtr, char *);
+
 
