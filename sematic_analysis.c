@@ -60,7 +60,7 @@ int arithmetic_operation_check(Data_type first_type, int operation, Data_type se
             }
             break;
         case PR_EPLUSE:
-            if(first_type == TYPE_STRING && first_type == TYPE_STRING) {
+            if(first_type == TYPE_STRING && second_type == TYPE_STRING) {
                 return OK;
             }
         case PR_EDIVE:
@@ -149,10 +149,12 @@ int is_global_variable(SymTabNodePtr root, char *id) {
 
 int is_variable_defined(SymTabNodePtr root, LocalTableNode local_table, ParamList *params, char *variable_id) {
     GlobalTableData *global_data;
-    if (LocalSymTabSearchMinus(local_table, variable_id))
+    if (LocalSymTabSearchMinus(local_table, variable_id)){
         return true;
-    if (ParamSearch(params, variable_id)) 
+    }
+    if (ParamSearch(params, variable_id)) {
         return true;
+    }
     if (GlobalSymTabSearch(root, variable_id, &global_data)){
         if (!global_data->funkce)
             return true;
@@ -166,47 +168,65 @@ int define_function(SymTabNodePtr *root, char *function_id) {
     } else {
         GlobalTableData *data = malloc (sizeof(GlobalTableData));
         data->funkce = true;
-        GlobalSymTabInsert(root, function_id, data);
-        //TODO kontrola na internal_error
-        return OK;
+        int returnValue = GlobalSymTabInsert(root, function_id, data);
+        return returnValue;
     }
 }
 
-// char * expr_parser_gen_uniq_id(SymTabNodePtr root, LocalTableNode local_table) {
+int define_local_variable(LocalTableNode *root, char *variable_id) {
+    if (!is_variable_defined(NULL, *root, NULL, variable_id)) {
+        LocalTableData *data = malloc (sizeof(GlobalTableData));
+        int returnValue = LocalSymTabInsert(root, variable_id, data);
+        return returnValue;
+    }
+    return OK;
+}
+
+int define_global_variable(SymTabNodePtr *root, char *variable_id) {
+    if (!is_variable_defined(*root, NULL, NULL, variable_id)) {
+        GlobalTableData *data = malloc (sizeof(GlobalTableData));
+        data->funkce = false;
+        int returnValue = GlobalSymTabInsert(root, variable_id, data);
+        return returnValue;
+    }
+    return OK;
+}
+
+char * expr_parser_gen_uniq_id(SymTabNodePtr *root, LocalTableNode local_table) {
     
-//     static int id = 1;
-//     char *name = "var";
-//     char *uniq_id = NULL;
-//     do {
-//         char *num = int_to_str(id);
-//         uniq_id = (char *) malloc(sizeof(char) * strlen(name) + strlen(num) + 1);
-//         if (uniq_id == NULL) {
-//             exit(INTERNAL_ERROR);
-//         }
+    static int id = 1;
+    char *name = "var";
+    char *uniq_id = NULL;
+    do {
+        char *num = int_to_str(id);
+        uniq_id = (char *) malloc(sizeof(char) * strlen(name) + strlen(num) + 1);
+        if (uniq_id == NULL) {
+            exit(INTERNAL_ERROR);
+        }
 
-//         strcpy(uniq_id, name);
-//         strncat(uniq_id, num, strlen(num));
-//         id++;
-//     } while(!is_variable_defined(root, local_table, NULL, uniq_id));
+        strcpy(uniq_id, name);
+        strncat(uniq_id, num, strlen(num));
+        id++;
+    } while(is_variable_defined(*root, local_table, NULL, uniq_id));
 
-//     return uniq_id;
+    return uniq_id;
     
-// }
+}
 
-// char * expr_parser_gen_uniq_id_with_prefix(SymTabNodePtr root, LocalTableNode local_table, char* prefix) {
-//     static int id = 1;
-//     char *uniq_id = NULL;
-//     do {
-//         char *num = int_to_str(id);
-//         uniq_id = (char *) malloc(strlen(num) + strlen(prefix) + 1);
-//         if (uniq_id == NULL) {
-//             exit(INTERNAL_ERROR);
-//         }
+char * expr_parser_gen_uniq_id_with_prefix(SymTabNodePtr root, LocalTableNode local_table, char* prefix) {
+    static int id = 1;
+    char *uniq_id = NULL;
+    do {
+        char *num = int_to_str(id);
+        uniq_id = (char *) malloc(strlen(num) + strlen(prefix) + 1);
+        if (uniq_id == NULL) {
+            exit(INTERNAL_ERROR);
+        }
 
-//         strcpy(uniq_id, prefix);
-//         strncat(uniq_id, num, strlen(num));
-//         id++;
-//     } while(!is_variable_defined(root, local_table, NULL, uniq_id));
+        strcpy(uniq_id, prefix);
+        strncat(uniq_id, num, strlen(num));
+        id++;
+    } while(is_variable_defined(root, local_table, NULL, uniq_id));
 
-//     return uniq_id;
-// }
+    return uniq_id;
+}

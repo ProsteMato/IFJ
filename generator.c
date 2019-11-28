@@ -98,7 +98,7 @@ char* int_to_str(int i){
 	if (str == NULL){
 		return NULL;
 	}
-	sprintf(str, "%d/0", i);
+	sprintf(str, "%d", i);
 	return str;
 }
 
