@@ -42,7 +42,7 @@ void set_build_in_function_param_count(SymTabNodePtr root, char *function_id);
  * @param param_count Count of params
  * @return Error code SEM_PARAMS_ERROR
  */
-int check_function_param_count(SymTabNodePtr root, int *function_id, int param_count);
+int check_function_param_count(SymTabNodePtr root, char *function_id, int param_count);
 
 /**
  * @brief This function returns data type of given build-id function id
@@ -60,7 +60,7 @@ Data_type build_in_function_return_type(char *function_id);
  * @param second_type Type of second operand
  * @return SEM_TYPE_ERROR
  */
-int arithmetic_operation_check(Data_type first_type, pTable operation, Data_type second_type);
+int arithmetic_operation_check(Data_type first_type, int operation, Data_type second_type);
 
 /**
  * @brief This function will check if two types are compatible for comparison operation
@@ -70,7 +70,7 @@ int arithmetic_operation_check(Data_type first_type, pTable operation, Data_type
  * @param second_type Type of second operand
  * @return SEM_TYPE_ERROR
  */
-int comparison_check(Data_type first_type, pTable relation, Data_type second_type);
+int comparison_check(Data_type first_type, int relation, Data_type second_type);
 
 /**
  * @brief Function will get return type from given 2 types
@@ -90,7 +90,7 @@ Data_type arithmetic_operation_return_type(Data_type first_type, Data_type secod
  * @param local_table pointer to a actual local table.
  * @return data type
  */
-Data_type get_type_from_token(SymTabNodePtr root, LocalTableNode *local_table, Token token);
+Data_type get_type_from_token(SymTabNodePtr root, LocalTableNode local_table, Token token);
 
 /**
  * @brief This function will check if function was defined.
@@ -121,7 +121,7 @@ int is_global_variable(SymTabNodePtr root, char *id);
  * 
  * @return Error code SEM_FUNCTION_ERROR - if is not defined / OK - is defined
  */
-int is_variable_defined(SymTabNodePtr root,  LocalTableNode *local_table, ParamList *params, char *variable_id); // doplniť parametre
+int is_variable_defined(SymTabNodePtr root,  LocalTableNode local_table, ParamList *params, char *variable_id); // doplniť parametre
 
 /**
  * @brief This function will define function in global sym table
@@ -151,6 +151,6 @@ char * expr_parser_gen_uniq_id(SymTabNodePtr root, LocalTableNode local_table);
  * @param prefix Prefix for uniq id.
  * @return uniq id
  */
-char * expr_parser_gen_uniq_id_with_prefix(SymTabNodePtr root, LocalTableNode local_table, char *function_id, char* prefix);
+char * expr_parser_gen_uniq_id_with_prefix(SymTabNodePtr root, LocalTableNode local_table, char* prefix);
 
 #endif
