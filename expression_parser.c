@@ -23,12 +23,12 @@ const char precedenceTable[tableSize][tableSize] = {
   { '>', '>', '>', '>', '>', '>', '>', '>', '>', '>', '>', '<', '>', '<', '<', '<', '#', '#', '>'}, // *       2
   { '>', '>', '>', '>', '>', '>', '>', '>', '>', '>', '>', '<', '>', '<', '<', '<', '#', '#', '>'}, // /       3
   { '>', '>', '>', '>', '>', '>', '>', '>', '>', '>', '>', '<', '>', '<', '<', '<', '#', '#', '>'}, // //      4
-  { '<', '<', '<', '<', '<', '#', '#', '#', '#', '#', '#', '<', '>', '<', '<', '<', '<', '#', '<'}, // <       5
-  { '<', '<', '<', '<', '<', '#', '#', '#', '#', '#', '#', '<', '>', '<', '<', '<', '<', '#', '<'}, // <=      6 
-  { '<', '<', '<', '<', '<', '#', '#', '#', '#', '#', '#', '<', '>', '<', '<', '<', '<', '#', '<'}, // >       7
-  { '<', '<', '<', '<', '<', '#', '#', '#', '#', '#', '#', '<', '>', '<', '<', '<', '<', '#', '<'}, // >=      8
-  { '<', '<', '<', '<', '<', '#', '#', '#', '#', '#', '#', '<', '>', '<', '<', '<', '<', '<', '<'}, // ==      9
-  { '<', '<', '<', '<', '<', '#', '#', '#', '#', '#', '#', '<', '>', '<', '<', '<', '<', '<', '<'}, // !=     10
+  { '<', '<', '<', '<', '<', '#', '#', '#', '#', '#', '#', '<', '>', '<', '<', '<', '<', '#', '>'}, // <       5
+  { '<', '<', '<', '<', '<', '#', '#', '#', '#', '#', '#', '<', '>', '<', '<', '<', '<', '#', '>'}, // <=      6 
+  { '<', '<', '<', '<', '<', '#', '#', '#', '#', '#', '#', '<', '>', '<', '<', '<', '<', '#', '>'}, // >       7
+  { '<', '<', '<', '<', '<', '#', '#', '#', '#', '#', '#', '<', '>', '<', '<', '<', '<', '#', '>'}, // >=      8
+  { '<', '<', '<', '<', '<', '#', '#', '#', '#', '#', '#', '<', '>', '<', '<', '<', '<', '<', '>'}, // ==      9
+  { '<', '<', '<', '<', '<', '#', '#', '#', '#', '#', '#', '<', '>', '<', '<', '<', '<', '<', '>'}, // !=     10
   { '<', '<', '<', '<', '<', '<', '<', '<', '<', '<', '<', '<', '=', '<', '<', '<', '<', '<', '#'}, // (      11
   { '>', '>', '>', '>', '>', '>', '>', '>', '>', '>', '>', '#', '>', '#', '#', '#', '#', '#', '>'}, // )      12
   { '>', '>', '>', '>', '>', '>', '>', '>', '>', '>', '>', '#', '>', '#', '#', '#', '#', '#', '>'}, // id     13 
@@ -140,7 +140,7 @@ int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3
                   return SEM_TYPE_ERROR;
             }
       }
-      else return OK;
+      
       
       if ( rule == PR_BIB)
       {
@@ -149,7 +149,6 @@ int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3
                   return SEM_TYPE_ERROR;
             }
       }
-      else return OK;
 
       if ( rule != PR_OPERAND || rule !=PR_BIB)
       {
@@ -451,7 +450,51 @@ int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3
 
       return OK;
 }
-
+/**
+int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3  )
+{
+      int error;
+      switch (rule)
+      {
+            case PR_EPLUSE:
+                  error = arithmetic_operation_check(sym1->dType, PR_EPLUSE, sym3->dType);
+                  return error;
+            case PR_EMINUSE:
+                  error = arithmetic_operation_check(sym1->dType, PR_EMINUSE, sym3->dType);
+                  return error;
+            case PR_EMULTE: 
+                  error = arithmetic_operation_check(sym1->dType, PR_EMULTE, sym3->dType);
+                  return error;
+            case PR_EDIVE: 
+                  error = arithmetic_operation_check(sym1->dType, PR_EDIVE, sym3->dType);
+                  return error;
+            case PR_EDIVDIVE: 
+                  error = arithmetic_operation_check(sym1->dType, PR_EDIVDIVE, sym3->dType);
+                  return error;
+            case PR_ELESSE: 
+                  error = comparison_check(sym1->dType, PR_ELESSE, sym3->dType);
+                  return error; 
+            case PR_ELESSEQE: 
+                  error = comparison_check(sym1->dType, PR_ELESSEQE, sym3->dType);
+                  return error; 
+            case PR_EGREATE: 
+                  error = comparison_check(sym1->dType, PR_EGREATE, sym3->dType);
+                  return error; 
+            case PR_EGREATEQE: 
+                  error = comparison_check(sym1->dType, PR_EGREATEQE, sym3->dType);
+                  return error; 
+            case PR_EEQE: 
+                  error = comparison_check(sym1->dType, PR_EEQE, sym3->dType);
+                  return error; 
+            case PR_ENOTEQE: 
+                  error = comparison_check(sym1->dType, PR_ENOTEQE, sym3->dType);
+                  return error; 
+            default: 
+                  error = -1;
+                  return error;  
+      }
+}
+*/
 
 int checkDivisionByZero(Token *token)
 {
@@ -689,12 +732,21 @@ int symbolsToReduce()
 {
       exprStack* top= sTop(&stack);
       int num = 0;
+      
      while (top->symbol != PT_SHIFT)
       {
             top= top->next; 
             num += 1;  
       } 
-
+      if (num == 2) num++;
+      /**
+     while (top != NULL)
+     {
+           if (top->symbol != PT_SHIFT)
+           {
+                 num++;
+           }
+     } */
       return num; 
 }
 
@@ -821,6 +873,11 @@ int callExpression(Token *token)
   pTable indexStack;
   pTable indexInput; 
   pRules rule;  
+  int i=0;
+  for (int j=0;  j < 100; j++)
+  {
+        precedenceRules[j] = -1;
+  }
   //exprStack* sym1 = NULL;
   //exprStack* sym2 = NULL;
   //exprStack* sym3 = NULL;
@@ -833,7 +890,11 @@ int callExpression(Token *token)
       indexStack= stack.top->symbol;
       if (indexStack == PT_E)
       {
-            indexStack = PT_DOLLAR;
+            indexStack = stack.top->next->symbol;
+      }
+      if ( indexStack == PT_DOLLAR && indexInput == PT_DOLLAR)
+      {
+            break;
       }
       switch (precedenceTable[indexStack][indexInput])
       {
@@ -842,18 +903,27 @@ int callExpression(Token *token)
                   eList.act = eList.act->rptr;
                   break;
             case ('<'):
-                  if (indexStack == PT_DOLLAR)
+                  if (stack.top->symbol == PT_DOLLAR || stack.top->symbol != PT_E)
                   {
                         sPush(&stack, PT_SHIFT, TYPE_UNDEFINED);
                         sPush(&stack, indexInput, eList.act->dType);
                   }
+                  else if (stack.top->symbol == PT_E)
+                  {
+                        sPop(&stack); 
+                        sPush(&stack, PT_SHIFT,TYPE_UNDEFINED);
+                        sPush(&stack, PT_E, TYPE_UNDEFINED);
+                        sPush(&stack, indexInput, TYPE_UNDEFINED);
+
+                  }
+                  /**
                   else 
                   {
                         sPop(&stack);
                         sPush(&stack, PT_SHIFT, TYPE_UNDEFINED);
                         sPush(&stack, PT_E, TYPE_UNDEFINED);
                         sPush(&stack, indexInput, eList.act->dType);
-                  }
+                  } */
                   eList.act=eList.act->rptr;
                   break;
             case ('>'):
@@ -879,11 +949,11 @@ int callExpression(Token *token)
                               sPush(&stack, PT_E, TYPE_UNDEFINED);
                         }
                   }
-                  if ( num == 3 )
+                  if ( num == 3)
                   {
-                        exprStack* sym1 = stack.top;
+                        exprStack* sym1 = stack.top->next->next;
                         exprStack* sym2 = stack.top->next;
-                        exprStack* sym3 =  stack.top->next->next;
+                        exprStack* sym3 =  stack.top;
                         rule  = findRule (num, sym1, sym2, sym3);
                         if (rule == PR_NOTARULE)
                         {
@@ -898,13 +968,16 @@ int callExpression(Token *token)
                               sPush(&stack, PT_E, TYPE_UNDEFINED);
                         }
                   }
+                  printf("Rule is: %d \n", rule);
+                  precedenceRules[i]=rule;
+                  i++;
                   break;
             default:
                   return SYNTAX_ERROR;
                   break;
 
             }
-      } while ( stack.top->symbol != PT_DOLLAR && eList.act->symbol != PT_DOLLAR);
+      } while ( stack.top->symbol != PT_DOLLAR || eList.act->symbol != PT_DOLLAR);
 
  //listDispose(&eList);
  //disposeStack(&stack);
