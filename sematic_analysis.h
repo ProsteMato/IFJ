@@ -134,13 +134,31 @@ int is_variable_defined(SymTabNodePtr root,  LocalTableNode local_table, ParamLi
 int define_function(SymTabNodePtr *root, char *function_id);
 
 /**
+ * @brief This function will create local varibale in local sym table of function
+ * 
+ * @param root Local sym table of function
+ * @param function_id ID of variable
+ * @return Error code 
+ */
+int define_local_variable(LocalTableNode *root, char *variable_id);
+
+/**
+ * @brief This function will create global variable in global sym table
+ * 
+ * @param root poiner to a gloal sym table
+ * @param function_id id of variable
+ * @return Error code
+ */
+int define_global_variable(SymTabNodePtr *root, char *variable_id);
+
+/**
  * @brief This function will generate uniq id for expr_parser
  * 
  * @param root pointer to a global sym table
  * @param local_table if we are in function this is pointer to a local function otherwise pointer to a global sym table
  * @return uniq id
  */
-char * expr_parser_gen_uniq_id(SymTabNodePtr root, LocalTableNode local_table);
+char * expr_parser_gen_uniq_id(SymTabNodePtr *root, LocalTableNode local_table);
 
 /**
  * @brief This function will generate uniq id for expr_parser with prefix
