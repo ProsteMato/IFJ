@@ -6,26 +6,30 @@
  * @author Michal Koval <xkoval17@stud.fit.vutbr.cz>
  */
 
+//is_global() -- MISOOO nechcelo mi preloziť kod zakomentoval som ti to tu 
+// a zmenil v Code_line ti upravil jeden parameter aby to prechazalo..
+
 #ifndef _GENERATOR_H
 #define _GENERATOR_H
 
 #include <stdlib.h>
 #include <string.h>
 #include "error.h"
+#include "my_string.h"
 
-#define HEADER_SIZE 11
-#define ADD_INST0 (inst) CL_add_inst(inst, NULL, NULL, NULL)
-#define ADD_INST1 (inst,p1) CL_add_inst(inst, p1, NULL, NULL)
-#define ADD_INST2 (inst,p1,p2) CL_add_inst(inst, p1, p2, NULL)
-#define ADD_INST3 (inst,p1,p2,p3) CL_add_inst(inst, p1, p2, p3)
+#define INT2STR_SIZE 12 // vsetky cisla velkosti int sa dokazu zmestit do 12 znakov
+int while_c = 0;
 
 // linked list of code for printing at the end
 typedef struct{
 	char *inst;
-	char *adr0;
-	char *adr1;
-	char *adr2;
-	Code_line *next;
+	size_t cap;
+	size_t len;
+} Code;
+
+typedef struct Code_line{
+	Code *code;
+	struct Code_line *next;
 } Code_line;
 
 typedef struct{
@@ -33,7 +37,11 @@ typedef struct{
 	Code_line *last;
 } Code_list;
 
-Code_list code;
+Code_list code_list;
+
+// vytvorit tabulku s premennymi
+char* int_to_str(int i);
+char* get_var_adr(char *var);
 
 void CL_init();
 int CL_add_inst(char *inst,	char *adr0,	char *adr1,	char *adr2);
@@ -42,49 +50,62 @@ void CL_destroy(Code_line *line);
 int init_generator();
 void print_final_code();
 
+char* get_var_adr(char *dest); // vymysliet
+char* create_code(char *code);
+
 // funkcie na generovanie IFJcode19
 
-void gen_header(); // generovanie zac programu
+int gen_header(); // generovanie zac programu
+int gen_int2float(char *var);
+int gen_assing_const_to_val(char *var, char *const, Token type); // type - TK_ int/float/str
+
 
 // vstavane fukcie
-void gen_def();
-void gen_if();
-void gen_else();
-void gen_pass();
-void gen_while();
-void gen_inputs();
-void gen_inputi();
-void gen_inputf();
-void gen_print();
-void gen_len();
-void gen_substr();
-void gen_ord();
-void gen_chr();
+int gen_inputs(char *dest);
+int gen_inputi(char *dest);
+int gen_inputf(char *dest);
+int gen_print(char *symb);
+int gen_len();
+int gen_substr();
+int gen_ord();
+int gen_chr();
+
+// podmienky
+//int gen_if();
+//int gen_else();
 
 // operacie mat
-void gen_add();
-void gen_minus();
-void gen_mult();
-void gen_div();
-void gen_idiv();
-void gen_concat();
+//int gen_add();
+//int gen_minus();
+//int gen_mult();
+//int gen_div();
+//int gen_idiv();
+//int gen_concat();
+
+// operacie relacne
+int gen_less_than(char *op1, char *op2); //is_variable_defined
+int gen_more_than(char *op1, char *op2);
+int gen_equal(char *op1, char *op2);
+int gen_equal_less(char *op1, char *op2);
+int gen_equal_more(char *op1, char *op2);
+int gen_not_equal(char *op1, char *op2);
 
 // while
-void gen_while_begin(); // while start
-void gen_while_end(); // while end
+int gen_while_label();
+int gen_while_begin(); // condition
+int gen_while_end();
 
 
 // funkcie
-
-// generovanie jumpu
-// hlavicka funkcie
-// ukoncenie funkcie
-// call funckcie
-
+int gen_f_start(char *id); // pri def
+int gen_f_end(char *id); // na koniec funkcie, za poslednym vygenerovanym prikazom tela f
+int gen_f_call(char *id);
+int gen_f_prep(); // pop zo stacku
 
 
 // stack na parametre
 // unique labely
-// int2float
 // // lokalnu alebo globalnu tabulku symbolov
+// na konci prejst zoznam a prehladat pouzitie built in funcii, tlacit len pouzite
+// prechod zase kvoli
 #endif //_GENERATOR_H
