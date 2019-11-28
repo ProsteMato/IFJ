@@ -6,7 +6,7 @@
  * @author Michal Koval <xkoval17@stud.fit.vutbr.cz>
  */
 #ifndef _ERROR_H
-#define _ERRORR_H
+#define _ERROR_H
 
 // main program
 #define LEX_ERROR 1
