@@ -52,6 +52,7 @@ int GlobalSymTabInsert (SymTabNodePtr* RootPtr, char * K, GlobalTableData *Obsah
 	else if (K > (*RootPtr)->Key)
 	    	GlobalSymTabInsert (&(*RootPtr)->RPtr, K, Obsah);
 	else (*RootPtr)->Data = Obsah; //strom toto id uz obsahuje -> prepisu obsah
+	return OK;
 }
 
 //pomocna funkce pro nahrazeni
@@ -139,6 +140,18 @@ int LocalSymTabSearch (LocalTableNode RootPtr, char * K, LocalTableData **Obsah)
 	}
 }
 
+int LocalSymTabSearchMinus (LocalTableNode RootPtr, char * K)	{
+
+	if (RootPtr == NULL) return FALSE; //neuspesne hledani
+	else if (K < RootPtr->Key)
+		return LocalSymTabSearchMinus (RootPtr->LPtr, K); //rekurzivni volani, hledam v levem podstromu
+	else if (K > RootPtr->Key)
+		return LocalSymTabSearchMinus (RootPtr->RPtr, K); //rekurzivni volani, hledam v pravem podstromu
+	else{ //K=RootPtr->Key, uspesne hledani
+		return TRUE;
+	}
+}
+
 //vlozeni noveho symbolu do tabulky, musi bytint kvuli vraceni chyby
 int LocalSymTabInsert (LocalTableNode* RootPtr, char * K, LocalTableData *Obsah){
 	if (*RootPtr == NULL){ //pokud nebylo alokovane, alokuju
@@ -153,6 +166,7 @@ int LocalSymTabInsert (LocalTableNode* RootPtr, char * K, LocalTableData *Obsah)
 	else if (K > (*RootPtr)->Key)
 	    	LocalSymTabInsert (&(*RootPtr)->RPtr, K, Obsah);
 	else (*RootPtr)->localData = Obsah; //strom toto id uz obsahuje -> prepisu obsah
+	return OK;
 }
 
 //odstraneni symbolu s klicem k
@@ -217,6 +231,7 @@ int ParamInsert(ParamList *L, char * id) {
 		else L->first = tmp;
 		L->last = tmp;
 	}
+	return OK;
 }
 
 //hledani parametru
@@ -285,47 +300,47 @@ void SetParamCount (SymTabNodePtr RootPtr, char * K, int pocet){
 
 // funkce pro testovani
 
-int main(int argc, char *argv[]){
-	printf("Inicialuzuju a vlozim uzel: \n");
+// int main(int argc, char *argv[]){
+// 	printf("Inicialuzuju a vlozim uzel: \n");
 
-	SymTabNodePtr novynode;
-	GlobalTableData nejakadata;
+// 	SymTabNodePtr novynode;
+// 	GlobalTableData nejakadata;
 	
-	char *Key = "nejaky kliiiiiiiiiic";
-	nejakadata.type = TYPE_INT;
-	nejakadata.funkce = TRUE;
-	nejakadata.define = FALSE;
+// 	char *Key = "nejaky kliiiiiiiiiic";
+// 	nejakadata.type = TYPE_INT;
+// 	nejakadata.funkce = TRUE;
+// 	nejakadata.define = FALSE;
 	
-	char *OtherKey = "nejaky jiny klic";
+// 	char *OtherKey = "nejaky jiny klic";
 
-	GlobalTableData jinadata;
-	jinadata.type = TYPE_STRING;
-	jinadata.funkce = FALSE;
-	jinadata.define = TRUE;
+// 	GlobalTableData jinadata;
+// 	jinadata.type = TYPE_STRING;
+// 	jinadata.funkce = FALSE;
+// 	jinadata.define = TRUE;
 
-	GlobalTableData *misto;
-
-
-	GlobalSymTabInit(&novynode);
-	GlobalSymTabInsert(&novynode, Key, &nejakadata);
-
-	printf(" Klic: %s \n", novynode->Key);
-	printf(" Data (datovy typ): %d \n", novynode->Data->type);
-	printf(" Data (je funkce): %d \n", novynode->Data->funkce);
-	printf(" Data (je definovano): %d \n \n", novynode->Data->define);
-
-	printf("Vlozim dalsi uzel: \n");
-
-	GlobalSymTabInsert(&novynode, OtherKey, &jinadata);
-	printf(" Klic: %s \n", novynode->RPtr->Key);
-	printf(" Data (datovy typ): %d \n", novynode->RPtr->Data->type);
-	printf(" Data (je funkce): %d \n", novynode->RPtr->Data->funkce);
-	printf(" Data (je definovano): %d \n \n", novynode->RPtr->Data->define);
-
-	printf("zkusim hledat OtherKey: %d \n", (GlobalSymTabSearch(novynode, OtherKey, &misto)));
-	char * NeexistujiciKlic = "nejsem tu";
-	printf("zkusim hledat něco co tam neni: %d \n", (GlobalSymTabSearch(novynode, NeexistujiciKlic, &misto)));
+// 	GlobalTableData *misto;
 
 
-	return 0;
-}
+// 	GlobalSymTabInit(&novynode);
+// 	GlobalSymTabInsert(&novynode, Key, &nejakadata);
+
+// 	printf(" Klic: %s \n", novynode->Key);
+// 	printf(" Data (datovy typ): %d \n", novynode->Data->type);
+// 	printf(" Data (je funkce): %d \n", novynode->Data->funkce);
+// 	printf(" Data (je definovano): %d \n \n", novynode->Data->define);
+
+// 	printf("Vlozim dalsi uzel: \n");
+
+// 	GlobalSymTabInsert(&novynode, OtherKey, &jinadata);
+// 	printf(" Klic: %s \n", novynode->RPtr->Key);
+// 	printf(" Data (datovy typ): %d \n", novynode->RPtr->Data->type);
+// 	printf(" Data (je funkce): %d \n", novynode->RPtr->Data->funkce);
+// 	printf(" Data (je definovano): %d \n \n", novynode->RPtr->Data->define);
+
+// 	printf("zkusim hledat OtherKey: %d \n", (GlobalSymTabSearch(novynode, OtherKey, &misto)));
+// 	char * NeexistujiciKlic = "nejsem tu";
+// 	printf("zkusim hledat něco co tam neni: %d \n", (GlobalSymTabSearch(novynode, NeexistujiciKlic, &misto)));
+
+
+// 	return 0;
+// }

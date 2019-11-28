@@ -3,6 +3,9 @@
  @brief Tabulka symbolu, implementovana pomoci binarniho stromu
  @author Zuzana Hradilova <xhradi16@stud.fit.vutbr.cz> */
 
+#ifndef _SYM_TABLE_
+#define _SYM_TABLE_
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -180,4 +183,8 @@ void SetParamCount (SymTabNodePtr, char *, int);
 //vraci true, pokud je nalezeno
 int GlobalSymTabSearchMinus (SymTabNodePtr, char *);
 
+//hledani bez ulozeni dat
+//vraci true, pokud je nalezeno
+int LocalSymTabSearchMinus (LocalTableNode, char *);
 
+#endif
