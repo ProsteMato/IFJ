@@ -94,7 +94,7 @@ int getIndex(Token *token)
   }
 }
  
-data_type getDataType(Token *token)
+Data_type getDataType(Token *token)
 {
       void tkq_init(); 
       if (token->type == TK_INT)
@@ -481,7 +481,7 @@ int createList(Token *token, exprList *eList)
   int leftBracket = 0;
   int rightBracket =0; 
   pTable symbol= getIndex(&token);
-  data_type dType= getDataType(&token);
+  Data_type dType= getDataType(&token);
   if (symbol == -1 )
   {
       error = INTERNAL_ERROR;
@@ -506,7 +506,7 @@ int createList(Token *token, exprList *eList)
             error= INTERNAL_ERROR;
             return error;
       }
-      data_type dType= getDataType(&token);
+      Data_type dType= getDataType(&token);
       if (token->type == TK_KW)
       {
             if ((strcmp(token->attribute, "None")) != 0)
@@ -705,7 +705,7 @@ int callExpression(Token *token)
   int rightBracket =0; 
   pTable symbol= getIndex(token);
   exprList eList;
-  data_type dType= getDataType(token);
+  Data_type dType= getDataType(token);
   if (symbol == -1 )
   {
       return INTERNAL_ERROR;
@@ -726,7 +726,7 @@ int callExpression(Token *token)
             listDispose(&eList);
             return INTERNAL_ERROR;
       }
-      data_type dType= getDataType(token);
+      Data_type dType= getDataType(token);
       if (token->type == TK_KW)
       {
             if ((strcmp(token->attribute, "None")) != 0)

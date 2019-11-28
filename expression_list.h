@@ -29,7 +29,7 @@ void listInitialize(exprList *eList);
  * @return INTERNAL ERROR when somethng goes wrong with list
  *          OK if everything was OKAY
  */
-int listInsertFirst(exprList *eList, pTable symbol, data_type dType);
+int listInsertFirst(exprList *eList, pTable symbol, Data_type dType);
 
 /**
  * @brief Insert token after active one and new token becomes active one 
@@ -40,7 +40,7 @@ int listInsertFirst(exprList *eList, pTable symbol, data_type dType);
  * @return INTERNAL_ERROR when something goes wrong with list 
  *          OK everything OKAY  
  **/
-int listInsertAct(exprList *eList, pTable symbol, data_type dType);
+int listInsertAct(exprList *eList, pTable symbol, Data_type dType);
 
 /**
  * @brief Function returns token from active item and next item becomes active

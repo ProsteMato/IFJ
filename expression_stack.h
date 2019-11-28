@@ -61,7 +61,7 @@ exprStack* sTop(stackTop* eStack);
  * @param symbol symbol to push onto a stack
  * @param dType type of symbol 
  */
-int sPush(stackTop* eStack, pTable symbol, data_type dType);
+int sPush(stackTop* eStack, pTable symbol, Data_type dType);
 
 /**
  * @brief Pop a symbol from a stack 
