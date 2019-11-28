@@ -102,6 +102,7 @@ typedef enum {
   PR_NOTARULE, // not a rule 
 } pRules;
 
+int precedenceRules[100] ;
 
 #include "expression_list.h"
 #include "expression_stack.h"
