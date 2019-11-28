@@ -17,9 +17,9 @@ int GlobalSymTabSearch (SymTabNodePtr RootPtr, char * K, GlobalTableData **Obsah
 
 	if (RootPtr == NULL) 
 		return false; //neuspesne hledani
-	else if (K < RootPtr->Key)
+	else if ((strcmp(RootPtr->Key, K) > 0))
 		return GlobalSymTabSearch (RootPtr->LPtr, K, Obsah); //rekurzivni volani, hledam v levem podstromu
-	else if (K > RootPtr->Key)
+	else if ((strcmp(RootPtr->Key, K) < 0))
 		return GlobalSymTabSearch (RootPtr->RPtr, K, Obsah); //rekurzivni volani, hledam v pravem podstromu
 	else{ //K=RootPtr->Key, uspesne hledani
 		*Obsah = RootPtr->Data; //vracim data o promenne
@@ -30,9 +30,9 @@ int GlobalSymTabSearch (SymTabNodePtr RootPtr, char * K, GlobalTableData **Obsah
 int GlobalSymTabSearchMinus (SymTabNodePtr RootPtr, char * K)	{
 
 	if (RootPtr == NULL) return false; //neuspesne hledani
-	else if (K < RootPtr->Key)
+	else if (strcmp(RootPtr->Key, K) > 0)
 		return GlobalSymTabSearchMinus (RootPtr->LPtr, K); //rekurzivni volani, hledam v levem podstromu
-	else if (K > RootPtr->Key)
+	else if (strcmp(RootPtr->Key, K) < 0)
 		return GlobalSymTabSearchMinus (RootPtr->RPtr, K); //rekurzivni volani, hledam v pravem podstromu
 	else{ //K=RootPtr->Key, uspesne hledani
 		return true;
@@ -48,9 +48,9 @@ int GlobalSymTabInsert (SymTabNodePtr* RootPtr, char * K, GlobalTableData *Obsah
 		(*RootPtr)->LPtr = NULL;
 		(*RootPtr)->RPtr = NULL;
 	}
-	else if (K < (*RootPtr)->Key)
+	else if (strcmp((*RootPtr)->Key, K) > 0)
 	    	GlobalSymTabInsert (&(*RootPtr)->LPtr, K, Obsah);
-	else if (K > (*RootPtr)->Key)
+	else if (strcmp((*RootPtr)->Key, K) < 0)
 	    	GlobalSymTabInsert (&(*RootPtr)->RPtr, K, Obsah);
 	else (*RootPtr)->Data = Obsah; //strom toto id uz obsahuje -> prepisu obsah
 	return OK;
@@ -85,8 +85,8 @@ void LocalReplaceByRightmost (LocalTableNode PtrReplaced, LocalTableNode *RootPt
 void GlobalSymTabDelete (SymTabNodePtr *RootPtr, char * K) {
 	if (*RootPtr == NULL) return;
 
-	if ((*RootPtr)->Key < K) GlobalSymTabDelete((&(*RootPtr)->RPtr), K);
-	else if ((*RootPtr)->Key > K) GlobalSymTabDelete((&(*RootPtr)->LPtr), K);
+	if ((strcmp((*RootPtr)->Key, K) < 0)) GlobalSymTabDelete((&(*RootPtr)->RPtr), K);
+	else if ((strcmp((*RootPtr)->Key, K) > 0)) GlobalSymTabDelete((&(*RootPtr)->LPtr), K);
 
 	else {
 		if ((*RootPtr)->LPtr == NULL && (*RootPtr)->RPtr == NULL){ //uzel nema podstrom
@@ -131,9 +131,9 @@ void LocalSymTabInit (LocalTableNode *RootPtr) {
 int LocalSymTabSearch (LocalTableNode RootPtr, char * K, LocalTableData **Obsah)	{
 
 	if (RootPtr == NULL) return false; //neuspesne hledani
-	else if (K < RootPtr->Key)
+	else if ((strcmp(RootPtr->Key, K) > 0))
 		return LocalSymTabSearch (RootPtr->LPtr, K, Obsah); //rekurzivni volani, hledam v levem podstromu
-	else if (K > RootPtr->Key)
+	else if ((strcmp(RootPtr->Key, K) < 0))
 		return LocalSymTabSearch (RootPtr->RPtr, K, Obsah); //rekurzivni volani, hledam v pravem podstromu
 	else{ //K=RootPtr->Key, uspesne hledani
 		*Obsah = RootPtr->localData; //vracim data o promenne
@@ -144,9 +144,9 @@ int LocalSymTabSearch (LocalTableNode RootPtr, char * K, LocalTableData **Obsah)
 int LocalSymTabSearchMinus (LocalTableNode RootPtr, char * K)	{
 
 	if (RootPtr == NULL) return false; //neuspesne hledani
-	else if (K < RootPtr->Key)
+	else if ((strcmp(RootPtr->Key, K) > 0))
 		return LocalSymTabSearchMinus (RootPtr->LPtr, K); //rekurzivni volani, hledam v levem podstromu
-	else if (K > RootPtr->Key)
+	else if ((strcmp(RootPtr->Key, K) < 0))
 		return LocalSymTabSearchMinus (RootPtr->RPtr, K); //rekurzivni volani, hledam v pravem podstromu
 	else{ //K=RootPtr->Key, uspesne hledani
 		return true;
@@ -162,9 +162,9 @@ int LocalSymTabInsert (LocalTableNode* RootPtr, char * K, LocalTableData *Obsah)
 		(*RootPtr)->LPtr = NULL;
 		(*RootPtr)->RPtr = NULL;
 	}
-	else if (K < (*RootPtr)->Key)
+	else if ((strcmp((*RootPtr)->Key, K) > 0))
 	    	LocalSymTabInsert (&(*RootPtr)->LPtr, K, Obsah);
-	else if (K > (*RootPtr)->Key)
+	else if ((strcmp((*RootPtr)->Key, K) < 0))
 	    	LocalSymTabInsert (&(*RootPtr)->RPtr, K, Obsah);
 	else (*RootPtr)->localData = Obsah; //strom toto id uz obsahuje -> prepisu obsah
 	return OK;
@@ -174,8 +174,8 @@ int LocalSymTabInsert (LocalTableNode* RootPtr, char * K, LocalTableData *Obsah)
 void LocalSymTabDelete (LocalTableNode *RootPtr, char * K) {
 	if (*RootPtr == NULL) return;
 
-	if ((*RootPtr)->Key < K) LocalSymTabDelete((&(*RootPtr)->RPtr), K);
-	else if ((*RootPtr)->Key > K) LocalSymTabDelete((&(*RootPtr)->LPtr), K);
+	if ((strcmp((*RootPtr)->Key, K) < 0)) LocalSymTabDelete((&(*RootPtr)->RPtr), K);
+	else if ((strcmp((*RootPtr)->Key, K) > 0)) LocalSymTabDelete((&(*RootPtr)->LPtr), K);
 
 	else {
 		if ((*RootPtr)->LPtr == NULL && (*RootPtr)->RPtr == NULL){ //uzel nema podstrom
@@ -242,6 +242,9 @@ void ParamSucc(ParamList *L){
 
 //hledani parametru
 bool ParamSearch (ParamList *L, char * id){
+	if (L == NULL) {
+		return false;
+	}
 	ParamFirst(L);
 	while ((L->act->id != id)){
 		ParamSucc(L);
