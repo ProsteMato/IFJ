@@ -7,7 +7,7 @@ int main(int argc, char const *argv[])
     char *build_in[] = {"inputi", "inputf", "inputs", "ord", "chr", "substr", "print", "len"};
     char *build_in_without_print[] = {"inputi", "inputf", "inputs", "ord", "chr", "substr", "len"};
     int id[] = {0, 0, 0, 2, 1, 3, 1};
-    SymTabNodePtr *root = NULL;
+    SymTabNodePtr *root = malloc(sizeof(struct SymTabNode));
     GlobalSymTabInit(root);
 
     printf("Kontrola build in functions\n");
@@ -44,9 +44,9 @@ int main(int argc, char const *argv[])
     printf("Natavenie parametrov build in functions == OK\n");
 
     printf("Kontrola parametrov build in functions\n");
-    for (int i = 0; i < 8; i++){
-        if(check_function_param_count(*root, build_in[i], id[i]) != OK){
-            printf("chyba v \"%s\"\n", build_in[i]);
+    for (int i = 0; i < 7; i++){
+        if(check_function_param_count(*root, build_in_without_print[i], id[i]) != OK){
+            printf("chyba v \"%s\"\n", build_in_without_print[i]);
             return 0;
         }
     }

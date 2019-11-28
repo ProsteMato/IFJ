@@ -132,8 +132,9 @@ Data_type get_type_from_token(SymTabNodePtr root, LocalTableNode local_table, To
 
 int is_function_defined(SymTabNodePtr root, char *function_id) {
     GlobalTableData *global_data;
-    if (GlobalSymTabSearch(root, function_id, &global_data))
+    if (GlobalSymTabSearch(root, function_id, &global_data)) {
         return true;
+    }
     return false;
 }
 
@@ -163,9 +164,9 @@ int define_function(SymTabNodePtr *root, char *function_id) {
     if (is_function_defined(*root, function_id)) {
         return SEM_FUNCTION_ERROR;
     } else {
-        GlobalTableData data;
-        data.funkce = true;
-        GlobalSymTabInsert(root, function_id, &data);
+        GlobalTableData *data = malloc (sizeof(GlobalTableData));
+        data->funkce = true;
+        GlobalSymTabInsert(root, function_id, data);
         //TODO kontrola na internal_error
         return OK;
     }

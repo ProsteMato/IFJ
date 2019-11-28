@@ -15,26 +15,27 @@ void GlobalSymTabInit (SymTabNodePtr *RootPtr) {
 //vyhledani promenne podle jejiho id
 int GlobalSymTabSearch (SymTabNodePtr RootPtr, char * K, GlobalTableData **Obsah)	{
 
-	if (RootPtr == NULL) return FALSE; //neuspesne hledani
+	if (RootPtr == NULL) 
+		return false; //neuspesne hledani
 	else if (K < RootPtr->Key)
 		return GlobalSymTabSearch (RootPtr->LPtr, K, Obsah); //rekurzivni volani, hledam v levem podstromu
 	else if (K > RootPtr->Key)
 		return GlobalSymTabSearch (RootPtr->RPtr, K, Obsah); //rekurzivni volani, hledam v pravem podstromu
 	else{ //K=RootPtr->Key, uspesne hledani
 		*Obsah = RootPtr->Data; //vracim data o promenne
-		return TRUE;
+		return true;
 	}
 }
 
 int GlobalSymTabSearchMinus (SymTabNodePtr RootPtr, char * K)	{
 
-	if (RootPtr == NULL) return FALSE; //neuspesne hledani
+	if (RootPtr == NULL) return false; //neuspesne hledani
 	else if (K < RootPtr->Key)
 		return GlobalSymTabSearchMinus (RootPtr->LPtr, K); //rekurzivni volani, hledam v levem podstromu
 	else if (K > RootPtr->Key)
 		return GlobalSymTabSearchMinus (RootPtr->RPtr, K); //rekurzivni volani, hledam v pravem podstromu
 	else{ //K=RootPtr->Key, uspesne hledani
-		return TRUE;
+		return true;
 	}
 }
 
@@ -129,26 +130,26 @@ void LocalSymTabInit (LocalTableNode *RootPtr) {
 //vyhledani promenne podle jejiho id -- melo by byt hotove
 int LocalSymTabSearch (LocalTableNode RootPtr, char * K, LocalTableData **Obsah)	{
 
-	if (RootPtr == NULL) return FALSE; //neuspesne hledani
+	if (RootPtr == NULL) return false; //neuspesne hledani
 	else if (K < RootPtr->Key)
 		return LocalSymTabSearch (RootPtr->LPtr, K, Obsah); //rekurzivni volani, hledam v levem podstromu
 	else if (K > RootPtr->Key)
 		return LocalSymTabSearch (RootPtr->RPtr, K, Obsah); //rekurzivni volani, hledam v pravem podstromu
 	else{ //K=RootPtr->Key, uspesne hledani
 		*Obsah = RootPtr->localData; //vracim data o promenne
-		return TRUE;
+		return true;
 	}
 }
 
 int LocalSymTabSearchMinus (LocalTableNode RootPtr, char * K)	{
 
-	if (RootPtr == NULL) return FALSE; //neuspesne hledani
+	if (RootPtr == NULL) return false; //neuspesne hledani
 	else if (K < RootPtr->Key)
 		return LocalSymTabSearchMinus (RootPtr->LPtr, K); //rekurzivni volani, hledam v levem podstromu
 	else if (K > RootPtr->Key)
 		return LocalSymTabSearchMinus (RootPtr->RPtr, K); //rekurzivni volani, hledam v pravem podstromu
 	else{ //K=RootPtr->Key, uspesne hledani
-		return TRUE;
+		return true;
 	}
 }
 
@@ -236,7 +237,7 @@ int ParamInsert(ParamList *L, char * id) {
 
 // TODO
 void ParamSucc(ParamList *L){
-	return;
+	L->act = L->act->next;
 }
 
 //hledani parametru
@@ -244,8 +245,8 @@ bool ParamSearch (ParamList *L, char * id){
 	ParamFirst(L);
 	while ((L->act->id != id)){
 		ParamSucc(L);
-		if (L->act == NULL) return FALSE; //došlo se na konec seznamu
-	} return TRUE;
+		if (L->act == NULL) return false; //došlo se na konec seznamu
+	} return true;
 }
 
 void DLDisposeList (ParamList *L) {
@@ -292,14 +293,16 @@ char *ParamListGetActive(ParamList *L) {
 //nove pridane funkce
 //nastavi hodnutu define na true
 void SetDefine(SymTabNodePtr RootPtr, char * K){
-	if (GlobalSymTabSearchMinus (RootPtr, K) == false) return;
-	else RootPtr->Data->define = TRUE;
+	GlobalTableData *data;
+	if (GlobalSymTabSearch (RootPtr, K, &data) == false) return;
+	else data->define = true;
 	return;
 }
 
 void SetParamCount (SymTabNodePtr RootPtr, char * K, int pocet){
-	if (GlobalSymTabSearchMinus (RootPtr, K) == false) return;
-	else RootPtr->Data->pocet_par = pocet;
+	GlobalTableData *data;
+	if (GlobalSymTabSearch(RootPtr, K, &data) == false) return;
+	else data->pocet_par = pocet;
 	return;
 }
 // TODO spravit zvlast subor na test
@@ -313,15 +316,15 @@ int main(int argc, char *argv[]){
 	
 	char *Key = "nejaky kliiiiiiiiiic";
 	nejakadata.type = TYPE_INT;
-	nejakadata.funkce = TRUE;
-	nejakadata.define = FALSE;
+	nejakadata.funkce = true;
+	nejakadata.define = false;
 	
 	char *OtherKey = "nejaky jiny klic";
 
 	GlobalTableData jinadata;
 	jinadata.type = TYPE_STRING;
-	jinadata.funkce = FALSE;
-	jinadata.define = TRUE;
+	jinadata.funkce = false;
+	jinadata.define = true;
 
 	GlobalTableData *misto;
 

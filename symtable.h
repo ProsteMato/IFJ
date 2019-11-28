@@ -11,9 +11,6 @@
 #include <string.h>
 #include <stdbool.h>
 
-#define TRUE 1
-#define FALSE 0
-
 //definice datovych typu pro ulozena data
 typedef enum {
   TYPE_INT,

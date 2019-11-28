@@ -1,13 +1,13 @@
 CC = gcc
 CFLAGS = -std=c99 -Wall -Werror -pedantic 
 
-all: sem-parser
+all: sem-test
 
 #run:
 #	./test <input
 
-sem-parser: sematic_analysis.o expression_parser.o sem_test.c expression_stack.o expression_list.o scanner.o stack.o string.o symtable.o #generator.o
-	${CC} ${CFLAGS}  $^ -o $@
+sem-test: sematic_analysis.o expression_parser.o sem_test.c expression_stack.o expression_list.o scanner.o stack.o string.o symtable.o #generator.o
+	${CC} ${CFLAGS}  $^ -o ./bin/$@
 
 expression_parser.o: ../expression_parser.c ../expression_parser.h 
 	${CC} ${CFLAGS} $< -c -o $@
@@ -37,4 +37,4 @@ stack.o: ../stack.c ../stack.h
 	${CC} ${CFLAGS} $< -c -o $@
 
 clean:
-	rm *.o test
+	rm *.o ./bin/sem-test
