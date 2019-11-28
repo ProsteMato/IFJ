@@ -6,14 +6,13 @@
  * @author Michal Koval <xkoval17@stud.fit.vutbr.cz>
  */
 
-//is_global() -- MISOOO nechcelo mi preloziť kod zakomentoval som ti to tu 
-// a zmenil v Code_line ti upravil jeden parameter aby to prechazalo..
-
 #ifndef _GENERATOR_H
 #define _GENERATOR_H
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
+#include "scanner.h"
 #include "error.h"
 #include "my_string.h"
 
@@ -27,10 +26,11 @@ typedef struct{
 	size_t len;
 } Code;
 
-typedef struct Code_line{
+typedef struct Code_line Code_line;
+struct Code_line{
 	Code *code;
-	struct Code_line *next;
-} Code_line;
+	Code_line *next;
+};
 
 typedef struct{
 	Code_line *first;
