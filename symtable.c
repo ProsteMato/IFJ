@@ -52,6 +52,7 @@ int GlobalSymTabInsert (SymTabNodePtr* RootPtr, char * K, GlobalTableData *Obsah
 	else if (K > (*RootPtr)->Key)
 	    	GlobalSymTabInsert (&(*RootPtr)->RPtr, K, Obsah);
 	else (*RootPtr)->Data = Obsah; //strom toto id uz obsahuje -> prepisu obsah
+	return OK;
 }
 
 //pomocna funkce pro nahrazeni
@@ -153,6 +154,7 @@ int LocalSymTabInsert (LocalTableNode* RootPtr, char * K, LocalTableData *Obsah)
 	else if (K > (*RootPtr)->Key)
 	    	LocalSymTabInsert (&(*RootPtr)->RPtr, K, Obsah);
 	else (*RootPtr)->localData = Obsah; //strom toto id uz obsahuje -> prepisu obsah
+	return OK;
 }
 
 //odstraneni symbolu s klicem k
@@ -217,6 +219,12 @@ int ParamInsert(ParamList *L, char * id) {
 		else L->first = tmp;
 		L->last = tmp;
 	}
+  return OK;
+}
+
+// TODO
+void ParamSucc(ParamList *L){
+	return;
 }
 
 //hledani parametru
@@ -282,9 +290,9 @@ void SetParamCount (SymTabNodePtr RootPtr, char * K, int pocet){
 	else RootPtr->Data->pocet_par = pocet;
 	return;
 }
-
+// TODO spravit zvlast subor na test
 // funkce pro testovani
-
+/*
 int main(int argc, char *argv[]){
 	printf("Inicialuzuju a vlozim uzel: \n");
 
@@ -329,3 +337,4 @@ int main(int argc, char *argv[]){
 
 	return 0;
 }
+*/
