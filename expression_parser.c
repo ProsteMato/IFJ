@@ -820,6 +820,7 @@ int callExpression(Token *token)
 
   pTable indexStack;
   pTable indexInput; 
+  pRules rule;  
   //exprStack* sym1 = NULL;
   //exprStack* sym2 = NULL;
   //exprStack* sym3 = NULL;
@@ -830,6 +831,10 @@ int callExpression(Token *token)
   {
       indexInput = eList.act->symbol;
       indexStack= stack.top->symbol;
+      if (indexStack == PT_E)
+      {
+            indexStack = PT_DOLLAR;
+      }
       switch (precedenceTable[indexStack][indexInput])
       {
             case ('='):
@@ -861,7 +866,8 @@ int callExpression(Token *token)
                   if (num == 1)
                   {
                         exprStack* sym1=stack.top;
-                        pRules rule =  findRule(num,sym1, NULL, NULL);
+                        rule =  findRule(num,sym1, NULL, NULL);
+                        
                         if ( rule == PR_NOTARULE)
                         {
                               return SYNTAX_ERROR;
@@ -878,7 +884,7 @@ int callExpression(Token *token)
                         exprStack* sym1 = stack.top;
                         exprStack* sym2 = stack.top->next;
                         exprStack* sym3 =  stack.top->next->next;
-                        pRules rule  = findRule (num, sym1, sym2, sym3);
+                        rule  = findRule (num, sym1, sym2, sym3);
                         if (rule == PR_NOTARULE)
                         {
                               return SYNTAX_ERROR;
@@ -892,7 +898,6 @@ int callExpression(Token *token)
                               sPush(&stack, PT_E, TYPE_UNDEFINED);
                         }
                   }
-
                   break;
             default:
                   return SYNTAX_ERROR;
