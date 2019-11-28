@@ -20,6 +20,10 @@ int main()
     }
     int result = callExpression(&testToken);
     printf("Result of callExpression %d \n", result);
+    for (int i=0; i < 15; i++)
+    {
+          printf("Rules used were: %d \n", precedenceRules[i]);
+    }
     if ( isRelational )
     {
           printf("There was a relational operand.\n");
