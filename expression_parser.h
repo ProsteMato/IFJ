@@ -20,7 +20,7 @@
 
 #define tableSize 19 
 bool isRelational;  //is operator relational? <, <=, >, >=, ==, != 
-data_type finalType; // final type of expression 
+Data_type finalType; // final type of expression 
 
 typedef enum {
   PT_PLUS,  // 0
@@ -62,13 +62,13 @@ typedef enum {
  */
 typedef struct stack {
     pTable symbol;
-    data_type dType; 
+    Data_type dType; 
     struct stack *next; 
 } exprStack; 
 
 typedef struct listItem {           
         pTable symbol;  
-        data_type dType;                                       
+        Data_type dType;                                       
         struct listItem *lptr;          
         struct listItem *rptr;        
 } *item;
@@ -126,7 +126,7 @@ int getIndex(Token *token) ;
  *         TYPE_STRING if it was string 
  *         TYPE_NONE if it wasn't defined or called function when it shouldnt 
  */
-data_type getDataType(Token *token);
+Data_type getDataType(Token *token);
 
 /**
  * @brief Function checks data type of operands
