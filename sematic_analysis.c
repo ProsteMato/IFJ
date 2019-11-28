@@ -165,6 +165,8 @@ int define_function(SymTabNodePtr *root, char *function_id) {
         GlobalTableData data;
         data.funkce = true;
         GlobalSymTabInsert(root, function_id, &data);
+        //TODO kontrola na internal_error
+        return OK;
     }
 }
 
