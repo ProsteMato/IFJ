@@ -7,7 +7,7 @@ int main(int argc, char const *argv[])
     char *build_in[] = {"inputi", "inputf", "inputs", "ord", "chr", "substr", "print", "len"};
     char *build_in_without_print[] = {"inputi", "inputf", "inputs", "ord", "chr", "substr", "len"};
     int id[] = {0, 0, 0, 2, 1, 3, 1};
-    SymTabNodePtr *root;
+    SymTabNodePtr *root = NULL;
     GlobalSymTabInit(root);
 
     printf("Kontrola build in functions\n");
