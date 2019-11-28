@@ -15,9 +15,10 @@
 #include "scanner.h"
 #include "error.h"
 #include "my_string.h"
+#include "symtable.h"
 
 #define INT2STR_SIZE 12 // vsetky cisla velkosti int sa dokazu zmestit do 12 znakov
-int while_c = 0;
+int while_counter;
 
 // linked list of code for printing at the end
 typedef struct{
@@ -51,13 +52,13 @@ int init_generator();
 void print_final_code();
 
 char* get_var_adr(char *dest); // vymysliet
-char* create_code(char *code);
+Code* create_code();
 
 // funkcie na generovanie IFJcode19
 
 int gen_header(); // generovanie zac programu
 int gen_int2float(char *var);
-int gen_assing_const_to_val(char *var, char *const, Token type); // type - TK_ int/float/str
+int gen_assing_const_to_val(char *var, char *const, Token *token); // type - TK_ int/float/str
 
 
 // vstavane fukcie
