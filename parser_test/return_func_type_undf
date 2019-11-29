@@ -3,7 +3,7 @@ def plus(a, b):
         return 'ahoj'
     else :
         return 5.5
-
+        
 a = plus('ahoj', 'ahojj')
 
 b = a + 'beta'
