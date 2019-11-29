@@ -1,0 +1,6 @@
+a = 5
+b = 4
+if (a > b)
+    print(a, ' je vetsi nez ', b, '\n')
+else
+    print(b, ' je vetsi nez ', a, '\n')

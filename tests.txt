@@ -17,7 +17,7 @@ Zuzana Hradilova (xhradi16)
             a = a - 1
         print('Vysledek je:', vysl, '\n')
 
-2. test na vypocet
+ok_01 test na vypocet
     a = 5
     b = 50.5
     c = 10
@@ -25,19 +25,19 @@ Zuzana Hradilova (xhradi16)
     print('Vysledek: ', vysl, '\n')
 vystup: Vysledek 555
 
-3. test na vypocet - primo
+ok_02 test na vypocet - primo
     vysl = ( 8 - 3 ) * 5
     print('Vysledek: ', vysl, '\n')
 vystup: Vysledek: 25
 
-4. test na if
+ok_03 test na if
     ahoj = 5
     svete = 5
     if ( ahoj == svete)
         print('Vytisknu petku: ', svete, '\n')
 vystup: Vytisknu petku: 5
     
-5. test na if / else
+ok_04 test na if / else
     ahoj = 5
     svete = 7
     if ( ahoj == svete)
@@ -47,7 +47,7 @@ vystup: Vytisknu petku: 5
 vystup: Vytisknu sedmicku: 7
 
 
-6. test na while
+ok_05 test na while
     a = 0
     while a < 3:
         b = a
@@ -59,14 +59,14 @@ vystup: Uvnitr while po: 0
         Uvnitr while po: 2
         Konec opakovani
 
-7. test na scitani retezcu
+ok_06 test na scitani retezcu
     a = ahoj_
     b = svete
     vysl = a + b
     print('Vysledek: ', vysl, '\n')
 vystup: Vysledek: ahoj_svete
 
-8. test na porovnani int + test na if
+ok_07 test na porovnani int + test na if
     a = 3
     b = 4
     if (a <>> b)
@@ -76,7 +76,7 @@ vystup: Vysledek: ahoj_svete
 vystup: 3 je mensi nez 4
 
 
-9. test na porovnani int
+ok_08 test na porovnani int
     a = 5
     b = 4
     if (a > b)
@@ -85,7 +85,7 @@ vystup: 3 je mensi nez 4
         print(b, ' je vetsi nez ', a, '\n')
 vystup: 5 je vetsi nez 4
 
-10. test na porovnani float
+ok_09 test na porovnani float
     a = 5.55
     b = 5.555
     if (a > b)
@@ -93,7 +93,6 @@ vystup: 5 je vetsi nez 4
     else
         print(b, ' je vetsi nez ', a, '\n')
 vystup: 5.555 je vetsi nez 5.55
-
 
 /// *** CHYBOVE TESTY *** ///
 
