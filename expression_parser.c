@@ -110,43 +110,6 @@ int checkDivisionByZero(Token *token)
   }
 
   return OK;
-
-}
-
-
-Data_type getDataType(Token *token)
-{
-      void tkq_init(); 
-      if (token->type == TK_INT)
-      {
-            return TYPE_INT;
-      }
-      else if ( token->type == TK_FLOAT)
-      {
-            return TYPE_FLOAT;
-      }
-      else if (token->type == TK_STRING)
-      {
-            return TYPE_STRING;
-      }
-      else if (token->type == TK_KW)
-      {
-            return TYPE_NONE;
-      }
-      else if (token->type == TK_ID)
-      {
-        //tData* identifier; 
-        // zavolanie funkcie SymTableSearch - a overenie čo vrátila 
-        return TYPE_UNDEFINED;
-      }
-      else if (token->type == TK_EOL || token->type == TK_EOF || token->type == TK_COLON)
-      {
-            return TYPE_UNDEFINED;
-      }
-      // zistiť dátový typ pre kľúčové slovo None 
-      // TODO možno NONE zmenené na iné, skontrolovať s tab. symbolov
-      return TYPE_UNDEFINED; 
-      
 }
 
 pRules findRule(int num, exprStack* sym1, exprStack* sym2, exprStack* sym3)
@@ -247,6 +210,7 @@ pRules findRule(int num, exprStack* sym1, exprStack* sym2, exprStack* sym3)
 
 }
 
+
 int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3  )
 {
       int error;
@@ -258,7 +222,6 @@ int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3
             case PR_EDIVE: 
             case PR_EDIVDIVE: 
                   error = arithmetic_operation_check(sym1->dType, sym2->symbol, sym3->dType);
-                 // finalType = arithmetic_operation_return_type(sym1->dType, sym3->dType);
                   return error;
             case PR_ELESSE: 
             case PR_ELESSEQE: 
@@ -267,7 +230,6 @@ int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3
             case PR_EEQE: 
             case PR_ENOTEQE: 
                   error = comparison_check(sym1->dType, sym2->symbol, sym3->dType);
-                //  finalType = TYPE_BOOL;
                   return error; 
             default: 
                   error = INTERNAL_ERROR;
@@ -483,6 +445,22 @@ int callExpression(Token *token)
         precedenceRules[j] = -1;
   }
   eList.act=eList.first;
+  if ( eList.act ->rptr == NULL)
+  {
+        switch (eList.act->symbol) 
+        {
+            case PT_INT: 
+            case PT_FLOAT:
+            case PT_STRING: 
+            case PT_NONE:
+            case PT_ID:
+                  // gen code 
+                  return OK;
+            default:
+                  return SYNTAX_ERROR;
+
+        }
+  }
   sPush(&stack, PT_DOLLAR, TYPE_UNDEFINED);
   do 
   {
@@ -564,7 +542,7 @@ int callExpression(Token *token)
                         exprStack* sym3 =  stack.top;
                         rule  = findRule (num, sym1, sym2, sym3);
                         int sematics = checkSematics(rule, sym1, sym2, sym3);
-                        Data_type finalType = getFinalType(rule, sym1, sym2, sym3);
+                        finalType = getFinalType(rule, sym1, sym2, sym3);
                         if (sematics != OK)
                         {
                               return sematics;
@@ -591,7 +569,7 @@ int callExpression(Token *token)
 
             }
       } while ( stack.top->symbol != PT_DOLLAR || eList.act->symbol != PT_DOLLAR);
- gen_expr();
+ //gen_expr();
  listDispose(&eList);
  //disposeStack(&stack);
  return OK;
