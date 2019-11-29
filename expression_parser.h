@@ -16,7 +16,7 @@
 #include <stdlib.h>
 #include <stdbool.h> 
 #include "symtable.h"
-#include "sematic_analysis.h"
+//#include "sematic_analysis.h"
 
 
 #define tableSize 19 
@@ -69,6 +69,7 @@ typedef struct stack {
 
 typedef struct listItem {           
         pTable symbol;  
+        char *attribute;
         Data_type dType;                                       
         struct listItem *lptr;          
         struct listItem *rptr;        
