@@ -24,7 +24,7 @@
 
 int while_counter;
 int if_counter;
-TKQueue param_q;
+TKQueue pq;
 
 
 // linked list of code for printing at the end
@@ -60,6 +60,13 @@ int init_generator(); //
 void print_final_code(); //
 
 Code* create_code(); //
+
+// param queue functions
+void pq_init();
+int pq_queue(Token *token, int ret_val);
+int pq_dequeue(Token* token);
+int pq_first(Token *token);
+void pq_destroy();
 
 // funkcie na generovanie IFJcode19
 

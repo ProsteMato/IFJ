@@ -29,24 +29,28 @@ typedef struct param {
     struct param * next;	//dalsi parametr
 } param;
 
+// seznam parametru funkce
 typedef struct paramlist {
   param *first;
   param *act;
   param *last;
 } ParamList;
 
+// tada symbolu v lokalni tabulce
 typedef struct LocalTableData {
   bool define;
   Data_type type;
 } LocalTableData;
 
+// binarni strom lokalni tabulky
 typedef struct LocalTableNode {
-  char *Key;
-  LocalTableData *localData;
-  struct LocalTableNode *LPtr;
-  struct LocalTableNode *RPtr;
+  char * Key;
+  LocalTableData * localData;
+  struct LocalTableNode * LPtr;
+  struct LocalTableNode * RPtr;
 } * LocalTableNode;
 
+// tada symbolu v globalni tabulce
 typedef struct GlobalTableData{
   Data_type type; //typ symbolu
   bool define;
@@ -56,7 +60,7 @@ typedef struct GlobalTableData{
   ParamList *paramList; //0. parametr (pouze u fce)
 } GlobalTableData;
 
-// definice pro binarni strom
+// binarni strom globalni tabulky
 typedef struct SymTabNode { // struktura definujici symbol
 	char * Key; //id
 	GlobalTableData * Data;
@@ -64,18 +68,11 @@ typedef struct SymTabNode { // struktura definujici symbol
 	struct SymTabNode * RPtr; //pravy podstrom
 } * SymTabNodePtr;
 
-//prototypy funkcí - globalni tabulka symbolu
+// FUNKCE PRO GLOBALNI TABULKU SYMBOLU
 
-//inicializace globalni tabulky symbolu
-//@param SymTabNodePtr - ukazatel na tabulku symbolu
+/** inicializace globalni tabulky symbolu
+@param SymTabNodePtr - ukazatel na tabulku symbolu */
 void GlobalSymTabInit (SymTabNodePtr *);
-
-/** hledani symbolu podle klice
-@param SymTabNodePtr - tabulka symbolu
-@param char - klic (id) hledaneho symbolu
-@param tData - misto kam se ulozi najdena data
-@return vraci false pokud je hledani neuspesne */
-int GlobalSymTabSearch (SymTabNodePtr, char *, GlobalTableData **);
 
 /** vlozeni noveho symbolu
 @param SymTabNodePtr - ukazatel na sym.tab. 
@@ -84,7 +81,20 @@ int GlobalSymTabSearch (SymTabNodePtr, char *, GlobalTableData **);
 @return v pripade neuspech alokace vraci chybu INTERNAL_ERROR */
 int GlobalSymTabInsert (SymTabNodePtr *, char *, GlobalTableData *);
 
-/** vymazani symbolu
+/** hledani symbolu podle klice
+@param SymTabNodePtr - tabulka symbolu
+@param char - klic (id) hledaneho symbolu
+@param tData - misto kam se ulozi najdena data
+@return vraci false pokud je hledani neuspesne */
+int GlobalSymTabSearch (SymTabNodePtr, char *, GlobalTableData **);
+
+/** hledani bez ulozeni nalezenych dat
+@param SymTabNodePtr - globalni tabulka symbolu
+@param char - ukazatel na klic
+@return vraci TRUE kdyz prvek s klicem v tabulce je, jinak FALSE */
+int GlobalSymTabSearchMinus (SymTabNodePtr, char *);
+
+/** vymazani symbolu z tabulky symbolu
 @param SymTabNodePtr - ukazatel na sym.tab.
 @param char - klic (id) symbolu který má být smazán */
 void GlobalSymTabDelete (SymTabNodePtr *, char *);
@@ -93,18 +103,40 @@ void GlobalSymTabDelete (SymTabNodePtr *, char *);
 @param SymTabNodePtr - ukazatel na tabulku symbolu */
 void GlobalSymTabDispose (SymTabNodePtr *);
 
-              //prototypy funkcí - lokalni tabulka symbolu
-
-//inicializace lokalni tabulky symbolu
-//@param SymTabNodePtr - ukazatel na tabulku symbolu
-void LocalSymTabInit (LocalTableNode *);
-
-/** hledani symbolu podle klice
+/** nastavi hodnutu define na true
 @param SymTabNodePtr - tabulka symbolu
-@param char - klic (id) hledaneho symbolu
-@param tData - misto kam se ulozi najdena data
-@return vraci false pokud je hledani neuspesne */
-int LocalSymTabSearch (LocalTableNode, char *, LocalTableData **);
+@char - klic symbolu u ktereho mam provest zmenu */
+void SetDefine(SymTabNodePtr, char *);
+
+/** nastavi typ globalni premmennej
+@param LocalTableNode - tabulka symbolu
+@param char - ukazatel na klic
+@param Data_type - datovy typ */
+void GlobalSetType(SymTabNodePtr, char *, Data_type);
+
+/** vraci lokalni tabulku symbolu patrici k funkci z globalni tabulky
+@param SymTabNodePtr - tabulka symbolu
+@param char - ukazatel na klic
+@return pokud klic neni nalezen vraci NULL, jinak vraci lokalni tabulku symbolu */
+LocalTableNode FindLocalTable(SymTabNodePtr, char *);
+
+/** vrati param list funkce
+@param SymTabNodePtr - tabulka symbolu
+@param char - ukazatel na klic
+@return pokud klic neni nalezen vraci NULL, jinak vraci list parametru */
+ParamList * FindParamList(SymTabNodePtr, char *);
+
+/** nastavi pocet paramentru
+@param SymTabNodePtr - tabulka symbolu
+@param char - ukazatel na klic
+@param int - pocet parametru */
+void SetParamCount (SymTabNodePtr, char *, int);
+
+// FUNKCE PRO LOKALNI TABULKU SYMBOLU
+
+/** inicializace lokalni tabulky symbolu
+@param SymTabNodePtr - ukazatel na tabulku symbolu */
+void LocalSymTabInit (LocalTableNode *);
 
 /** vlozeni noveho symbolu
 @param SymTabNodePtr - ukazatel na sym.tab. 
@@ -113,7 +145,20 @@ int LocalSymTabSearch (LocalTableNode, char *, LocalTableData **);
 @return v pripade neuspech alokace vraci chybu INTERNAL_ERROR */
 int LocalSymTabInsert (LocalTableNode *, char *, LocalTableData *);
 
-/** vymazani symbolu
+/** hledani symbolu podle klice
+@param SymTabNodePtr - tabulka symbolu
+@param char - klic (id) hledaneho symbolu
+@param tData - misto kam se ulozi najdena data
+@return vraci false pokud je hledani neuspesne */
+int LocalSymTabSearch (LocalTableNode, char *, LocalTableData **);
+
+/** hledani bez ulozeni nalezenych dat
+@param SymTabNodePtr - lokalni tabulka symbolu
+@param char - ukazatel na klic
+@return vraci TRUE kdyz prvek s klicem v tabulce je, jinak FALSE */
+int LocalSymTabSearchMinus (LocalTableNode, char *);
+
+/** vymazani symbolu z tabulky symbolu
 @param SymTabNodePtr - ukazatel na sym.tab.
 @param char - klic (id) symbolu který má být smazán */
 void LocalSymTabDelete (LocalTableNode *, char *);
@@ -122,15 +167,18 @@ void LocalSymTabDelete (LocalTableNode *, char *);
 @param SymTabNodePtr - ukazatel na tabulku symbolu */
 void LocalSymTabDispose (LocalTableNode *);
 
-/*
-// ulozeni paramentru funkce
-typedef struct param {
-    char * nazev;	//ukazatel na id
-    struct param * before; //predchozi paramentr
-    struct param * next;	//dalsi parametr
-} param; */
+/** nastavi hodnutu define na true
+@param SymTabNodePtr - tabulka symbolu
+@char - klic symbolu u ktereho mam provest zmenu */
+void LocalSetDefine(LocalTableNode, char *);
 
-              //prototypy funkcí - seznam parametru funkce
+/** nastavi typ localni promenne
+@param LocalTableNode - tabulka symbolu
+@param char - ukazatel na klic
+@param Data_type - datovy typ */
+void LocalSetType(LocalTableNode, char *, Data_type);
+
+// FUNKCE PRO SEZNAM PARAMETRU
 
 /** inicializace seznamu parametru
 @param param - ukazatel seznam parametru */
@@ -146,7 +194,7 @@ int ParamInsert (ParamList *, char *);
 @param param - ukazatel seznam parametru */
 void ParamDispose (ParamList *);
 
-/** nastaveni aktivity na 1. prvek seznamu parametru
+/** nastaveni aktivitu na 1. prvek seznamu parametru
 @param param - ukazatel seznam parametru */
 void ParamFirst (ParamList *);
 
@@ -159,59 +207,15 @@ void ParamSucc (ParamList *);
 @return vraci id aktivniho prvku nebo NULL pokud neni aktivni */
 char *ParamGetActive(ParamList *);
 
-//TODO funkce(paramlist, id) je tam
 /** hleda parametr podle klici
 @param ParamList - seznam parametru
 @param char - klic ktery hledam
 @return pokud je nalezeno vraci TRUE */
 bool ParamSearch (ParamList *, char *);
 
-/** nastavi hodnutu define na true
-@param SymTabNodePtr - tabulka symbolu
-@char - klic symbolu u ktereho mam provest zmenu */
-void SetDefine(SymTabNodePtr, char *);
-
-/** nastavi hodnutu define na true
-@param SymTabNodePtr - tabulka symbolu
-@char - klic symbolu u ktereho mam provest zmenu */
-void LocalSetDefine(LocalTableNode, char *);
-
-/** nastavi typ localnej premmennej
-@param LocalTableNode - tabulka symbolu
-@param char - ukazatel na klic
-@param Data_type - datovy typ */
-void LocalSetType(LocalTableNode, char *, Data_type);
-
-/** nastavi typ globalni premmennej
-@param LocalTableNode - tabulka symbolu
-@param char - ukazatel na klic
-@param Data_type - datovy typ */
-void GlobalSetType(SymTabNodePtr, char *, Data_type);
-
-/** nastavi pocet paramentru
-@param SymTabNodePtr - tabulka symbolu
-@param char - ukazatel na klic
-@return pokud klic neni nalezen vraci NULL, jinak vraci lokalni tabulku symbolu */
-LocalTableNode FindLocalTable(SymTabNodePtr, char *);
-
-/** vrati param list z funkcie
-@param SymTabNodePtr - tabulka symbolu
-@param char - ukazatel na klic
-@return pokud klic neni nalezen vraci NULL, jinak vraci list parametru */
-ParamList * FindParamList(SymTabNodePtr, char *);
-
-/** nastavi pocet paramentru
-@param SymTabNodePtr - tabulka symbolu
-@param char - ukazatel na klic
-@param int - pocet parametru */
-void SetParamCount (SymTabNodePtr, char *, int);
-
-//hledani bez ulozeni dat
-//vraci true, pokud je nalezeno
-int GlobalSymTabSearchMinus (SymTabNodePtr, char *);
-
-//hledani bez ulozeni dat
-//vraci true, pokud je nalezeno
-int LocalSymTabSearchMinus (LocalTableNode, char *);
+/**TODO:
+funkce ktera projde celou globalni tabulku a zkontroluje vsechny funkce, 
+pokud najde nedefinovanou fci, vrati ukazatel prvni nedef. fce, jinak NULL */
+char *UndefinedFunctionControl(SymTabNodePtr);
 
 #endif

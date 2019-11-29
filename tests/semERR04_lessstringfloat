@@ -1,0 +1,4 @@
+if 'abc' < 4.4 : 
+    pass
+else :
+    pass

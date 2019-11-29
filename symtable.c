@@ -1,5 +1,7 @@
-//tabulka symbolu, predelana z ukolu c401 z IAL
-//Zuzana Hradilova, xhradi16
+/** Project: Implementace prekladace imperativniho jazyka IFJ19
+
+ @brief Tabulka symbolu, implementovana pomoci binarniho stromu
+ @author Zuzana Hradilova <xhradi16@stud.fit.vutbr.cz> */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,7 +9,7 @@
 #include "error.h"
 #include "symtable.h"
 
-		//funkce pro globalni tabulku symbolu
+// FUNKCE PRO GLOBALNI TABULKU SYMBOLU
 void GlobalSymTabInit (SymTabNodePtr *RootPtr) {
 	*RootPtr = NULL;
 }
@@ -122,7 +124,7 @@ void GlobalSymTabDispose (SymTabNodePtr *RootPtr) {
 	}
 }
 
-		//funkce pro lokalni tabulku symbolu
+// FUNKCE PRO LOKALNI TABULKU SYMBOLU
 void LocalSymTabInit (LocalTableNode *RootPtr) {
 	*RootPtr = NULL;
 }
@@ -211,7 +213,7 @@ void LocalSymTabDispose (LocalTableNode *RootPtr) {
 	}
 }
 
-		//funkce pro seznam parametru
+// FUNKCE PRO SEZNAM PARAMETRU
 
 void ParamInit (ParamList * L) {
 	L->first = NULL;
@@ -235,7 +237,6 @@ int ParamInsert(ParamList *L, char * id) {
   return OK;
 }
 
-// TODO
 void ParamSucc(ParamList *L){
 	L->act = L->act->next;
 }
@@ -340,4 +341,16 @@ ParamList * FindParamList(SymTabNodePtr RootPtr, char * K){
 	GlobalTableData *data;
 	if (GlobalSymTabSearch(RootPtr, K, &data) == false) return NULL;
 	return data->paramList;
+}
+
+char *UndefinedFunctionControl(SymTabNodePtr RootPtr){
+	if (RootPtr != NULL)
+	if (RootPtr->Data->funkce == true){ // symbol je funkce
+		if (RootPtr->Data->define == false){ // funkce nebyla definovana
+			return RootPtr->Key;
+		}
+	}
+	UndefinedFunctionControl(RootPtr->LPtr);
+	UndefinedFunctionControl(RootPtr->RPtr);
+	return NULL;
 }
