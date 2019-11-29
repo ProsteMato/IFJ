@@ -600,6 +600,7 @@ int after_id(Token *token) {
 */
 int def_id(Token *token) {
 	//TODO pridat generovanie atd...
+	int returnValue = 0;
 	if (token->type == TK_BRACKET_L) {
 		if(!is_function_defined(root, saved_id)) {
 			int returnValue = define_function(&root, saved_id);
@@ -609,11 +610,13 @@ int def_id(Token *token) {
 			}
 		}
 		GET_NEXT_TOKEN(token);
-		if (arg_params(token) == OK) {
+		if ((returnValue = arg_params(token)) == OK) {
 			GET_NEXT_TOKEN(token);
 			if (token->type == TK_EOL || token->type == TK_EOF) {
 				return eof_or_eol(token);
 			}
+		} else {
+			return returnValue;
 		}
 	} else if (token->type == TK_EOL || token->type == TK_EOF) {
 		if(!is_variable_defined(root, local_table, param_list, saved_id)) {
