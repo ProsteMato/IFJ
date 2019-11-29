@@ -10,26 +10,26 @@
 int main(int argc, char *argv[]){
 	printf("Inicialuzuju a vlozim uzel: \n");
 
-	SymTabNodePtr novynode;
-	GlobalTableData nejakadata;
+	SymTabNodePtr novynode = malloc(sizeof(struct SymTabNode));
+	GlobalTableData *nejakadata = malloc(sizeof(struct GlobalTableData));
 	
 	char *Key = "nejaky kliiiiiiiiiic";
-	nejakadata.type = TYPE_INT;
-	nejakadata.funkce = true;
-	nejakadata.define = false;
+	nejakadata->type = TYPE_INT;
+	nejakadata->funkce = true;
+	nejakadata->define = false;
 	
 	char *OtherKey = "nejaky jiny klic";
 
-	GlobalTableData jinadata;
-	jinadata.type = TYPE_STRING;
-	jinadata.funkce = false;
-	jinadata.define = true;
+	GlobalTableData *jinadata = malloc(sizeof(struct GlobalTableData));
+	jinadata->type = TYPE_STRING;
+	jinadata->funkce = false;
+	jinadata->define = true;
 
 	GlobalTableData *misto;
 
 
 	GlobalSymTabInit(&novynode);
-	GlobalSymTabInsert(&novynode, Key, &nejakadata);
+	GlobalSymTabInsert(&novynode, Key, nejakadata);
 
 	printf(" Klic: %s \n", novynode->Key);
 	printf(" Data (datovy typ): %d \n", novynode->Data->type);
@@ -38,7 +38,7 @@ int main(int argc, char *argv[]){
 
 	printf("Vlozim dalsi uzel: \n");
 
-	GlobalSymTabInsert(&novynode, OtherKey, &jinadata);
+	GlobalSymTabInsert(&novynode, OtherKey, jinadata);
 	printf(" Klic: %s \n", novynode->RPtr->Key);
 	printf(" Data (datovy typ): %d \n", novynode->RPtr->Data->type);
 	printf(" Data (je funkce): %d \n", novynode->RPtr->Data->funkce);
@@ -47,7 +47,6 @@ int main(int argc, char *argv[]){
 	printf("zkusim hledat OtherKey: %d \n", (GlobalSymTabSearch(novynode, OtherKey, &misto)));
 	char * NeexistujiciKlic = "nejsem tu";
 	printf("zkusim hledat něco co tam neni: %d \n", (GlobalSymTabSearch(novynode, NeexistujiciKlic, &misto)));
-
-
+	
 	return 0;
 }
