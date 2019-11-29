@@ -21,8 +21,11 @@
 
 #define INT2STR_SIZE 12 // vsetky cisla velkosti int sa dokazu zmestit do 12 znakov
 #define FLOAT2STR_SIZE 23 // mas rozsah floatu prebehnutym %a formatom
+
 int while_counter;
 int if_counter;
+TKQueue param_q;
+
 
 // linked list of code for printing at the end
 typedef struct{
