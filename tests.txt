@@ -99,26 +99,19 @@ vystup: 5.555 je vetsi nez 5.55
 
 /// CHYBA 1 - CHYBNA STRUKTURA LEXEMU
 
-*** 19. spatne klicove slovo ***
+*** 01. spatne klicove slovo ***
 ahoj = 5
 svete = 5
 fi ( ahoj == svete)
     print('Zdravim', svete, '\n')
 
-*** 20. spatne klicove slovo ***
+*** 02. spatne klicove slovo ***
 ahoj = 5
 svete = 5
 ifi ( ahoj == svete)
     print('Zdravim', svete, '\n')
 
-*** 21. spatne klicove slovo ***
-ahoj = 5
-svete = 4
-whole ( ahoj > svete)
-    svete = svete + 1
-    print('Zdravim', svete, '\n')
-
-*** 22. spatne klicove slovo ***
+*** 03. spatne klicove slovo ***
 ahoj = 5
 svete = 4
 whilee ( ahoj > svete)
@@ -127,21 +120,21 @@ whilee ( ahoj > svete)
 
 /// CHYBA 1 - SPATNY POCET ODSAZENI
 
-*** 12. spatna uroven odsazeni 1. ***
+*** 04. spatna uroven odsazeni 1. ***
 a = 0
 while a < 1:
 b = a
     a = a + 1
 print('Vysledek je:', b, '\n')
 
-*** 13. spatna uroven odsazeni 2. ***
+*** 05. spatna uroven odsazeni ***
 a = 0
 while a < 1:
         b = a
 a = a + 1
 print('Vysledek je:', b, '\n')
 
-*** 17. spatna uroven odsazeni 2. ***
+*** 06. spatna uroven odsazeni ***
 a = 0
         while a < 1:
     b = a
@@ -150,35 +143,35 @@ print('Vysledek je:', b, '\n')
 
 /// CHYBA 3 - NEDEFINOVANA FUNKCE / PROMENNA
 
-*** 7. pouziti neexistujici promenne ***
+*** 07. pouziti neexistujici promenne ***
 a = 4
 vysl = ( a * b )
 print('Vysledek:', vysl, '\n')
 
 /// CHYBA 9 - BEHOVA CHYBA DELENI NULOU
 
-*** 14. deleni nulou 2.primo, chyba 9 ***
+*** 08. deleni nulou - primo  ***
 a = 12
 vysl = a / 0
 print('Vysledek:', vysl, '\n')
 
-*** 15. deleni nulou 2.primo, chyba 9 ***
+*** 09. deleni nulou - primo ***
 a = 6
 vysl = a // 0
 print('Vysledek:', vysl, '\n')
 
-*** 16. deleni nulou 2.primo, chyba 9 ***
+*** 10. deleni nulou - primo  ***
 a = 0
 vysl = 25 // a
 print('Vysledek:', vysl, '\n')
 
-*** 8. deleni nulou 1., chyba 9 ***
+*** 11. deleni nulou ***
 a = 5
 b = 0
 vysl = a / b
 print('Vysledek:', vysl, '\n')
 
-*** 9. deleni nulou 2., chyba 9 ***
+*** 12. deleni nulou ***
 a = 5
 b = 0
 vysl = a // b
@@ -186,59 +179,71 @@ print('Vysledek:', vysl, '\n')
 
 /// *** OSTATNI CHYBOVE TESTY - ZATIM NEZARAZENO *** ///
 
-//1. celocistne deleni necelych cisel 1., vraci chybu 4
+*** 13. celocistne deleni necelych cisel 1., vraci chybu 4 ***
 a = 5
 b = 50.5
 vysl = a // b
 print('Vysledek:', vysl, '\n')
 
-//2. celocistne deleni necelych cisel 2., vraci chybu 4
+*** 14. celocistne deleni necelych cisel 2., vraci chybu 4 ***
 a = 5.5
 b = 50
 vysl = a // b
 print('Vysledek:', vysl, '\n')
 
-//3. deleni cisla str, chyba 4
+*** 15. deleni cisla str, (chyba 4?) ***
 a = 5.8
 b = 'ahoj'
 vysl = a / b
 print('Vysledek:', vysl, '\n')
 
-//4. spatny pocet zavorek 1. test, chyba 2
+*** 16. chyby prava zavorka (chyba 2?) ***
 a = 4
 b = 3
 c = 5
 vysl = (( a * b ) / c
 print('Vysledek:', vysl, '\n')
 
-//5. spatny pocet zavorek 2. test, chyba 2
+*** 17. leva zavorka navic (chyba 2?) ***
 a = 4
 b = 3
 c = 5
 vysl = ( a * b ) / c )
 print('Vysledek:', vysl, '\n')
 
-//6. spatne poradi zavorek, chyba 2
+*** 18. prava zavorka driv nez leva (chyba 2?) ***
 a = 4
 b = 3
 c = 5
 vysl = ) a * b ) / c
 print('Vysledek:', vysl, '\n')
 
-//10. spatne kombinace operatoru 1. 
+// 2 operetory za sebou (*+)
 a = 5
 b = 0
 vysl = a *+ b
 print('Vysledek:', vysl, '\n')
 
-//11. spatne kombinace operatoru 2.
+// 2 operetory za sebou (+/)
 a = 5
 b = 0
 vysl = a +/ b
 print('Vysledek:', vysl, '\n')
 
-//18. pouziti spatne promenne
+// pouziti promenne s chybou
 ahoj = 4
 svete = 5
 vysl = ( ahoj * steve )
+print('Vysledek:', vysl, '\n')
+
+// odecitani str
+a = 'ahoj'
+b = 'hello'
+vysl = a - b
+print('Vysledek:', vysl, '\n')
+
+// cislo + str
+a = 5
+b = 'hello'
+vysl = a + b
 print('Vysledek:', vysl, '\n')

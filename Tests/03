@@ -1,0 +1,5 @@
+ahoj = 5
+svete = 4
+whilee ( ahoj > svete)
+    svete = svete + 1
+    print('Zdravim', svete, '\n')

@@ -1,0 +1,4 @@
+a = 5.8
+b = 'ahoj'
+vysl = a / b
+print('Vysledek:', vysl, '\n')

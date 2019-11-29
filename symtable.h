@@ -171,6 +171,11 @@ bool ParamSearch (ParamList *, char *);
 @char - klic symbolu u ktereho mam provest zmenu */
 void SetDefine(SymTabNodePtr, char *);
 
+/** nastavi hodnutu define na true
+@param SymTabNodePtr - tabulka symbolu
+@char - klic symbolu u ktereho mam provest zmenu */
+void LocalSetDefine(LocalTableNode, char *);
+
 /** nastavi pocet paramentru
 @param SymTabNodePtr - tabulka symbolu
 @param char - ukazatel na klic
