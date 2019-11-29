@@ -1,0 +1,244 @@
+Testy
+Zuzana Hradilova (xhradi16)
+
+/// *** NECHYBOVE TESTY *** ///
+
+1. test ze zadani
+    print('Zadejte cislo pro vypocet faktorialu: ')
+    a = inputi()
+    if a < 0: # chybi kontrola a == None pro pripad nevalidniho vstupu
+        print("""
+    Faktorial nelze spocitat
+    """)
+    else:
+        vysl = 1
+        while a > 0:
+            vysl = vysl * a
+            a = a - 1
+        print('Vysledek je:', vysl, '\n')
+
+2. test na vypocet
+    a = 5
+    b = 50.5
+    c = 10
+    vysl = ( a + b ) * c
+    print('Vysledek: ', vysl, '\n')
+vystup: Vysledek 555
+
+3. test na vypocet - primo
+    vysl = ( 8 - 3 ) * 5
+    print('Vysledek: ', vysl, '\n')
+vystup: Vysledek: 25
+
+4. test na if
+    ahoj = 5
+    svete = 5
+    if ( ahoj == svete)
+        print('Vytisknu petku: ', svete, '\n')
+vystup: Vytisknu petku: 5
+    
+5. test na if / else
+    ahoj = 5
+    svete = 7
+    if ( ahoj == svete)
+        print('Vytisknu petku: ', svete, '\n')
+    else
+        print('Vytisknu sedmicku: ', svete, '\n')
+vystup: Vytisknu sedmicku: 7
+
+
+6. test na while
+    a = 0
+    while a < 3:
+        b = a
+        a = a + 1
+        print('Uvnitr while po: ', b, '\n')
+    print('Konec opakovani \n')
+vystup: Uvnitr while po: 0
+        Uvnitr while po: 1
+        Uvnitr while po: 2
+        Konec opakovani
+
+7. test na scitani retezcu
+    a = ahoj_
+    b = svete
+    vysl = a + b
+    print('Vysledek: ', vysl, '\n')
+vystup: Vysledek: ahoj_svete
+
+8. test na porovnani int + test na if
+    a = 3
+    b = 4
+    if (a <>> b)
+        print(a, ' je mensi nez ', b, '\n')
+    else
+        print(b, ' je mensi nez ', a, '\n')
+vystup: 3 je mensi nez 4
+
+
+9. test na porovnani int
+    a = 5
+    b = 4
+    if (a > b)
+        print(a, ' je vetsi nez ', b, '\n')
+    else
+        print(b, ' je vetsi nez ', a, '\n')
+vystup: 5 je vetsi nez 4
+
+10. test na porovnani float
+    a = 5.55
+    b = 5.555
+    if (a > b)
+        print(a, ' je vetsi nez ', b, '\n')
+    else
+        print(b, ' je vetsi nez ', a, '\n')
+vystup: 5.555 je vetsi nez 5.55
+
+
+/// *** CHYBOVE TESTY *** ///
+
+/// CHYBA 1 - CHYBNA STRUKTURA LEXEMU
+
+*** 19. spatne klicove slovo ***
+ahoj = 5
+svete = 5
+fi ( ahoj == svete)
+    print('Zdravim', svete, '\n')
+
+*** 20. spatne klicove slovo ***
+ahoj = 5
+svete = 5
+ifi ( ahoj == svete)
+    print('Zdravim', svete, '\n')
+
+*** 21. spatne klicove slovo ***
+ahoj = 5
+svete = 4
+whole ( ahoj > svete)
+    svete = svete + 1
+    print('Zdravim', svete, '\n')
+
+*** 22. spatne klicove slovo ***
+ahoj = 5
+svete = 4
+whilee ( ahoj > svete)
+    svete = svete + 1
+    print('Zdravim', svete, '\n')
+
+/// CHYBA 1 - SPATNY POCET ODSAZENI
+
+*** 12. spatna uroven odsazeni 1. ***
+a = 0
+while a < 1:
+b = a
+    a = a + 1
+print('Vysledek je:', b, '\n')
+
+*** 13. spatna uroven odsazeni 2. ***
+a = 0
+while a < 1:
+        b = a
+a = a + 1
+print('Vysledek je:', b, '\n')
+
+*** 17. spatna uroven odsazeni 2. ***
+a = 0
+        while a < 1:
+    b = a
+    a = a + 1
+print('Vysledek je:', b, '\n')
+
+/// CHYBA 3 - NEDEFINOVANA FUNKCE / PROMENNA
+
+*** 7. pouziti neexistujici promenne ***
+a = 4
+vysl = ( a * b )
+print('Vysledek:', vysl, '\n')
+
+/// CHYBA 9 - BEHOVA CHYBA DELENI NULOU
+
+*** 14. deleni nulou 2.primo, chyba 9 ***
+a = 12
+vysl = a / 0
+print('Vysledek:', vysl, '\n')
+
+*** 15. deleni nulou 2.primo, chyba 9 ***
+a = 6
+vysl = a // 0
+print('Vysledek:', vysl, '\n')
+
+*** 16. deleni nulou 2.primo, chyba 9 ***
+a = 0
+vysl = 25 // a
+print('Vysledek:', vysl, '\n')
+
+*** 8. deleni nulou 1., chyba 9 ***
+a = 5
+b = 0
+vysl = a / b
+print('Vysledek:', vysl, '\n')
+
+*** 9. deleni nulou 2., chyba 9 ***
+a = 5
+b = 0
+vysl = a // b
+print('Vysledek:', vysl, '\n')
+
+/// *** OSTATNI CHYBOVE TESTY - ZATIM NEZARAZENO *** ///
+
+//1. celocistne deleni necelych cisel 1., vraci chybu 4
+a = 5
+b = 50.5
+vysl = a // b
+print('Vysledek:', vysl, '\n')
+
+//2. celocistne deleni necelych cisel 2., vraci chybu 4
+a = 5.5
+b = 50
+vysl = a // b
+print('Vysledek:', vysl, '\n')
+
+//3. deleni cisla str, chyba 4
+a = 5.8
+b = 'ahoj'
+vysl = a / b
+print('Vysledek:', vysl, '\n')
+
+//4. spatny pocet zavorek 1. test, chyba 2
+a = 4
+b = 3
+c = 5
+vysl = (( a * b ) / c
+print('Vysledek:', vysl, '\n')
+
+//5. spatny pocet zavorek 2. test, chyba 2
+a = 4
+b = 3
+c = 5
+vysl = ( a * b ) / c )
+print('Vysledek:', vysl, '\n')
+
+//6. spatne poradi zavorek, chyba 2
+a = 4
+b = 3
+c = 5
+vysl = ) a * b ) / c
+print('Vysledek:', vysl, '\n')
+
+//10. spatne kombinace operatoru 1. 
+a = 5
+b = 0
+vysl = a *+ b
+print('Vysledek:', vysl, '\n')
+
+//11. spatne kombinace operatoru 2.
+a = 5
+b = 0
+vysl = a +/ b
+print('Vysledek:', vysl, '\n')
+
+//18. pouziti spatne promenne
+ahoj = 4
+svete = 5
+vysl = ( ahoj * steve )
+print('Vysledek:', vysl, '\n')
