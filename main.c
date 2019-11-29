@@ -13,7 +13,7 @@
 
 int main (int argc, char * argv[]){
 	// init globalnej tabulky symbolov
-	GlobalSymTabInit(root);
+	GlobalSymTabInit(&root);
 	Token token;
 	int ret_val;
 	ret_val = get_next_token(&token);
@@ -26,6 +26,6 @@ int main (int argc, char * argv[]){
 		return ret_val;
 	}
 	print_final_code();
-	GlobalSymTabDispose(root);
+	GlobalSymTabDispose(&root);
 	return OK;
 }
