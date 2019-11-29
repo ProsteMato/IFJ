@@ -176,6 +176,18 @@ void SetDefine(SymTabNodePtr, char *);
 @char - klic symbolu u ktereho mam provest zmenu */
 void LocalSetDefine(LocalTableNode, char *);
 
+//nastavi typ localnej premmennej
+void LocalSetType(LocalTableNode, char *, Data_type);
+
+//nastavi typ globalnej premennej
+void GlobalSetType(SymTabNodePtr, char *, Data_type);
+
+//vrati localnu tabulku symbolov z funkcie
+LocalTableNode FindLocalTable(SymTabNodePtr, char *);
+
+//vrati param list z funkcie
+ParamList * FindParamList(SymTabNodePtr, char *);
+
 /** nastavi pocet paramentru
 @param SymTabNodePtr - tabulka symbolu
 @param char - ukazatel na klic
