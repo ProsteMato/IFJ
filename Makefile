@@ -5,7 +5,7 @@ OBJ = scanner.o symtable.o stack.o main.o parser.o generator.o scanner.o my_stri
 all: cifj19
 
 cifj19: ${OBJ}
-	${CC} ${CFLAGS} $< -o $@
+	${CC} ${CFLAGS} $^ -o $@
 
 clean:
 	rm *.o cifj19
@@ -40,7 +40,7 @@ expression_parser.o: expression_parser.c expression_parser.h
 stack.o: stack.c stack.h
 	${CC} ${CFLAGS} -c $< -o $@
 
-expression_stack.o.o: expression_stack.o.c expression_stack.o.h
+expression_stack.o: expression_stack.c expression_stack.h
 	${CC} ${CFLAGS} -c $< -o $@
 
 expression_list.o: expression_list.c expression_list.h
