@@ -194,7 +194,10 @@ void GlobalSetType(SymTabNodePtr, char *, Data_type);
 @return pokud klic neni nalezen vraci NULL, jinak vraci lokalni tabulku symbolu */
 LocalTableNode FindLocalTable(SymTabNodePtr, char *);
 
-//vrati param list z funkcie
+/** vrati param list z funkcie
+@param SymTabNodePtr - tabulka symbolu
+@param char - ukazatel na klic
+@return pokud klic neni nalezen vraci NULL, jinak vraci list parametru */
 ParamList * FindParamList(SymTabNodePtr, char *);
 
 /** nastavi pocet paramentru

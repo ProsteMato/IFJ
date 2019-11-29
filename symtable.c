@@ -335,3 +335,9 @@ LocalTableNode FindLocalTable(SymTabNodePtr RootPtr, char * K){
 	if (GlobalSymTabSearch(RootPtr, K, &data) == false) return NULL;
 	return *data->localTableNode;
 }
+
+ParamList * FindParamList(SymTabNodePtr RootPtr, char * K){
+	GlobalTableData *data;
+	if (GlobalSymTabSearch(RootPtr, K, &data) == false) return NULL;
+	return data->paramList;
+}
