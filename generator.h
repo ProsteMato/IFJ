@@ -16,10 +16,15 @@
 #include "error.h"
 #include "my_string.h"
 #include "symtable.h"
+#include "sematic_analysis.h"
 
 #define INT2STR_SIZE 12 // vsetky cisla velkosti int sa dokazu zmestit do 12 znakov
+#define FLOAT2STR_SIZE 23 // mas rozsah floatu prebehnutym %a formatom
 int while_counter;
 
+SymTabNodePtr root; // ZMAZAT, zatial len kvoli prekladu
+LocalTableNode local_table; // ZMAZAT, zatial len kvoli prekladu
+ParamList *params; // ZMAZAT, zatial len kvoli prekladu
 // linked list of code for printing at the end
 typedef struct{
 	char *inst;
@@ -41,35 +46,35 @@ typedef struct{
 Code_list code_list;
 
 // vytvorit tabulku s premennymi
-char* int_to_str(int i);
-char* get_var_adr(char *var);
+char* int_to_str(int i); //
+char* float_to_str(char *f); //
+char* transform_for_write(char *str); //
 
-void CL_init();
-int CL_add_inst(char *inst,	char *adr0,	char *adr1,	char *adr2);
-void CL_destroy(Code_line *line);
+void CL_init(); //
+void CL_destroy(Code_line *line); // 
+int CL_add_line(Code *line); //
 
-int init_generator();
-void print_final_code();
+int init_generator(); //
+void print_final_code(); //
 
-char* get_var_adr(char *dest); // vymysliet
-Code* create_code();
+Code* create_code(); //
 
 // funkcie na generovanie IFJcode19
 
-int gen_header(); // generovanie zac programu
-int gen_int2float(char *var);
-int gen_assing_const_to_val(char *var, char *const, Token *token); // type - TK_ int/float/str
+int gen_header(); // generovanie zac programu //
+int gen_int2float(char *var); // netestovane
+int gen_assing_const_to_val(char *var, Token *token); // type - TK_ int/float/str
 
 
 // vstavane fukcie
-int gen_inputs(char *dest);
-int gen_inputi(char *dest);
-int gen_inputf(char *dest);
-int gen_print(char *symb);
-int gen_len();
-int gen_substr();
-int gen_ord();
-int gen_chr();
+int gen_inputs(char *dest); // netestovane
+int gen_inputi(char *dest); // netestovane
+int gen_inputf(char *dest); // netestovane
+int gen_print(char *symb); // netestovane
+int gen_len(); //
+int gen_substr(); //
+int gen_ord(); //
+int gen_chr(); //
 
 // podmienky
 //int gen_if();
@@ -92,16 +97,16 @@ int gen_equal_more(char *op1, char *op2);
 int gen_not_equal(char *op1, char *op2);
 
 // while
-int gen_while_label();
-int gen_while_begin(); // condition
-int gen_while_end();
+int gen_while_label(); //
+int gen_while_begin(); // condition //
+int gen_while_end(); //
 
 
 // funkcie
-int gen_f_start(char *id); // pri def
-int gen_f_end(char *id); // na koniec funkcie, za poslednym vygenerovanym prikazom tela f
-int gen_f_call(char *id);
-int gen_f_prep(); // pop zo stacku
+int gen_f_start(char *id); // pri def //
+int gen_f_end(char *id); // na koniec funkcie, za poslednym vygenerovanym prikazom tela f //
+int gen_f_call(char *id); //
+int gen_f_prep_params();
 
 
 // stack na parametre

@@ -20,4 +20,4 @@ parser.o: ../parser.c  ../parser.h
 	${CC} -c ${CFLAGS} $< -o $@
 
 clean:
-	rm *.o test-parser
+	rm *.o ./bin/test-parser
