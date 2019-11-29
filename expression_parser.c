@@ -477,8 +477,8 @@ int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3
                   return error;  
       }
 }
-*/
 
+*/
 int checkDivisionByZero(Token *token)
 {
   //Token *nextToken;
@@ -739,7 +739,12 @@ int callExpression(Token *token)
       return INTERNAL_ERROR;
   }
   listInitialize(&eList);
-  listInsertFirst(&eList,symbol,dType);
+  listInitialize(&operandList);
+  if (symbol == PT_ID || symbol == PT_INT || symbol == PT_FLOAT ||symbol == PT_STRING)
+  {
+        listInsertFirst(&operandList,token->attribute, symbol, dType);
+  }
+  listInsertFirst(&eList,token->attribute, symbol,dType);
   int e = get_next_token(token); 
   if  (e != OK)
   {     
@@ -820,7 +825,16 @@ int callExpression(Token *token)
                   return DIVISION_BY_ZERO_ERROR;
             }
       }
-      listInsertAct(&eList,symbol, dType);
+      listInsertAct(&eList,token->attribute, symbol, dType);
+      if ( operandList.first != NULL || symbol == PT_ID || symbol == PT_INT || symbol == PT_FLOAT ||symbol == PT_STRING)
+      {
+            listInsertAct(&operandList,token->attribute, symbol, dType);
+      }
+      else
+      {
+            listInsertFirst(&operandList,token->attribute, symbol, dType);
+      }
+      
      int e = get_next_token(token); 
       if  (e != OK)
       {     
@@ -828,7 +842,7 @@ int callExpression(Token *token)
       } 
       if (token->type == TK_EOL || token->type == TK_EOF || token->type == TK_COLON )
       {
-            listInsertAct(&eList, PT_DOLLAR, TYPE_UNDEFINED);
+            listInsertAct(&eList,token->attribute, PT_DOLLAR, TYPE_UNDEFINED);
       }
       
   }
