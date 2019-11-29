@@ -261,8 +261,8 @@ int stat(Token *token) {
 			GET_NEXT_TOKEN(token);
 			//TODO priprava na generovanie...ziskat lables for if and else
 			//TODO urobit samotne generovanie...
-			//if ((returnValue = callExpression(token)) == OK) {
-			if ((returnValue = expression(token)) == OK) {
+			if ((returnValue = callExpression(token)) == OK) {
+			//if ((returnValue = expression(token)) == OK) {
 				GET_NEXT_TOKEN(token);
 				if (token->type == TK_COLON) {
 					GET_NEXT_TOKEN(token);
@@ -306,8 +306,8 @@ int stat(Token *token) {
 		*/
 		} else if (strcmp(token->attribute, "while") == 0) {
 			//TODO generovanie while ziskavanie uniq lable...
-			//if ((returnValue = callExpression(token)) == OK) {
-			if ((returnValue = expression(token)) == OK) {
+			if ((returnValue = callExpression(token)) == OK) {
+			//if ((returnValue = expression(token)) == OK) {
 				GET_NEXT_TOKEN(token);
 				if (token->type == TK_COLON) {
 					GET_NEXT_TOKEN(token);
@@ -367,8 +367,8 @@ int stat(Token *token) {
 			token->type == TK_DIV_DIV
 			) {
 			UNGET_TOKEN(token);
-			//if((returnValue = callExpression(token)) == OK) {
-			if ((returnValue = expression(savedToken)) == OK) {
+			if((returnValue = callExpression(token)) == OK) {
+			//if ((returnValue = expression(savedToken)) == OK) {
 				if(!isRelational) {
 					GET_NEXT_TOKEN(token);
 					if (token->type == TK_EOL || token->type == TK_EOF) {
@@ -399,8 +399,8 @@ int stat(Token *token) {
 		token->type == TK_INT ||
 		(token->type == TK_KW && strcmp(token->attribute, "None") == 0)
 		) {
-		//if((returnValue = callExpression(token)) == OK) {
-		if ((returnValue = expression(token)) == OK) {
+		if((returnValue = callExpression(token)) == OK) {
+		//if ((returnValue = expression(token)) == OK) {
 			if(!isRelational) {
 				GET_NEXT_TOKEN(token);
 				if (token->type == TK_EOL || token->type == TK_EOF) {
@@ -534,8 +534,8 @@ int assign(Token *token) {
 		token->type == TK_STRING ||
 		(token->type == TK_KW && strcmp(token->attribute, "None") == 0)
 		){
-		//if((returnValue = callExpression(token)) == OK) {
-		if ((returnValue = expression(token)) == OK) {
+		if((returnValue = callExpression(token)) == OK) {
+		//if ((returnValue = expression(token)) == OK) {
 			if(!isRelational) {
 				GET_NEXT_TOKEN(token);
 				if (token->type == TK_EOL || token->type == TK_EOF) {
@@ -561,8 +561,8 @@ int assign(Token *token) {
 			token->type == TK_DIV_DIV
 		) {
 			UNGET_TOKEN(token);
-			//if((returnValue = callExpression(savedToken)) == OK) {
-			if ((returnValue = expression(savedToken)) == OK) {
+			if((returnValue = callExpression(savedToken)) == OK) {
+			//if ((returnValue = expression(savedToken)) == OK) {
 				if(!isRelational) {
 					GET_NEXT_TOKEN(token);
 					if (token->type == TK_EOL || token->type == TK_EOF) {
@@ -647,8 +647,8 @@ int after_return(Token *token) {
 	if (token->type == TK_EOL || token->type == TK_EOF) {
 		return eof_or_eol(token);
 	}
-	//if((returnValue = callExpression(token)) == OK) {
-	else if ((returnValue = expression(token)) == OK) {
+	else if((returnValue = callExpression(token)) == OK) {
+	//else if ((returnValue = expression(token)) == OK) {
 		if (!isRelational) {
 			GET_NEXT_TOKEN(token);
 			return eof_or_eol(token);
