@@ -99,19 +99,19 @@ vystup: 5.555 je vetsi nez 5.55
 
 /// CHYBA 1 - CHYBNA STRUKTURA LEXEMU
 
-*** 01. spatne klicove slovo ***
+*** lex_err_01 spatne klicove slovo ***
 ahoj = 5
 svete = 5
 fi ( ahoj == svete)
     print('Zdravim', svete, '\n')
 
-*** 02. spatne klicove slovo ***
+*** lex_err_02 spatne klicove slovo ***
 ahoj = 5
 svete = 5
 ifi ( ahoj == svete)
     print('Zdravim', svete, '\n')
 
-*** 03. spatne klicove slovo ***
+*** lex_err_03 spatne klicove slovo ***
 ahoj = 5
 svete = 4
 whilee ( ahoj > svete)
@@ -120,21 +120,21 @@ whilee ( ahoj > svete)
 
 /// CHYBA 1 - SPATNY POCET ODSAZENI
 
-*** 04. spatna uroven odsazeni 1. ***
+*** lex_err_04 spatna uroven odsazeni 1. ***
 a = 0
 while a < 1:
 b = a
     a = a + 1
 print('Vysledek je:', b, '\n')
 
-*** 05. spatna uroven odsazeni ***
+*** lex_err_05 spatna uroven odsazeni ***
 a = 0
 while a < 1:
         b = a
 a = a + 1
 print('Vysledek je:', b, '\n')
 
-*** 06. spatna uroven odsazeni ***
+*** lex_err_06 spatna uroven odsazeni ***
 a = 0
         while a < 1:
     b = a
@@ -150,28 +150,28 @@ print('Vysledek:', vysl, '\n')
 
 /// CHYBA 9 - BEHOVA CHYBA DELENI NULOU
 
-*** 08. deleni nulou - primo  ***
+*** zero_div_08 deleni nulou - primo  ***
 a = 12
 vysl = a / 0
 print('Vysledek:', vysl, '\n')
 
-*** 09. deleni nulou - primo ***
+*** zero_div_09 deleni nulou - primo ***
 a = 6
 vysl = a // 0
 print('Vysledek:', vysl, '\n')
 
-*** 10. deleni nulou - primo  ***
+*** zero_div_10 deleni nulou - primo  ***
 a = 0
 vysl = 25 // a
 print('Vysledek:', vysl, '\n')
 
-*** 11. deleni nulou ***
+*** zero_div_11 deleni nulou ***
 a = 5
 b = 0
 vysl = a / b
 print('Vysledek:', vysl, '\n')
 
-*** 12. deleni nulou ***
+*** zero_div_12 deleni nulou ***
 a = 5
 b = 0
 vysl = a // b
