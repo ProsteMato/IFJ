@@ -302,9 +302,42 @@ void SetDefine(SymTabNodePtr RootPtr, char * K){
 	return;
 }
 
+void LocalSetDefine(LocalTableNode RootPtr, char * K){
+	LocalTableData *data;
+	if (LocalSymTabSearch (RootPtr, K, &data) == false) return;
+	else data->define = true;
+	return;
+}
+
 void SetParamCount (SymTabNodePtr RootPtr, char * K, int pocet){
 	GlobalTableData *data;
 	if (GlobalSymTabSearch(RootPtr, K, &data) == false) return;
 	else data->pocet_par = pocet;
 	return;
+}
+
+void GlobalSetType(SymTabNodePtr RootPtr, char * K, Data_type type){
+	GlobalTableData *data;
+	if (GlobalSymTabSearch(RootPtr, K, &data) == false) return;
+	else data->type = type;
+	return;
+}
+
+void LocalSetType(LocalTableNode RootPtr, char * K, Data_type type){
+	LocalTableData *data;
+	if (LocalSymTabSearch(RootPtr, K, &data) == false) return;
+	else data->type = type;
+	return;
+}
+
+LocalTableNode FindLocalTable(SymTabNodePtr RootPtr, char * K){
+	GlobalTableData *data;
+	if (GlobalSymTabSearch(RootPtr, K, &data) == false) return NULL;
+	return *data->localTableNode;
+}
+
+ParamList * FindParamList(SymTabNodePtr RootPtr, char * K){
+	GlobalTableData *data;
+	if (GlobalSymTabSearch(RootPtr, K, &data) == false) return NULL;
+	return data->paramList;
 }

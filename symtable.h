@@ -171,6 +171,35 @@ bool ParamSearch (ParamList *, char *);
 @char - klic symbolu u ktereho mam provest zmenu */
 void SetDefine(SymTabNodePtr, char *);
 
+/** nastavi hodnutu define na true
+@param SymTabNodePtr - tabulka symbolu
+@char - klic symbolu u ktereho mam provest zmenu */
+void LocalSetDefine(LocalTableNode, char *);
+
+/** nastavi typ localnej premmennej
+@param LocalTableNode - tabulka symbolu
+@param char - ukazatel na klic
+@param Data_type - datovy typ */
+void LocalSetType(LocalTableNode, char *, Data_type);
+
+/** nastavi typ globalni premmennej
+@param LocalTableNode - tabulka symbolu
+@param char - ukazatel na klic
+@param Data_type - datovy typ */
+void GlobalSetType(SymTabNodePtr, char *, Data_type);
+
+/** nastavi pocet paramentru
+@param SymTabNodePtr - tabulka symbolu
+@param char - ukazatel na klic
+@return pokud klic neni nalezen vraci NULL, jinak vraci lokalni tabulku symbolu */
+LocalTableNode FindLocalTable(SymTabNodePtr, char *);
+
+/** vrati param list z funkcie
+@param SymTabNodePtr - tabulka symbolu
+@param char - ukazatel na klic
+@return pokud klic neni nalezen vraci NULL, jinak vraci list parametru */
+ParamList * FindParamList(SymTabNodePtr, char *);
+
 /** nastavi pocet paramentru
 @param SymTabNodePtr - tabulka symbolu
 @param char - ukazatel na klic

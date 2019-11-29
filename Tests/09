@@ -1,0 +1,3 @@
+a = 6
+vysl = a // 0
+print('Vysledek:', vysl, '\n')

@@ -1,0 +1,3 @@
+a = 12
+vysl = a / 0
+print('Vysledek:', vysl, '\n')
