@@ -170,7 +170,7 @@ int define_function(SymTabNodePtr *root, char *function_id) {
         LocalTableNode *local_table = malloc(sizeof(struct LocalTableNode));
         ParamList *list = malloc(sizeof(struct paramlist));
         LocalSymTabInit(local_table);
-        ParamInit(&list);
+        ParamInit(list);
         data->localTableNode = local_table;
         data->paramList = list;
         data->funkce = true;

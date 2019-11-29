@@ -17,15 +17,13 @@
 #include "my_string.h"
 #include "symtable.h"
 #include "sematic_analysis.h"
+#include "main.h"
 
 #define INT2STR_SIZE 12 // vsetky cisla velkosti int sa dokazu zmestit do 12 znakov
 #define FLOAT2STR_SIZE 23 // mas rozsah floatu prebehnutym %a formatom
 int while_counter;
 int if_counter;
 
-SymTabNodePtr root; // ZMAZAT, zatial len kvoli prekladu
-LocalTableNode local_table; // ZMAZAT, zatial len kvoli prekladu
-ParamList *params; // ZMAZAT, zatial len kvoli prekladu
 // linked list of code for printing at the end
 typedef struct{
 	char *inst;

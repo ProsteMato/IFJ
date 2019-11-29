@@ -199,7 +199,7 @@ int symbolsToReduce();
  *          TYPE_BOOL if relational operation
  *          TYPE_UNDEFINED if some error
  */
-Data_Type getFinalType(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3);
+Data_type getFinalType(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3);
 
 /**
  * @brief Function that covers expression parser 
