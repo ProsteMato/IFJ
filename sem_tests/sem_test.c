@@ -29,6 +29,12 @@ int main(int argc, char const *argv[])
     }
     printf("Deklarácie build-in functions == OK\n");
 
+    LocalTableNode local_table =  FindLocalTable(root, "inputi");
+    define_local_variable(&local_table, "a");
+    if(is_variable_defined(root, local_table, NULL, "a")) {
+        printf("ano\n");
+    }
+
     printf("Kontrola deklarácie build-in functions\n");
     for (int i = 0; i < 8; i++){
         if(!is_function_defined(root, build_in[i])){

@@ -10,6 +10,7 @@
 #include "expression_parser.h"
 #include "error.h"
 #include "scanner.h"
+#include "main.h"
 
 const char precedenceTable[tableSize][tableSize] = {
   // 0  , 1 ,  2,   3,   4,   5.   6,   7,   8,   9,  10,  11,  12,  13,   14,  15,   16, 17, 18
@@ -316,7 +317,7 @@ int callExpression(Token *token)
   int rightBracket =0; 
   pTable symbol= getIndex(token);
   exprList eList;
-  Data_type dType = get_type_from_token(root,actualLocalTable,*token);
+  Data_type dType = get_type_from_token(root, local_table,*token);
   if (symbol == -1 )
   {
       return INTERNAL_ERROR;
@@ -329,12 +330,22 @@ int callExpression(Token *token)
   }
   if (token->type == TK_ID)
   {
-      int err = is_variable_defined(root, actualLocalTable, NULL, token->attribute);
+      int err = is_variable_defined(root, local_table, NULL, token->attribute);
       if (err != OK)
       {
             return err;
       }
   }
+  if (token->type == TK_BRACKET_L)
+  {
+      leftBracket+=1;
+  }
+
+  if (token->type == TK_BRACKET_R)
+  {
+      rightBracket+=1;
+  }
+  
   listInsertFirst(&eList,token->attribute, symbol,dType);
   int e = get_next_token(token); 
   if  (e != OK)
@@ -350,7 +361,7 @@ int callExpression(Token *token)
             listDispose(&eList);
             return INTERNAL_ERROR;
       }
-      Data_type dType=  get_type_from_token(root,actualLocalTable,*token);
+      Data_type dType=  get_type_from_token(root,local_table,*token);
       if (token->type == TK_KW)
       {
             if ((strcmp(token->attribute, "None")) != 0)
@@ -361,7 +372,7 @@ int callExpression(Token *token)
       }
       if (token->type == TK_ID)
       {
-            int err = is_variable_defined(root, actualLocalTable, NULL, token->attribute);
+            int err = is_variable_defined(root, local_table, NULL, token->attribute);
             if (err != OK)
             {
                   return err;
@@ -580,7 +591,7 @@ int callExpression(Token *token)
 
             }
       } while ( stack.top->symbol != PT_DOLLAR || eList.act->symbol != PT_DOLLAR);
- gen_exp();
+ gen_expr();
  listDispose(&eList);
  //disposeStack(&stack);
  return OK;

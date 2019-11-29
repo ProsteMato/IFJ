@@ -19,7 +19,7 @@
 
 SymTabNodePtr root;
 LocalTableNode local_table;
-ParamList *params;
+ParamList *param_list;
 
 
 #endif //_MAIN_H
