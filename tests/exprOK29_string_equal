@@ -1,0 +1,4 @@
+if 'abc' == 'abc' : 
+    pass
+else : 
+    pass
