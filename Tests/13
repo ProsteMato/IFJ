@@ -1,0 +1,4 @@
+a = 5
+b = 50.5
+vysl = a // b
+print('Vysledek:', vysl, '\n')

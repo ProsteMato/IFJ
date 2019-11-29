@@ -1,0 +1,5 @@
+a = 4
+b = 3
+c = 5
+vysl = (( a * b ) / c
+print('Vysledek:', vysl, '\n')
