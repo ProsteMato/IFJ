@@ -234,6 +234,7 @@ int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3
             case PR_BIB: 
                   switch (sym2->symbol)
                   {
+                        case (PT_E):
                         case (PT_INT):
                         case (PT_FLOAT):
                         case (PT_STRING):
@@ -304,10 +305,9 @@ int callExpression(Token *token)
   }
   if (token->type == TK_ID)
   {
-      int err = is_variable_defined(root, local_table, NULL, token->attribute);
-      if (err != OK)
+      if (!is_variable_defined(root, local_table, NULL, token->attribute))
       {
-            return err;
+            return SEM_FUNCTION_ERROR;
       }
   }
   if (token->type == TK_BRACKET_L)
@@ -346,10 +346,9 @@ int callExpression(Token *token)
       }
       if (token->type == TK_ID)
       {
-            int err = is_variable_defined(root, local_table, NULL, token->attribute);
-            if (err != OK)
+            if (!is_variable_defined(root, local_table, NULL, token->attribute))
             {
-                  return err;
+                  return SEM_FUNCTION_ERROR;
             }
       }
       //count number of brackets - must be even
