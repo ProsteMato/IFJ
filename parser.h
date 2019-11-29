@@ -13,6 +13,9 @@
 
 #include "scanner.h"
 #include "expression_parser.h"
+#include "symtable.h"
+#include "generator.h"
+#include "sematic_analysis.h"
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
