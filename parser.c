@@ -328,20 +328,13 @@ int stat(Token *token) {
 				return OK;
 			}
 		/*
-			29:  <func-nested-stat> -> return expr EOL
+			29:  <func-nested-stat> -> return <after-return>
 		*/
 		} else if (strcmp(token->attribute, "return") == 0 && in_function) {
+			int returnValue = 0;
 			GET_NEXT_TOKEN(token);
-			//if((returnValue = callExpression(token)) == OK) {
-			if ((returnValue = expression(token)) == OK) {
-				if (!isRelational) {
-					GET_NEXT_TOKEN(token);
-					if (token->type == TK_EOL) {
-						return OK;
-					}
-				} else {
-					return SYNTAX_ERROR;
-				}
+			if((returnValue = after_return(token)) == OK) {
+				return OK;
 			} else {
 				return returnValue;
 			}
@@ -593,6 +586,26 @@ int def_id(Token *token) {
 		return OK;
 	} 
 	return SYNTAX_ERROR;
+}
+
+int after_return(Token *token) {
+	int returnValue = 0;
+	if (token->type == TK_EOL) {
+		return OK;
+	}
+	//if((returnValue = callExpression(token)) == OK) {
+	else if ((returnValue = expression(token)) == OK) {
+		if (!isRelational) {
+			GET_NEXT_TOKEN(token);
+			if (token->type == TK_EOL) {
+				return OK;
+			}
+		} else {
+			return SYNTAX_ERROR;
+		}
+	} else {
+		return returnValue;
+	}
 }
 
 
