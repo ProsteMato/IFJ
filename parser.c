@@ -91,6 +91,7 @@ int st_list(Token *token) {
 	*/
 	int returnValue = 0;
 	if (token->type == TK_KW && !(strcmp(token->attribute, "None") == 0)) {
+		
 		if (strcmp(token->attribute, "def") == 0 && !in_function && !in_if_while) {
 			returnValue = stat(token);
 			if (returnValue == OK) {
@@ -213,7 +214,7 @@ int next_st_list(Token *token) {
 
 int stat(Token *token) {
 	int returnValue = 0;
-	
+
 	if (token->type == TK_KW) {
 		/*
 			4:  <stat> -> def id ( <params> : EOL INDENT <func-nested-st-list>
@@ -372,7 +373,8 @@ int stat(Token *token) {
 				return returnValue;
 			}
 		} else if (
-				token->type == TK_EOL || 
+				token->type == TK_EOL ||
+				token->type == TK_EOF ||
 				token->type == TK_BRACKET_L ||
 				token->type == TK_ASSIGN
 			) {
@@ -562,7 +564,7 @@ int after_id(Token *token) {
 	if(token->type == TK_ASSIGN) {
 		GET_NEXT_TOKEN(token);
 		return assign(token);
-	} else if (token->type == TK_EOL || token->type == TK_BRACKET_L) {
+	} else if (token->type == TK_EOL || token->type == TK_EOF || token->type == TK_BRACKET_L) {
 		return def_id(token);
 	}
 	return SYNTAX_ERROR;
