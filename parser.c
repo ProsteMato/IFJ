@@ -527,7 +527,7 @@ int assign(Token *token) {
 	} else if (token->type == TK_ID) {
 		Token *savedToken = token;
 		GET_NEXT_TOKEN(token);
-		if (savedToken->type == TK_BRACKET_L || savedToken->type == TK_EOL) {
+		if (savedToken->type == TK_BRACKET_L || savedToken->type == TK_EOL || savedToken->type == TK_EOF) {
 			return def_id(token);
 		} else if (
 			savedToken->type == TK_PLUS ||
