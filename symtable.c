@@ -315,3 +315,17 @@ void SetParamCount (SymTabNodePtr RootPtr, char * K, int pocet){
 	else data->pocet_par = pocet;
 	return;
 }
+
+void GlobalSetType(SymTabNodePtr RootPtr, char * K, Data_type type){
+	GlobalTableData *data;
+	if (GlobalSymTabSearch(RootPtr, K, &data) == false) return;
+	else data->type = type;
+	return;
+}
+
+void LocalSetType(LocalTableNode RootPtr, char * K, Data_type type){
+	LocalTableData *data;
+	if (LocalSymTabSearch(RootPtr, K, &data) == false) return;
+	else data->type = type;
+	return;
+}
