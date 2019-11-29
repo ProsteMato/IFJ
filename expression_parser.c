@@ -445,6 +445,7 @@ int callExpression(Token *token)
         precedenceRules[j] = -1;
   }
   eList.act=eList.first;
+
   if ( eList.act ->rptr == NULL)
   {
         switch (eList.act->symbol) 
@@ -502,10 +503,10 @@ int callExpression(Token *token)
                   }
                   else if (stack.top->symbol == PT_E)
                   {
-                        Data_type type = stack.top->dType;
+                        finalType = stack.top->dType;
                         sPop(&stack); 
                         sPush(&stack, PT_SHIFT,TYPE_UNDEFINED);
-                        sPush(&stack, PT_E, type);
+                        sPush(&stack, PT_E, finalType);
                         sPush(&stack, indexInput, eList.act->dType);
 
                   }
@@ -529,10 +530,10 @@ int callExpression(Token *token)
                         }
                         else 
                         {
-                              Data_type type= sym1->dType;
+                              finalType= sym1->dType;
                               sPop(&stack);
                               sPop(&stack);
-                              sPush(&stack, PT_E, type);
+                              sPush(&stack, PT_E, finalType);
                         }
                   }
                   if ( num == 3)
@@ -569,7 +570,12 @@ int callExpression(Token *token)
 
             }
       } while ( stack.top->symbol != PT_DOLLAR || eList.act->symbol != PT_DOLLAR);
- //gen_expr();
+  int errUnget= unget_token(token);
+  if (errUnget != OK)
+  {
+        return e;
+  }
+  //gen_expr();
  listDispose(&eList);
  //disposeStack(&stack);
  return OK;

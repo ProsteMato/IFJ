@@ -73,7 +73,7 @@ void pq_destroy();
 int gen_header(); // generovanie zac programu //
 int gen_int2float(char *var); // netestovane
 int gen_assing_const_to_val(char *var, Token *token); // type - TK_ int/float/str
-
+int defvar(char *var);
 
 // vstavane fukcie
 int gen_inputs(char *dest); // netestovane
@@ -91,6 +91,9 @@ int gen_else();
 int gen_if_end();
 
 // operacie mat
+
+
+
 int gen_expr();
 int gen_stack_plus();
 int gen_stack_mult();
@@ -108,21 +111,84 @@ int gen_minus(char *op1, char *op2);
 int gen_mult(char *op1, char *op2);
 int gen_div(char *op1, char *op2);
 int gen_idiv(char *op1, char *op2);
+/**
+ * @brief      Generetes the cocatenation of strings
+ *
+ * @param      op1   String with name of first var
+ * @param      op2   String with name of second var
+ *
+ * @return     OK if successfull, INTERNAL_ERROR in case of internal error
+ *             occurrence
+ */
 int gen_concat(char *op1, char *op2);
 
-// while
-int gen_while_label(); //
-int gen_while_begin(); // condition //
-int gen_while_end(); //
+//----------------------------------------
+//                WHILE
+//---------------------------------------
+
+/**
+ * @brief      Generates label for while, from this point the body of while begins
+ *
+ * @return     OK if successfull, INTERNAL_ERROR in case of internal error
+ *             occurrence
+ */
+int gen_while_label();
+/**
+ *
+ * @brief      Generates beginning of while, the conditional jump to the end in
+ *             case of condition ot being true anymore
+ *
+ * @return     OK if successfull, INTERNAL_ERROR in case of internal error 
+ *             occurrence
+ */
+int gen_while_begin();
+/**
+ * @brief      Generates JUMP to the label of while and LABEL behind the while
+ *
+ * @return     OK if successfull, INTERNAL_ERROR in case of internal error
+ *             occurrence
+ */
+int gen_while_end();
 
 
-// funkcie
-int gen_f_start(char *id); // pri def //
-int gen_f_end(char *id); // na koniec funkcie, za poslednym vygenerovanym prikazom tela f //
-int gen_f_call(char *id); //
+// ---------------------------------
+//            FUNKCIE
+// ---------------------------------
+
+// @brief      Generates beginning of function, LABEL, PUSHFRAME, DEFVAR retval
+//
+// @param      id    String with name of function
+//
+// @return     OK if successfull, INTERNAL_ERROR in case of internal error
+//             occurrence
+int gen_f_start(char *id);
+/**
+ * @brief      Generates commands at the the end of function, POPFRAME, RETURN
+ *
+ * @param      id    String with name of function
+ *
+ * @return     OK if successfull, INTERNAL_ERROR in case of internal error occurrence
+ */
+int gen_f_end(char *id);
+/**
+ * @brief      Generates function call, CALL 'function label'
+ *
+ * @param      id    String with name of function
+ *
+ * @return     OK if successfull, INTERNAL_ERROR in case of internal error occurrence
+ */
+int gen_f_call(char *id);
+/**
+ * @brief      Generates commands to pass variable to function as parameters,
+ *             CREATEFRAME, DEFVAR params
+ *
+ * @return     OK if successfull, INTERNAL_ERROR in case of internal error
+ *             occurrence
+ */
 int gen_f_prep_params();
+
 
 // unique labely
 // na konci prejst zoznam a prehladat pouzitie built in funcii, tlacit len pouzite
-// prechod zase kvoli
+
 #endif //_GENERATOR_H
