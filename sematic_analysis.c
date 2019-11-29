@@ -53,7 +53,7 @@ Data_type build_in_function_return_type(char *function_id) {
 int arithmetic_operation_check(Data_type first_type, int operation, Data_type second_type) {   
     switch(operation) {
         case PR_EDIVDIVE:
-            if(first_type == TYPE_INT || second_type == TYPE_INT) {
+            if(first_type == TYPE_INT && second_type == TYPE_INT) {
                 return OK;
             } else {
                 return SEM_TYPE_ERROR;
