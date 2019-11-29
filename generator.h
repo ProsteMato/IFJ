@@ -81,6 +81,7 @@ int gen_chr(); //
 //int gen_else();
 
 // operacie mat
+int gen_expr();
 //int gen_add();
 //int gen_minus();
 //int gen_mult();
@@ -89,12 +90,12 @@ int gen_chr(); //
 //int gen_concat();
 
 // operacie relacne
-int gen_less_than(char *op1, char *op2); //is_variable_defined
-int gen_more_than(char *op1, char *op2);
-int gen_equal(char *op1, char *op2);
-int gen_equal_less(char *op1, char *op2);
-int gen_equal_more(char *op1, char *op2);
-int gen_not_equal(char *op1, char *op2);
+//int gen_less_than(char *op1, char *op2); //is_variable_defined
+//int gen_more_than(char *op1, char *op2);
+//int gen_equal(char *op1, char *op2);
+//int gen_equal_less(char *op1, char *op2);
+//int gen_equal_more(char *op1, char *op2);
+//int gen_not_equal(char *op1, char *op2);
 
 // while
 int gen_while_label(); //
@@ -108,10 +109,7 @@ int gen_f_end(char *id); // na koniec funkcie, za poslednym vygenerovanym prikaz
 int gen_f_call(char *id); //
 int gen_f_prep_params();
 
-
-// stack na parametre
 // unique labely
-// // lokalnu alebo globalnu tabulku symbolov
 // na konci prejst zoznam a prehladat pouzitie built in funcii, tlacit len pouzite
 // prechod zase kvoli
 #endif //_GENERATOR_H
