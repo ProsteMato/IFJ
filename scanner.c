@@ -9,35 +9,35 @@
 #include "scanner.h"
 
 Keywords is_keyword(char* s, unsigned len){
-	if (strncmp (s, "def", len) == 0){
+	if (strncmp (s, "def", len) == 0 && len == 3){
 		return KW_DEF;
-	} else if (strncmp (s, "else", len) == 0){
+	} else if (strncmp (s, "else", len) == 0 && len == 4){
 		return KW_ELSE;
-	} else if (strncmp (s, "if", len) == 0){
+	} else if (strncmp (s, "if", len) == 0 && len == 2){
 		return KW_IF;
-	} else if (strncmp (s, "None", len) == 0){
+	} else if (strncmp (s, "None", len) == 0 && len == 4){
 		return KW_NONE;
-	} else if (strncmp (s, "pass", len) == 0){
+	} else if (strncmp (s, "pass", len) == 0 && len == 4){
 		return KW_PASS;
-	} else if (strncmp (s, "return", len) == 0){
+	} else if (strncmp (s, "return", len) == 0 && len == 6){
 		return KW_RETURN;
-	} else if (strncmp (s, "while", len) == 0){
+	} else if (strncmp (s, "while", len) == 0 && len == 5){
 		return KW_WHILE;
-	} else if (strncmp (s, "inputs", len) == 0){
+	} else if (strncmp (s, "inputs", len) == 0 && len == 6){
 		return KW_INPUTS;
-	} else if (strncmp (s, "inputf", len) == 0){
+	} else if (strncmp (s, "inputf", len) == 0 && len == 6){
 		return KW_INPUTF;
-	} else if (strncmp (s, "inputi", len) == 0){
+	} else if (strncmp (s, "inputi", len) == 0 && len == 6){
 		return KW_INPUTI;
-	} else if (strncmp (s, "len", len) == 0){
+	} else if (strncmp (s, "len", len) == 0 && len == 3){
 		return KW_LEN;
-	} else if (strncmp (s, "substr", len) == 0){
+	} else if (strncmp (s, "substr", len) == 0 && len == 6){
 		return KW_SUBSTR;
-	} else if (strncmp (s, "ord", len) == 0){
+	} else if (strncmp (s, "ord", len) == 0 && len == 3){
 		return KW_ORD;
-	} else if (strncmp (s, "chr", len) == 0){
+	} else if (strncmp (s, "chr", len) == 0 && len == 3){
 		return KW_CHR;
-	} else if (strncmp (s, "print", len) == 0){
+	} else if (strncmp (s, "print", len) == 0 && len == 5){
 		return KW_PRINT;
 	} else {
 		return -1;
