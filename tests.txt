@@ -1,0 +1,184 @@
+//testy
+//zuzana hradilova xhradi16
+
+//testy, ktere by meli projit
+// 1. test ze zadani
+print('Zadejte cislo pro vypocet faktorialu: ')
+a = inputi()
+if a < 0: # chybi kontrola a == None pro pripad nevalidniho vstupu
+    print("""
+Faktorial nelze spocitat
+""")
+else:
+    vysl = 1
+    while a > 0:
+        vysl = vysl * a
+        a = a - 1
+    print('Vysledek je:', vysl, '\n')
+
+//2. test na vypocet
+a = 5
+b = 50.5
+c = 10
+vysl = ( a + b ) * c
+print('Vysledek:', vysl, '\n')
+
+//3.test na if
+ahoj = 5
+svete = 5
+if ( ahoj == svete)
+    print('Vytisknu petku:', svete, '\n')
+
+//4. test na while
+a = 0
+while a < 3:
+    b = a
+    a = a + 1
+    print('Uvnitr while po:', b, '\n')
+print('Konec opakovani \n')
+
+//5. test na scitani retezcu
+a = ahoj_
+b = svete
+vysl = a + b
+print('Vysledek:', vysl, '\n')
+
+//6. test na porovnani int + test na if
+a = 3
+b = 4
+if (a > b)
+    print(a, 'je vetsi nez', b, '\n')
+print(b, 'je vetsi nez', a, '\n')
+
+//7. test na porovnani int
+a = 5
+b = 4
+if (a > b)
+    print(a, 'je vetsi nez', b, '\n')
+else
+    print(b, 'je vetsi nez', a, '\n')
+
+//8. test na porovnani float
+a = 5.55
+b = 5.556
+if (a > b)
+    print(a, 'je vetsi nez', b, '\n')
+else
+    print(b, 'je vetsi nez', a, '\n')
+
+//testy s chybou
+//1. celocistne deleni necelych cisel 1., vraci chybu 4
+a = 5
+b = 50.5
+vysl = a // b
+print('Vysledek:', vysl, '\n')
+
+//2. celocistne deleni necelych cisel 2., vraci chybu 4
+a = 5.5
+b = 50
+vysl = a // b
+print('Vysledek:', vysl, '\n')
+
+//3. deleni cisla str, chyba 4
+a = 5.8
+b = 'ahoj'
+vysl = a / b
+print('Vysledek:', vysl, '\n')
+
+//4. spatny pocet zavorek 1. test, chyba 2
+a = 4
+b = 3
+c = 5
+vysl = (( a * b ) / c
+print('Vysledek:', vysl, '\n')
+
+//5. spatny pocet zavorek 2. test, chyba 2
+a = 4
+b = 3
+c = 5
+vysl = ( a * b ) / c )
+print('Vysledek:', vysl, '\n')
+
+//6. spatne poradi zavorek, chyba 2
+a = 4
+b = 3
+c = 5
+vysl = ) a * b ) / c
+print('Vysledek:', vysl, '\n')
+
+//7. pouziti neexistujici promenne, chyba 3
+a = 4
+vysl = ( a * b )
+print('Vysledek:', vysl, '\n')
+
+//8. deleni nulou 1., chyba 9
+a = 5
+b = 0
+vysl = a / b
+print('Vysledek:', vysl, '\n')
+
+//9. deleni nulou 2., chyba 9
+a = 5
+b = 0
+vysl = a // b
+print('Vysledek:', vysl, '\n')
+
+//10. spatne kombinace operatoru 1. 
+a = 5
+b = 0
+vysl = a *+ b
+print('Vysledek:', vysl, '\n')
+
+//11. spatne kombinace operatoru 2.
+a = 5
+b = 0
+vysl = a +/ b
+print('Vysledek:', vysl, '\n')
+
+//12. spatna uroven odsazeni 1.
+a = 0
+while a < 1:
+b = a
+    a = a + 1
+print('Vysledek je:', b, '\n')
+
+//13. spatna uroven odsazeni 2.
+a = 0
+while a < 1:
+        b = a
+a = a + 1
+print('Vysledek je:', b, '\n')
+
+//14. deleni nulou 2.primo, chyba 9
+a = 12
+vysl = a / 0
+print('Vysledek:', vysl, '\n')
+
+//15. deleni nulou 2.primo, chyba 9
+a = 6
+vysl = a // 0
+print('Vysledek:', vysl, '\n')
+
+//16. deleni nulou 2.primo, chyba 9
+a = 0
+vysl = 25 // a
+print('Vysledek:', vysl, '\n')
+
+//17. spatna uroven odsazeni 2.
+a = 0
+        while a < 1:
+    b = a
+    a = a + 1
+print('Vysledek je:', b, '\n')
+
+//18. pouziti spatne promenne
+ahoj = 4
+svete = 5
+vysl = ( ahoj * steve )
+print('Vysledek:', vysl, '\n')
+
+//19. spatne klicove slovo
+ahoj = 5
+svete = 5
+fi ( ahoj == svete)
+    print('Zdravim', svete, '\n')
