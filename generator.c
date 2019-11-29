@@ -17,6 +17,9 @@ int CL_add_line(Code *line){
 	if (line == NULL){
 		return INTERNAL_ERROR;
 	}
+	if (!append_char(&(line->inst), &(line->len), &(line->cap), '\0')){
+		return INTERNAL_ERROR;
+	}
 	Code_line *new = (Code_line*) malloc (sizeof(Code_line));
 	if (new == NULL){
 		// chyba alokacie pamate
@@ -87,9 +90,6 @@ int add_code(Code *code, char *inst){
 			return INTERNAL_ERROR;
 		}
 	}
-	if (!append_char(&(code->inst), &(code->len), &(code->cap), ' ')){
-		return INTERNAL_ERROR;
-	}
 	return OK;
 }
 
@@ -102,10 +102,48 @@ char* int_to_str(int i){
 	return str;
 }
 
+char* float_to_str(char *f){
+	char *tmp = malloc(sizeof(char)*FLOAT2STR_SIZE);
+	if (tmp == NULL){
+		return NULL;
+	}
+	sprintf(tmp, "%a", atof(f));
+	return tmp;
+}
+
+char* transform_for_write(char *str){
+	Code *code = create_code();
+	if (code == NULL){
+		return NULL;
+	}
+	size_t len = strlen(str);
+	for (int i = 0; i < len; i++){
+		if ((str[i] >= 0 && str[i] <= 32) ||
+			str[i] == 35 || str[i] == 92){
+			if (!append_char(&(code->inst), &(code->len), &(code->cap), '\\'))
+				return NULL;
+			if (!append_char(&(code->inst), &(code->len), &(code->cap), '0'))
+				return NULL;
+			int jednotky = str[i]%10;
+			int desiatky = (str[i] - jednotky)/10; 
+			if (!append_char(&(code->inst), &(code->len), &(code->cap), desiatky+'0'))
+				return NULL;
+			if (!append_char(&(code->inst), &(code->len), &(code->cap), jednotky+'0'))
+				return NULL;
+		} else {
+			if (!append_char(&(code->inst), &(code->len), &(code->cap), str[i]))
+				return NULL;
+		}
+	}
+	char *ret = code->inst;
+	free(code);
+	return ret;
+}
+
 // -------------------
 // generovacie funkcie
 // -------------------
-/*
+/* is_global
 int gen_less_than(char *op1, char *op2){
 	Code *code = create_code();
 	if (!code)
@@ -118,7 +156,7 @@ int gen_less_than(char *op1, char *op2){
 	// op1 je premenna
 	if (is_variable_defined(root,op1)){
 		if (is_global_variable(root,op1){
-			if (add_code(code, "GL@"))
+			if (add_code(code, "GF@"))
 				return INTERNAL_ERROR;
 		} else {
 			if (add_code(code, "LF@"))
@@ -135,7 +173,7 @@ int gen_less_than(char *op1, char *op2){
 	// op2 je premenna
 	if (is_variable_defined(root,op2)){
 		if (is_global_variable(root,op2){
-			if (add_code(code, " GL@"))
+			if (add_code(code, " GF@"))
 				return INTERNAL_ERROR;
 		} else {
 			if (add_code(code, " LF@"))
@@ -197,7 +235,7 @@ int gen_while_begin(){
 		return INTERNAL_ERROR;
 	if (add_code(code, unq_while_n))
 		return INTERNAL_ERROR;
-	if (add_code(code, " GL@&expr_&val bool@false"))
+	if (add_code(code, " GF@&expr&val bool@false"))
 		return INTERNAL_ERROR;
 	if (CL_add_line(code))
 		return INTERNAL_ERROR;
@@ -234,33 +272,70 @@ int gen_while_end(){
 	while_counter++;
 	return OK;
 }
-/*
+
 int gen_int2float(char *var){
 	Code *code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
 
-	if (add_code(code, "INT2FLOAT\0"))
+	int glob = is_global_variable(root, var);
+
+	if (add_code(code, "INT2FLOAT \0"))
 		return INTERNAL_ERROR;
-	var = var_get_adr(var);
-	if (var == NULL)
-		return INTERNAL_ERROR;
+	
+	if (glob){
+		if (add_code(code, "GF@"))
+			return INTERNAL_ERROR;
+	} else {
+		if (add_code(code, "LF@"))
+			return INTERNAL_ERROR;
+	}
 	if (add_code(code, var))
 		return INTERNAL_ERROR;
+
+	if (glob){
+		if (add_code(code, " GF@"))
+			return INTERNAL_ERROR;
+	} else {
+		if (add_code(code, " LF@"))
+			return INTERNAL_ERROR;
+	}
+	if (add_code(code, var))
+		return INTERNAL_ERROR;
+
 	if (CL_add_line(code))
 		return INTERNAL_ERROR;
 
 	return OK;
 }
-*/
+
 int gen_print(char *symb){
 	Code *code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
+
 	if (add_code(code, "WRITE \0"))
 		return INTERNAL_ERROR;
-	if (add_code(code, symb)) // ziskat adresu kvoli hodnote
-		return INTERNAL_ERROR;
+
+	// zistenie ci je symb premenna abo konst
+	if (is_variable_defined(root, local_table, params,symb)){ // premenna
+		if (is_global_variable(root, symb)){ // global
+			if (add_code(code, "GF@\0"))
+				return INTERNAL_ERROR;
+		} else { // lokal
+			if (add_code(code, "LF@\0"))
+				return INTERNAL_ERROR;
+		}
+	} else {// konst
+		if (add_code(code, "string@\0"))
+			return INTERNAL_ERROR;
+		char *trans_str = transform_for_write(symb);
+		if (trans_str == NULL)
+			return INTERNAL_ERROR;
+		if (add_code(code, trans_str))
+			return INTERNAL_ERROR;
+	}
+
 	if (CL_add_line(code))
 		return INTERNAL_ERROR;
 
@@ -281,7 +356,8 @@ int gen_f_call(char *id){
 
 	return OK;
 }
-int gen_assing_const_to_val(char *var, char *value, Token *token){
+
+int gen_assing_const_to_val(char *var, Token *token){
 	Code *code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
@@ -300,32 +376,41 @@ int gen_assing_const_to_val(char *var, char *value, Token *token){
 		return INTERNAL_ERROR;
 	if (add_code(code, var))
 		return INTERNAL_ERROR;
-	if (add_code(code, " "))
-		return INTERNAL_ERROR;
 
+	char *converted;
 	if(token->type == TK_INT){
-		if (add_code(code, "int@"))
+		if (add_code(code, " int@"))
+			return INTERNAL_ERROR;
+		if (add_code(code, token->attribute))
 			return INTERNAL_ERROR;
 	} else if (token->type == TK_FLOAT){
-		if (add_code(code, "float@"))
+		if (add_code(code, " float@"))
+			return INTERNAL_ERROR;
+		converted = float_to_str(token->attribute);
+		if (converted == NULL)
+			return INTERNAL_ERROR;
+		if (add_code(code, converted))
 			return INTERNAL_ERROR;
 	} else if (token->type == TK_STRING){
-		if (add_code(code, "string@"))
+		if (add_code(code, " string@"))
+			return INTERNAL_ERROR;
+		converted = transform_for_write(token->attribute);
+		if (add_code(code, converted))
 			return INTERNAL_ERROR;
 	} else {
 		return INTERNAL_ERROR;
 	}
 
-	if (add_code(code, value))
-		return INTERNAL_ERROR;
 	if (CL_add_line(code))
 		return INTERNAL_ERROR;
 
 	return OK;
 }
-/*
-int gen_f_prep_params(){
-	// TODO stack s parametrami
+
+int gen_f_prep_params(){ // parametre cez TKQueue, pridavane v spravnom poradi, teda 1. vlozeny ako 1., posledny ako posledny
+	Token* token = malloc(sizeof(Token));
+	if(token == NULL)
+		return INTERNAL_ERROR;
 	Code *code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
@@ -338,7 +423,10 @@ int gen_f_prep_params(){
 		return INTERNAL_ERROR;
 
 	// vytvaranie parametrov v cykle
-	for (int i = 1; !pop(stack); i++){ // TODO prepisat - kym nie je stack prazdny
+	if (tkq_dequeue(token)){ // otestovat
+		return INTERNAL_ERROR;
+	}
+	for (int i = 1; token != NULL; i++){
 		code = create_code();
 		if (!code)
 			return INTERNAL_ERROR;
@@ -362,15 +450,56 @@ int gen_f_prep_params(){
 			return INTERNAL_ERROR;
 		if (add_code(code, " "))
 			return INTERNAL_ERROR;
-		/////////////// pridat co sa movne do premennej parametru
+
+		free(tmp);
+		
+		if (token->type == TK_ID){ // parameter je premenna
+			if (is_global_variable(root,token->attribute)){ // globalna premenna
+				if (add_code(code, "GF@%\0"))
+					return INTERNAL_ERROR;
+			} else { // lokalna premenna
+				if (add_code(code, "LF@%\0"))
+					return INTERNAL_ERROR;
+			}
+			if (add_code(code, token->attribute))
+				return INTERNAL_ERROR;
+		} else if (token->type == TK_FLOAT){ // konst float
+			if (add_code(code, "float@"))
+				return INTERNAL_ERROR;
+			tmp = float_to_str(token->attribute);
+			if (tmp == NULL)
+				return INTERNAL_ERROR;
+			if (add_code(code, tmp))
+				return INTERNAL_ERROR;
+		} else if (token->type == TK_INT){ // konst int
+			if (add_code(code, "int@"))
+				return INTERNAL_ERROR;
+			if (add_code(code, token->attribute))
+				return INTERNAL_ERROR;
+		} else if (token->type == TK_STRING){ // konst string
+			if (add_code(code, "string@"))
+				return INTERNAL_ERROR;
+			tmp = transform_for_write(token->attribute);
+			if (tmp == NULL)
+				return INTERNAL_ERROR;
+			if (add_code(code, tmp))
+				return INTERNAL_ERROR;
+		} else {
+			return INTERNAL_ERROR;
+		}
+
 		if (CL_add_line(code))
 			return INTERNAL_ERROR;
+
+		if (tkq_dequeue(token)){
+			return INTERNAL_ERROR;
+		}
 
 		free(tmp);
 	}
 	return OK;
 }
-*/
+
 int gen_f_start(char *id){
 	Code *code = create_code();
 	// LABEL $id
@@ -455,21 +584,28 @@ int gen_header(){
 		return INTERNAL_ERROR;
 	return OK;
 }
-/*
+
 int gen_inputs(char *dest){
 	if (dest == NULL)
 		return INTERNAL_ERROR;
 	Code *code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
-	if (add_code(code, "READ\0"))
+	if (add_code(code, "READ \0"))
+		return INTERNAL_ERROR;
+	
+	int glob = is_global_variable(root, dest);
+	if (glob){
+		if (add_code(code, "GF@"))
+			return INTERNAL_ERROR;
+	} else {
+		if (add_code(code, "LF@"))
+			return INTERNAL_ERROR;
+	}
+	if (add_code(code, dest))
 		return INTERNAL_ERROR;
 
-	char *var = get_var_adr(dest);
-	if (add_code(code, var))
-		return INTERNAL_ERROR;
-
-	if (add_code(code, "string\0"))
+	if (add_code(code, " string\0"))
 		return INTERNAL_ERROR;
 	if (CL_add_line(code))
 		return INTERNAL_ERROR;
@@ -482,14 +618,22 @@ int gen_inputi(char *dest){
 	Code *code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
-	if (add_code(code, "READ\0"))
+	if (add_code(code, "READ \0"))
 		return INTERNAL_ERROR;
 
-	char *var = get_var_adr(dest);
-	if (add_code(code, var))
+	int glob = is_global_variable(root, dest);
+	if (glob){
+		if (add_code(code, "GF@"))
+			return INTERNAL_ERROR;
+	} else {
+		if (add_code(code, "LF@"))
+			return INTERNAL_ERROR;
+	}
+
+	if (add_code(code, dest))
 		return INTERNAL_ERROR;
 
-	if (add_code(code, "int\0"))
+	if (add_code(code, " int\0"))
 		return INTERNAL_ERROR;
 	if (CL_add_line(code))
 		return INTERNAL_ERROR;
@@ -502,20 +646,28 @@ int gen_inputf(char *dest){
 	Code *code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
-	if (add_code(code, "READ\0"))
+	if (add_code(code, "READ \0"))
 		return INTERNAL_ERROR;
 
-	char *var = get_var_adr(dest);
-	if (add_code(code, var))
+	int glob = is_global_variable(root, dest);
+	if (glob){
+		if (add_code(code, "GF@"))
+			return INTERNAL_ERROR;
+	} else {
+		if (add_code(code, "LF@"))
+			return INTERNAL_ERROR;
+	}
+
+	if (add_code(code, dest))
 		return INTERNAL_ERROR;
 
-	if (add_code(code, "float\0"))
+	if (add_code(code, " float\0"))
 		return INTERNAL_ERROR;
 	if (CL_add_line(code))
 		return INTERNAL_ERROR;
 	return OK;
 }
-*/
+
 int gen_len(){
 	Code *code = create_code();
 	if (!code)
@@ -845,8 +997,6 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (CL_add_line(code))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
-		return INTERNAL_ERROR;
 
 	code = create_code();
 	if (!code)
@@ -962,7 +1112,7 @@ int gen_substr(){
 	code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
-	if (add_code(code, "JUMPIFEQ $substr_end LF@cond_val bool@true0"))
+	if (add_code(code, "JUMPIFEQ $substr_end LF@cond_val bool@true\0"))
 		return INTERNAL_ERROR;
 	if (CL_add_line(code))
 		return INTERNAL_ERROR;
