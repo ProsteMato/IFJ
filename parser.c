@@ -32,7 +32,8 @@ bool in_function = false;
 bool in_if_while = false;
 bool if_in_else = false;
 int depth = 0;
-Token savedToken;
+Token *savedToken = NULL;
+char *saved_id = NULL;
 
 int prog(Token *token) {
 	pq_init();
@@ -224,7 +225,8 @@ int stat(Token *token) {
 				if(returnValue != OK) {
 					return returnValue;
 				}
-				savedToken = *token;
+				savedToken = token;
+				saved_id = token->attribute;
 				local_table = FindLocalTable(root, token->attribute);
 				param_list = FindParamList(root, token->attribute);
 				GET_NEXT_TOKEN(token);
@@ -259,8 +261,8 @@ int stat(Token *token) {
 			GET_NEXT_TOKEN(token);
 			//TODO priprava na generovanie...ziskat lables for if and else
 			//TODO urobit samotne generovanie...
-			if ((returnValue = callExpression(token)) == OK) {
-			//if ((returnValue = expression(token)) == OK) {
+			//if ((returnValue = callExpression(token)) == OK) {
+			if ((returnValue = expression(token)) == OK) {
 				GET_NEXT_TOKEN(token);
 				if (token->type == TK_COLON) {
 					GET_NEXT_TOKEN(token);
@@ -339,6 +341,7 @@ int stat(Token *token) {
 			int returnValue = 0;
 			GET_NEXT_TOKEN(token);
 			if((returnValue = after_return(token)) == OK) {
+				//TODO gen return
 				return OK;
 			} else {
 				return returnValue;
@@ -353,7 +356,8 @@ int stat(Token *token) {
 		6:  <stat> -> expr <eof-or-eol>
 	*/
 	} else if (token->type == TK_ID) {
-		savedToken = *token;
+		savedToken = token;
+		saved_id = token->attribute;
 		GET_NEXT_TOKEN(token);
 		if (
 			token->type == TK_MINUS ||
@@ -364,7 +368,7 @@ int stat(Token *token) {
 			) {
 			UNGET_TOKEN(token);
 			//if((returnValue = callExpression(token)) == OK) {
-			if ((returnValue = expression(&savedToken)) == OK) {
+			if ((returnValue = expression(savedToken)) == OK) {
 				if(!isRelational) {
 					GET_NEXT_TOKEN(token);
 					if (token->type == TK_EOL || token->type == TK_EOF) {
@@ -420,7 +424,7 @@ int params(Token *token) {
 	//TODO spracovávanie kontrolovanie a generovanie funkcie
 	GET_NEXT_TOKEN(token);
 	if (token->type == TK_BRACKET_R) {
-		SetParamCount(root, savedToken.attribute, 0);
+		SetParamCount(root, saved_id, 0);
 		return OK;
 	} else if (token->type == TK_ID) {
 		GET_NEXT_TOKEN(token);
@@ -453,7 +457,7 @@ int params_next(Token *token) {
 			return params_next(token);
 		}
 	} else if (token->type == TK_BRACKET_R) {
-		SetParamCount(root, savedToken.attribute, count);
+		SetParamCount(root, saved_id, count);
 		count = 1;
 		return OK;
 	}
@@ -480,7 +484,7 @@ int arg_params(Token *token) {
 				return returnValue;
 			}
 	} else if (token->type == TK_BRACKET_R) {
-		return check_function_param_count(root, savedToken.attribute, 0);
+		return check_function_param_count(root, saved_id, 0);
 	} else {
 		return SYNTAX_ERROR;
 	}
@@ -512,7 +516,7 @@ int arg_next_params(Token *token) {
 			}
 		}
 	} else if (token->type == TK_BRACKET_R) {
-		return check_function_param_count(root, savedToken.attribute, count);
+		return check_function_param_count(root, saved_id, count);
 	}
 	return SYNTAX_ERROR;
 }
@@ -544,20 +548,21 @@ int assign(Token *token) {
 			return returnValue;
 		}
 	} else if (token->type == TK_ID) {
-		savedToken = *token;
+		savedToken = token;
+		saved_id = token->attribute;
 		GET_NEXT_TOKEN(token);
-		if (savedToken.type == TK_BRACKET_L || savedToken.type == TK_EOL || savedToken.type == TK_EOF) {
+		if (token->type == TK_BRACKET_L || token->type == TK_EOL || token->type == TK_EOF) {
 			return def_id(token);
 		} else if (
-			savedToken.type == TK_PLUS ||
-			savedToken.type == TK_MINUS ||
-			savedToken.type == TK_MULT ||
-			savedToken.type == TK_DIV ||
-			savedToken.type == TK_DIV_DIV
+			token->type == TK_PLUS ||
+			token->type == TK_MINUS ||
+			token->type == TK_MULT ||
+			token->type == TK_DIV ||
+			token->type == TK_DIV_DIV
 		) {
 			UNGET_TOKEN(token);
 			//if((returnValue = callExpression(savedToken)) == OK) {
-			if ((returnValue = expression(&savedToken)) == OK) {
+			if ((returnValue = expression(savedToken)) == OK) {
 				if(!isRelational) {
 					GET_NEXT_TOKEN(token);
 					if (token->type == TK_EOL || token->type == TK_EOF) {
@@ -596,9 +601,9 @@ int after_id(Token *token) {
 int def_id(Token *token) {
 	//TODO pridat generovanie atd...
 	if (token->type == TK_BRACKET_L) {
-		if(!is_function_defined(root, savedToken.attribute)) {
-			int returnValue = define_function(&root, savedToken.attribute);
-			set_build_in_function_param_count(root, savedToken.attribute);
+		if(!is_function_defined(root, saved_id)) {
+			int returnValue = define_function(&root, saved_id);
+			set_build_in_function_param_count(root, saved_id);
 			if (returnValue != OK) {
 				return returnValue;
 			}
@@ -611,7 +616,7 @@ int def_id(Token *token) {
 			}
 		}
 	} else if (token->type == TK_EOL || token->type == TK_EOF) {
-		if(!is_variable_defined(root, local_table, param_list, savedToken.attribute)) {
+		if(!is_variable_defined(root, local_table, param_list, saved_id)) {
 			return SEM_FUNCTION_ERROR;
 		}
 		return eof_or_eol(token);
