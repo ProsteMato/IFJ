@@ -318,9 +318,9 @@ int stat(Token *token) {
 				return returnValue;
 			}
 		/*
-			7:  <stat> -> pass EOL
-			24:  <func-nested-stat> -> pass EOL
-			33:  <nested-stat> -> pass EOL
+			7:  <stat> -> pass <eof-or-eol>
+			24:  <func-nested-stat> -> pass <eof-or-eol>
+			33:  <nested-stat> -> pass <eof-or-eol>
 		*/
 		} else if (strcmp(token->attribute, "pass") == 0) {
 			GET_NEXT_TOKEN(token);
@@ -343,9 +343,9 @@ int stat(Token *token) {
 		5:  <stat> -> id <after_id>
 		28:  <func-nested-stat> -> id <after_id>
 		37:  <nested-stat> -> id <after_id>
-		26:  <func-nested-stat> -> expr EOL
-		35:  <nested-stat> -> expr EOL
-		6:  <stat> -> expr EOL
+		26:  <func-nested-stat> -> expr <eof-or-eol>
+		35:  <nested-stat> -> expr <eof-or-eol>
+		6:  <stat> -> expr <eof-or-eol>
 	*/
 	} else if (token->type == TK_ID) {
 		Token *savedToken = token;
@@ -379,9 +379,9 @@ int stat(Token *token) {
 			return after_id(token);
 		}
 	/*
-		26:  <func-nested-stat> -> expr	EOL
-		35:  <nested-stat> -> expr EOL
-		6:  <stat> -> expr EOL
+		26:  <func-nested-stat> -> expr	<eof-or-eol>
+		35:  <nested-stat> -> expr <eof-or-eol>
+		6:  <stat> -> expr <eof-or-eol>
 	*/
 	} else if (
 		token->type == TK_FLOAT ||
@@ -497,7 +497,7 @@ int arg_next_params(Token *token) {
 }
 
 /*
-42:  <assign> -> expr EOL
+42:  <assign> -> expr <eof-or-eol>
 43:  <assign> -> id <def-id>
 */
 int assign(Token *token) {
@@ -569,8 +569,8 @@ int after_id(Token *token) {
 }
 
 /*
-44:  <def-id> -> ( <arg-params> EOL
-45:  <def-id> -> EOL
+44:  <def-id> -> ( <arg-params> <eof-or-eol>
+45:  <def-id> -> <eof-or-eol>
 */
 int def_id(Token *token) {
 	//TODO pridat generovanie atd...
@@ -588,13 +588,21 @@ int def_id(Token *token) {
 	return SYNTAX_ERROR;
 }
 
+/*
+	46:  <after-return> -> expr <eof-or-eol>
+	47:  <after-return> -> <eof-or-eol>
+*/
 int eof_or_eol(Token *token) {
-	if (token->type == EOL || token->type == EOF) {
+	if (token->type == TK_EOL || token->type == TK_EOF) {
 		return OK;
 	}
 	return SYNTAX_ERROR;
 }
 
+/*
+	48:  <eof-or-eol> -> EOL
+	49:  <eof-or-eol> -> EOF
+*/
 int after_return(Token *token) {
 	int returnValue = 0;
 	if (token->type == TK_EOL || token->type == TK_EOF) {

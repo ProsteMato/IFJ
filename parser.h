@@ -143,6 +143,14 @@ int def_id(Token *token);
 int after_return(Token *token);
 
 /**
+ * @brief       This function check if on eol is EOL or EOF
+ * 
+ * @param       token   Token from scanner
+ * @return      Error code
+ */
+int eof_or_eol(Token *token);
+
+/**
  * @brief       Can be called only in function or if or while it is checking if next token is
  *              DEDENT or something else.
  * 
