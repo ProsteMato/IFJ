@@ -335,6 +335,16 @@ int callExpression(Token *token)
             return err;
       }
   }
+  if (token->type == TK_BRACKET_L)
+  {
+      leftBracket+=1;
+  }
+
+  if (token->type == TK_BRACKET_R)
+  {
+      rightBracket+=1;
+  }
+  
   listInsertFirst(&eList,token->attribute, symbol,dType);
   int e = get_next_token(token); 
   if  (e != OK)
