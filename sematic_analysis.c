@@ -167,6 +167,12 @@ int define_function(SymTabNodePtr *root, char *function_id) {
         return SEM_FUNCTION_ERROR;
     } else {
         GlobalTableData *data = malloc (sizeof(GlobalTableData));
+        LocalTableNode *local_table = malloc(sizeof(struct LocalTableNode));
+        ParamList *list = malloc(sizeof(struct paramlist));
+        LocalSymTabInit(local_table);
+        ParamInit(&list);
+        data->localTableNode = local_table;
+        data->paramList = list;
         data->funkce = true;
         int returnValue = GlobalSymTabInsert(root, function_id, data);
         return returnValue;

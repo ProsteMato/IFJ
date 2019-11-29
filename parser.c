@@ -222,7 +222,10 @@ int stat(Token *token) {
 		if (strcmp(token->attribute, "def") == 0 && !in_function && !in_if_while) {
 			GET_NEXT_TOKEN(token);
 			if (token->type == TK_ID) {
-				//TODO urobit nieco z ID pre novú definiciu funkcie
+				returnValue = define_function(root, token->attribute);
+				if(returnValue != OK) {
+					return returnValue;
+				}
 				GET_NEXT_TOKEN(token);
 				if (token->type == TK_BRACKET_L) {
 					returnValue = params(token);
