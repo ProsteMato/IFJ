@@ -8,6 +8,61 @@
 
 #include "generator.h"
 
+void pq_init(){
+	pq.first = NULL;
+	pq.last = NULL;
+}
+
+int pq_queue(Token *token, int ret_val){
+	QToken *qtk = (QToken*) malloc(sizeof(QToken));
+	if (qtk == NULL){
+		// internal ERROR
+		return INTERNAL_ERROR;
+	}
+	qtk->token = token;
+	qtk->ret_val = ret_val;
+	qtk->behind = NULL;
+	// no token in queue
+	if (pq.last == NULL && pq.first == NULL){
+		pq.last = qtk;
+		pq.first = qtk;
+	} else {
+		pq.last->behind = qtk;
+		pq.last = qtk;
+	}
+	return OK;
+}
+
+int pq_dequeue(Token* token){
+	token = pq.first->token;
+	int ret_val = pq.first->ret_val;
+	QToken *tmp = pq.first;
+	// jeden element v queue
+	if (pq.first == pq.last){
+		pq.first = NULL;
+		pq.last = NULL;
+	} else {
+		pq.first = pq.first->behind;
+	}
+	free(tmp);
+	return ret_val;
+}
+
+int pq_first(Token *token){
+	token = pq.first->token;
+	return pq.first->ret_val;
+}
+
+void pq_destroy(){
+	QToken *tmp;
+	while (pq.first != NULL){
+		tmp = pq.first->behind;
+		free(pq.first);
+		pq.first = tmp;
+	}
+	pq.last = NULL;
+}
+
 void CL_init(){
 	code_list.first = NULL;
 	code_list.last = NULL;
@@ -777,7 +832,7 @@ int gen_f_prep_params(){ // parametre cez TKQueue, pridavane v spravnom poradi, 
 		return INTERNAL_ERROR;
 
 	// vytvaranie parametrov v cykle
-	if (tkq_dequeue(param_q, token)){ // otestovat
+	if (pq_dequeue(token)){ // otestovat
 		return INTERNAL_ERROR;
 	}
 	for (int i = 1; token != NULL; i++){
@@ -845,7 +900,7 @@ int gen_f_prep_params(){ // parametre cez TKQueue, pridavane v spravnom poradi, 
 		if (CL_add_line(code))
 			return INTERNAL_ERROR;
 
-		if (tkq_dequeue(param_q, token)){
+		if (pq_dequeue(token)){
 			return INTERNAL_ERROR;
 		}
 

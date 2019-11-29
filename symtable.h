@@ -213,4 +213,9 @@ char *ParamGetActive(ParamList *);
 @return pokud je nalezeno vraci TRUE */
 bool ParamSearch (ParamList *, char *);
 
+/**TODO:
+funkce ktera projde celou globalni tabulku a zkontroluje vsechny funkce, 
+pokud najde nedefinovanou fci, vrati ukazatel prvni nedef. fce, jinak NULL */
+char *UndefinedFunctionControl(SymTabNodePtr);
+
 #endif

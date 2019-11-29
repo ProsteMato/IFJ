@@ -342,3 +342,15 @@ ParamList * FindParamList(SymTabNodePtr RootPtr, char * K){
 	if (GlobalSymTabSearch(RootPtr, K, &data) == false) return NULL;
 	return data->paramList;
 }
+
+char *UndefinedFunctionControl(SymTabNodePtr RootPtr){
+	if (RootPtr != NULL)
+	if (RootPtr->Data->funkce == true){ // symbol je funkce
+		if (RootPtr->Data->define == false){ // funkce nebyla definovana
+			return RootPtr->Key;
+		}
+	}
+	UndefinedFunctionControl(RootPtr->LPtr);
+	UndefinedFunctionControl(RootPtr->RPtr);
+	return NULL;
+}

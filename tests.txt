@@ -143,7 +143,7 @@ print('Vysledek je:', b, '\n')
 
 /// CHYBA 3 - NEDEFINOVANA FUNKCE / PROMENNA
 
-*** 07. pouziti neexistujici promenne ***
+*** undef_var_07 pouziti neexistujici promenne ***
 a = 4
 vysl = ( a * b )
 print('Vysledek:', vysl, '\n')
@@ -178,20 +178,20 @@ vysl = a // b
 print('Vysledek:', vysl, '\n')
 
 /// *** OSTATNI CHYBOVE TESTY - ZATIM NEZARAZENO *** ///
-
-*** 13. celocistne deleni necelych cisel 1., vraci chybu 4 ***
+/// CHYBA 4 - CHYBA DATOVE KOMPATIBILITY
+*** incomp_type_13 celocistne deleni necelych cisel 1., vraci chybu 4 ***
 a = 5
 b = 50.5
 vysl = a // b
 print('Vysledek:', vysl, '\n')
 
-*** 14. celocistne deleni necelych cisel 2., vraci chybu 4 ***
+*** incomp_type_14 celocistne deleni necelych cisel 2., vraci chybu 4 ***
 a = 5.5
 b = 50
 vysl = a // b
 print('Vysledek:', vysl, '\n')
 
-*** 15. deleni cisla str, (chyba 4?) ***
+*** incomp_type_15 deleni cisla str, (chyba 4?) ***
 a = 5.8
 b = 'ahoj'
 vysl = a / b
