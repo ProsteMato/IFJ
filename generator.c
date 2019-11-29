@@ -143,6 +143,1286 @@ char* transform_for_write(char *str){
 // -------------------
 // generovacie funkcie
 // -------------------
+// precedenceRules
+// operandList
+
+int gen_expr(){
+	int i = 0;
+	item operand = operandList.last;
+	Code *code;
+	if (!code)
+		return INTERNAL_ERROR;
+	char *tmp;
+
+	while (precedenceRules[i] != -1){ // kym neprejdem cely zoznam
+		if (precedenceRules[i] == PR_OPERAND){ // var na stack
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "PUSHS \0"))
+					return INTERNAL_ERROR;
+			if(is_global_variable(root, operandList.last->attribute)){
+				if (add_code(code, "GF@\0"))
+					return INTERNAL_ERROR;
+			} else {
+				if (add_code(code, "LF@\0"))
+					return INTERNAL_ERROR;
+			}
+			if (add_code(code, operandList.last->attribute))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+		} else if (precedenceRules[i] == PR_INT){
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "PUSHS int@\0"))
+					return INTERNAL_ERROR;
+			if (add_code(code, operandList.last->attribute))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+		} else if (precedenceRules[i] == PR_FLOAT){
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "PUSHS float@\0"))
+					return INTERNAL_ERROR;
+			tmp = float_to_str(operandList.last->attribute);
+			if (tmp == NULL)
+				return NULL;
+			if (add_code(code, tmp))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+			free(tmp);
+		} else if (precedenceRules[i] == PR_STRING){
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "PUSHS string@\0"))
+					return INTERNAL_ERROR;
+			tmp = transform_for_write(operandList.last->attribute);
+			if (tmp == NULL)
+				return NULL;
+			if (add_code(code, tmp))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+			free(tmp);
+		} else if (precedenceRules[i] == PR_EPLUSE){
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "CREATEFRAME\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "PUSHFRAME\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "DEFVAR LF@$op1$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "DEFVAR LF@$op2$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "DEFVAR LF@$type1$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "DEFVAR LF@$type2$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "POPS LF@$op1$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "POPS LF@$op2$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "TYPE LF@$type1$ LF@$op1$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "TYPE LF@$type2$ LF@$op2$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMPIFNEQ $plus_not_same_type$ LF@$type1$ LF@$type2$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMPIFEQ $plus_concat$ LF@$type1$ string@string\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			// tu uz mozu byt len dva inty/float -> jump na add
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMP $plus_add$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			// concat
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "LABEL $plus_concat$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "CONCAT ADD LF@$op1$ LF@$op1$ LF@$op2$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMP $plus_end$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "LABEL $plus_two_floats$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			// rozdielne typy
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "LABEL $plus_not_same_type$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			// rozdielne typy
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "LABEL $plus_not_same_type$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			// ak je ktorykolvek z nich neda sa vykonat operacia
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMPIFEQ $plus_fail$ LF@$type1$ string@string\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMPIFEQ $plus_fail$ LF@$type2$ string@string\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			// jeden je float a druhy int, trepa zistit ktory je int a pretypovat ho na float
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMPIFEQ $plus_int2float_op1$ LF@$type1$ string@int\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			// druhy operator je int
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "INT2FLOAT LF@$op2$ LF@$op2$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMP $plus_add$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "LABEL $plus_int2float_op1$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "INT2FLOAT LF@$op1$ LF@$op1$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMP $plus_add$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "LABEL $plus_fail$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "EXIT int@4\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "LABEL $plus_add$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "ADD LF@$op1$ LF@$op1$ LF@$op2$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "LABEL $plus_end$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "PUSHS LF@$op1$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "POPFRAME\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+		} else if (precedenceRules[i] == PR_EMINUSE){
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "CREATEFRAME\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "PUSHFRAME\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "DEFVAR LF@$op1$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "DEFVAR LF@$op2$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "DEFVAR LF@$type1$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "DEFVAR LF@$type2$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "POPS LF@$op1$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "POPS LF@$op2$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "TYPE LF@$type1$ LF@$op1$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "TYPE LF@$type2$ LF@$op2$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMPIFNEQ $minus_diff_types$ LF@$type1$ LF@$type2$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			// rovnake typy
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMPIFEQ $minus_exit_4$ LF@$type1$ string@string\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMP $minus_sub$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			// rozdielne typy
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "LABEL $minus_diff_type$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			// ak je ktorykolvek z nich string neda sa vykonat operacia
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMPIFEQ $minus_exit_4$ LF@$type1$ string@string\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMPIFEQ $minus_exit_4$ LF@$type2$ string@string\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			// jeden je float a druhy int, trepa zistit ktory je int a pretypovat ho na float
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMPIFEQ $minus_int2float_op1$ LF@$type1$ string@int\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			// druhy operator je int
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "INT2FLOAT LF@$op2$ LF@$op2$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMP $minus_sub$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "LABEL $minus_int2float_op1$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "INT2FLOAT LF@$op1$ LF@$op1$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMP $minus_sub$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "LABEL $minus_exit_4$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "EXIT int@4\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "LABEL $minus_sub$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "SUB LF@$op1$ LF@$op2$ LF@$op1$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "PUSHS LF@$op1$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "POPFRAME\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+			
+		} else if (precedenceRules[i] == PR_EMULTE){
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "CREATEFRAME\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "PUSHFRAME\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "DEFVAR LF@$op1$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "DEFVAR LF@$op2$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "DEFVAR LF@$type1$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "DEFVAR LF@$type2$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "POPS LF@$op1$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "POPS LF@$op2$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "TYPE LF@$type1$ LF@$op1$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "TYPE LF@$type2$ LF@$op2$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMPIFNEQ $times_diff_types$ LF@$type1$ LF@$type2$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			// rovnake typy
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMPIFEQ $times_exit_4$ LF@$type1$ string@string\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMP $times_mult$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			// rozdielne typy
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "LABEL $times_diff_type$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			// ak je ktorykolvek z nich string neda sa vykonat operacia
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMPIFEQ $times_exit_4$ LF@$type1$ string@string\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMPIFEQ $times_exit_4$ LF@$type2$ string@string\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			// jeden je float a druhy int, trepa zistit ktory je int a pretypovat ho na float
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMPIFEQ $times_int2float_op1$ LF@$type1$ string@int\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			// druhy operator je int
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "INT2FLOAT LF@$op2$ LF@$op2$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMP $times_mult$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "LABEL $times_int2float_op1$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "INT2FLOAT LF@$op1$ LF@$op1$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMP $times_mult$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "LABEL $times_exit_4$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "EXIT int@4\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "LABEL $times_mult$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "MUL LF@$op1$ LF@$op2$ LF@$op1$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "PUSHS LF@$op1$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "POPFRAME\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+		} else if (precedenceRules[i] == PR_EDIVE){
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "CREATEFRAME\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "PUSHFRAME\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "DEFVAR LF@$op1$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "DEFVAR LF@$op2$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "DEFVAR LF@$type1$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "DEFVAR LF@$type2$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "POPS LF@$op1$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "POPS LF@$op2$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "TYPE LF@$type1$ LF@$op1$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "TYPE LF@$type2$ LF@$op2$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMPIFEQ $div_fail$ LF@$type1$ string@string\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMPIFEQ $div_fail$ LF@$type2$ string@string\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMPIFNEQ $div_not_same$ LF@$type1$ LF@$type2$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMPIFEQ $div_div$ LF@$type1$ string@float\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "INT2FLOAT LF@$op1$ LF@$op1$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "INT2FLOAT LF@$op2$ LF@$op2$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "LABEL $div_div$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMPIFEQ $div_zero$ LF@$op1$ float@0x0p+0\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "DIV LF@$op1$ LF@$op2$ LF@$op1$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMP $div_end$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "LABEL $div_zero$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "EXIT int@9\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "LABEL $div_fail$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "EXIT int@4\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			// druhy operator je int
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "LABEL $div_not_same$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMPIFNEQ $div_int2float_op2$ LF@$type2$ string@float\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "INT2FLOAT LF@$op1$ LF@$op1$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMP $div_div$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "LABEL $div_int2float_op2$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "INT2FLOAT LF@$op2$ LF@$op2$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMP $div_div$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "LABEL $div_end$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "PUSHS LF@$op1$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "POPFRAME\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+		} else if (precedenceRules[i] == PR_EDIVDIVE){
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "CREATEFRAME\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "PUSHFRAME\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "DEFVAR LF@$op1$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "DEFVAR LF@$op2$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "DEFVAR LF@$type1$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "DEFVAR LF@$type2$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "POPS LF@$op1$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "POPS LF@$op2$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "TYPE LF@$type1$ LF@$op1$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "TYPE LF@$type2$ LF@$op2$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMPIFNEQ $idiv_fail$ LF@$type1$ LF@$type2$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			// rovnake typy
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMPIFNEQ $idiv_fail$ LF@$type1$ string@int\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMPIFNEQ $idiv_zero$ LF@$op1$ int@0\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "IDIV LF@$op1$ LF@$op2$ LF@$op1$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+				code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMP $idiv_end$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "LABEL $idiv_fail$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "EXIT int@4\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "LABEL $idiv_zero$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "EXIT int@9\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "LABEL $idiv_end$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "PUSHS LF@$op1$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "POPFRAME\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(code))
+				return INTERNAL_ERROR;
+		} else if (precedenceRules[i] == PR_ELESSE){
+			
+		} else if (precedenceRules[i] == PR_ELESSEQE){
+			
+		} else if (precedenceRules[i] == PR_EGREATE){
+			
+		} else if (precedenceRules[i] == PR_EGREATEQE){
+			
+		} else if (precedenceRules[i] == PR_EEQE){
+			
+		} else if (precedenceRules[i] == PR_ENOTEQE){
+			
+		} else if (precedenceRules[i] == PR_BIB){ // zatial nic
+			
+		} else if (precedenceRules[i] == PR_NONE){ // zatial nic
+			
+		} else if (precedenceRules[i] == PR_NOTARULE){ // zatial nic
+			
+		}
+	}
+}
+
 /* is_global
 int gen_less_than(char *op1, char *op2){
 	Code *code = create_code();
@@ -235,7 +1515,7 @@ int gen_while_begin(){
 		return INTERNAL_ERROR;
 	if (add_code(code, unq_while_n))
 		return INTERNAL_ERROR;
-	if (add_code(code, " GF@&expr&val bool@false"))
+	if (add_code(code, " GF@&expr&val bool@false\0"))
 		return INTERNAL_ERROR;
 	if (CL_add_line(code))
 		return INTERNAL_ERROR;
