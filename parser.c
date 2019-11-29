@@ -603,9 +603,8 @@ int after_return(Token *token) {
 		} else {
 			return SYNTAX_ERROR;
 		}
-	} else {
-		return returnValue;
-	}
+	} 
+	return returnValue;
 }
 
 
@@ -641,7 +640,7 @@ int value(Token *token) {
 }
 
 int expression(Token *token) {
-	while(token->type != TK_EOL && token->type != TK_COLON) {
+	while(token->type != TK_EOL && token->type != TK_COLON && token->type != TK_EOF) {
 			GET_NEXT_TOKEN(token);
 	}
 	UNGET_TOKEN(token);
