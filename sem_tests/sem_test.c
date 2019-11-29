@@ -9,7 +9,7 @@ int main(int argc, char const *argv[])
     char *build_in_without_print[] = {"inputi", "inputf", "inputs", "ord", "chr", "substr", "len"};
     int id[] = {0, 0, 0, 2, 1, 3, 1};
     root = malloc(sizeof(struct SymTabNode));
-    GlobalSymTabInit(root);
+    GlobalSymTabInit(&root);
 
     printf("Kontrola build in functions\n");
     for (int i = 0; i < 8; i++){
@@ -22,7 +22,7 @@ int main(int argc, char const *argv[])
 
     printf("Deklarácie build-in functions\n");
     for (int i = 0; i < 8; i++){
-        if(define_function(root, build_in[i])){
+        if(define_function(&root, build_in[i])){
             printf("chyba v \"%s\"\n", build_in[i]);
             return 0;
         }
@@ -31,7 +31,7 @@ int main(int argc, char const *argv[])
 
     printf("Kontrola deklarácie build-in functions\n");
     for (int i = 0; i < 8; i++){
-        if(!is_function_defined(*root, build_in[i])){
+        if(!is_function_defined(root, build_in[i])){
             printf("chyba v \"%s\"\n", build_in[i]);
             return 0;
         }
@@ -40,13 +40,13 @@ int main(int argc, char const *argv[])
     
     printf("Natavenie parametrov build in functions\n");
     for (int i = 0; i < 7; i++){
-        set_build_in_function_param_count(*root, build_in_without_print[i]);
+        set_build_in_function_param_count(root, build_in_without_print[i]);
     }
     printf("Natavenie parametrov build in functions == OK\n");
 
     printf("Kontrola parametrov build in functions\n");
     for (int i = 0; i < 7; i++){
-        if(check_function_param_count(*root, build_in_without_print[i], id[i]) != OK){
+        if(check_function_param_count(root, build_in_without_print[i], id[i]) != OK){
             printf("chyba v \"%s\"\n", build_in_without_print[i]);
             return 0;
         }
@@ -94,14 +94,14 @@ int main(int argc, char const *argv[])
         return 0;
         }
     printf("kontrola aritmetických operacii == OK\n");
-    define_global_variable(root, "var1");
-    if(!is_variable_defined(*root, NULL, NULL, "var1")) {
+    define_global_variable(&root, "var1");
+    if(!is_variable_defined(root, NULL, NULL, "var1")) {
         printf("chyba premenna ma byt definovaná\n");
         return 0;
     }
     printf("created global variable\n");
-    char *variable = expr_parser_gen_uniq_id(root, NULL);
+    char *variable = expr_parser_gen_uniq_id(&root, NULL);
     printf("%s\n", variable);
-    GlobalSymTabDispose(root);
+    GlobalSymTabDispose(&root);
     return 0;
 }
