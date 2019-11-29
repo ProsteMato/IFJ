@@ -447,9 +447,12 @@ int params_next(Token *token) {
 				return returnValue;
 			}
 			GET_NEXT_TOKEN(token);
+			count++;
 			return params_next(token);
 		}
 	} else if (token->type == TK_BRACKET_R) {
+		SetParamCount(root, token->attribute, count);
+		count = 1;
 		return OK;
 	}
 	return SYNTAX_ERROR;
