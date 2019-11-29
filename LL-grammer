@@ -29,7 +29,7 @@ LL-grammer pre IFJ19
 26:  <func-nested-stat> -> expr EOL
 27:  <func-nested-stat> -> while expr : EOL INDENT <func-nested-st-list>
 28:  <func-nested-stat> -> id <after_id>
-29:  <func-nested-stat> -> return expr EOL
+29:  <func-nested-stat> -> return <after-return>
 30:  <next-func-nested-st-list> -> DEDENT
 31:  <next-func-nested-st-list> -> <func-nested-st-list>
 32:  <nested-st-list> -> <nested-stat> <next-nested-st-list>
@@ -46,6 +46,8 @@ LL-grammer pre IFJ19
 43:  <assign> -> id <def-id>
 44:  <def-id> -> ( <arg-params> EOL
 45:  <def-id> -> EOL
+46:  <after-return> -> expr EOL
+47:  <after-return> -> EOL
 
 
 ---------------------------------------------------------------------------------------------
@@ -79,7 +81,7 @@ Pre program na tvorenie LL tabulky pre iný dovod to tu nieje
 26:   FUNC-NESTED-STAT -> expr eol
 27:   FUNC-NESTED-STAT -> while expr : eol indent FUNC-NESTED-STAT
 28:   FUNC-NESTED-STAT -> id AFTED_ID
-29:   FUNC-NESTED-STAT -> return expr eol
+29:   FUNC-NESTED-STAT -> return AFTER-RETURN
 30:   NEXT-FUNC-NESTED-ST-LIST -> dedent
 31:   NEXT-FUNC-NESTED-ST-LIST -> FUNC-NESTED-ST-LIST
 32:   NESTED-ST-LIST → NESTED-STAT NEXT-NESTED-ST-LIST
@@ -96,4 +98,6 @@ Pre program na tvorenie LL tabulky pre iný dovod to tu nieje
 43:   ASSIGN -> id DEF-ID
 44:   DEF-ID -> ( ARG-PARAMS eol
 45:   DEF-ID -> eol
+46:   AFTER-RETURN -> expr eol
+47:   AFTER-RETURN -> eol
 -----------------------------------------------------------------------------------------------
