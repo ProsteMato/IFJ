@@ -324,8 +324,8 @@ int stat(Token *token) {
 		*/
 		} else if (strcmp(token->attribute, "pass") == 0) {
 			GET_NEXT_TOKEN(token);
-			if (token->type == TK_EOL) {
-				return OK;
+			if (token->type == TK_EOL || token->type == TK_EOF) {
+				return eof_or_eol(token);
 			}
 		/*
 			29:  <func-nested-stat> -> return <after-return>
@@ -362,8 +362,8 @@ int stat(Token *token) {
 			if ((returnValue = expression(savedToken)) == OK) {
 				if(!isRelational) {
 					GET_NEXT_TOKEN(token);
-					if (token->type == TK_EOL) {
-						return OK;
+					if (token->type == TK_EOL || token->type == TK_EOF) {
+						return eof_or_eol(token);
 					}
 				} else {
 					return SYNTAX_ERROR;
@@ -393,8 +393,8 @@ int stat(Token *token) {
 		if ((returnValue = expression(token)) == OK) {
 			if(!isRelational) {
 				GET_NEXT_TOKEN(token);
-				if (token->type == TK_EOL) {
-					return OK;
+				if (token->type == TK_EOL || token->type == TK_EOF) {
+					return eof_or_eol(token);
 				}
 			} else {
 				return SYNTAX_ERROR;
@@ -513,8 +513,8 @@ int assign(Token *token) {
 		if ((returnValue = expression(token)) == OK) {
 			if(!isRelational) {
 				GET_NEXT_TOKEN(token);
-				if (token->type == TK_EOL) {
-					return OK;
+				if (token->type == TK_EOL || token->type == TK_EOF) {
+					return eof_or_eol(token);
 				}
 			} else {
 				return SYNTAX_ERROR;
@@ -539,8 +539,8 @@ int assign(Token *token) {
 			if ((returnValue = expression(savedToken)) == OK) {
 				if(!isRelational) {
 					GET_NEXT_TOKEN(token);
-					if (token->type == TK_EOL) {
-						return OK;
+					if (token->type == TK_EOL || token->type == TK_EOF) {
+						return eof_or_eol(token);
 					}
 				} else {
 					return SYNTAX_ERROR;
@@ -578,28 +578,33 @@ int def_id(Token *token) {
 		GET_NEXT_TOKEN(token);
 		if (arg_params(token) == OK) {
 			GET_NEXT_TOKEN(token);
-			if (token->type == TK_EOL) {
-				return OK;
+			if (token->type == TK_EOL || token->type == TK_EOF) {
+				return eof_or_eol(token);
 			}
 		}
-	} else if (token->type == TK_EOL) {
-		return OK;
+	} else if (token->type == TK_EOL || token->type == TK_EOF) {
+		return eof_or_eol(token);
 	} 
+	return SYNTAX_ERROR;
+}
+
+int eof_or_eol(Token *token) {
+	if (token->type == EOL || token->type == EOF) {
+		return OK;
+	}
 	return SYNTAX_ERROR;
 }
 
 int after_return(Token *token) {
 	int returnValue = 0;
-	if (token->type == TK_EOL) {
-		return OK;
+	if (token->type == TK_EOL || token->type == TK_EOF) {
+		return eof_or_eol(token);
 	}
 	//if((returnValue = callExpression(token)) == OK) {
 	else if ((returnValue = expression(token)) == OK) {
 		if (!isRelational) {
 			GET_NEXT_TOKEN(token);
-			if (token->type == TK_EOL) {
-				return OK;
-			}
+			return eof_or_eol(token);
 		} else {
 			return SYNTAX_ERROR;
 		}
