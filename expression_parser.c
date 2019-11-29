@@ -231,6 +231,18 @@ int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3
             case PR_ENOTEQE: 
                   error = comparison_check(sym1->dType, sym2->symbol, sym3->dType);
                   return error; 
+            case PR_BIB: 
+                  switch (sym2->symbol)
+                  {
+                        case (PT_INT):
+                        case (PT_FLOAT):
+                        case (PT_STRING):
+                        case (PT_ID): 
+                        case (PT_NONE):
+                              return OK; 
+                        default: 
+                              return SYNTAX_ERROR;
+                  }
             default: 
                   error = INTERNAL_ERROR;
                   return error;  
