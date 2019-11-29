@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <stdbool.h> 
 #include "symtable.h"
+#include "sematic_analysis.h"
 
 
 #define tableSize 19 
@@ -106,6 +107,8 @@ int precedenceRules[100] ;
 
 #include "expression_list.h"
 #include "expression_stack.h"
+
+exprList operandList;
 
 /**
  * @brief Function return an index in precedence table of token 
