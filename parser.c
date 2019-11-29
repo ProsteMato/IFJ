@@ -318,14 +318,14 @@ int stat(Token *token) {
 				return returnValue;
 			}
 		/*
-			7:  <stat> -> pass EOL
-			24:  <func-nested-stat> -> pass EOL
-			33:  <nested-stat> -> pass EOL
+			7:  <stat> -> pass <eof-or-eol>
+			24:  <func-nested-stat> -> pass <eof-or-eol>
+			33:  <nested-stat> -> pass <eof-or-eol>
 		*/
 		} else if (strcmp(token->attribute, "pass") == 0) {
 			GET_NEXT_TOKEN(token);
-			if (token->type == TK_EOL) {
-				return OK;
+			if (token->type == TK_EOL || token->type == TK_EOF) {
+				return eof_or_eol(token);
 			}
 		/*
 			29:  <func-nested-stat> -> return <after-return>
@@ -343,9 +343,9 @@ int stat(Token *token) {
 		5:  <stat> -> id <after_id>
 		28:  <func-nested-stat> -> id <after_id>
 		37:  <nested-stat> -> id <after_id>
-		26:  <func-nested-stat> -> expr EOL
-		35:  <nested-stat> -> expr EOL
-		6:  <stat> -> expr EOL
+		26:  <func-nested-stat> -> expr <eof-or-eol>
+		35:  <nested-stat> -> expr <eof-or-eol>
+		6:  <stat> -> expr <eof-or-eol>
 	*/
 	} else if (token->type == TK_ID) {
 		Token *savedToken = token;
@@ -362,8 +362,8 @@ int stat(Token *token) {
 			if ((returnValue = expression(savedToken)) == OK) {
 				if(!isRelational) {
 					GET_NEXT_TOKEN(token);
-					if (token->type == TK_EOL) {
-						return OK;
+					if (token->type == TK_EOL || token->type == TK_EOF) {
+						return eof_or_eol(token);
 					}
 				} else {
 					return SYNTAX_ERROR;
@@ -379,9 +379,9 @@ int stat(Token *token) {
 			return after_id(token);
 		}
 	/*
-		26:  <func-nested-stat> -> expr	EOL
-		35:  <nested-stat> -> expr EOL
-		6:  <stat> -> expr EOL
+		26:  <func-nested-stat> -> expr	<eof-or-eol>
+		35:  <nested-stat> -> expr <eof-or-eol>
+		6:  <stat> -> expr <eof-or-eol>
 	*/
 	} else if (
 		token->type == TK_FLOAT ||
@@ -393,8 +393,8 @@ int stat(Token *token) {
 		if ((returnValue = expression(token)) == OK) {
 			if(!isRelational) {
 				GET_NEXT_TOKEN(token);
-				if (token->type == TK_EOL) {
-					return OK;
+				if (token->type == TK_EOL || token->type == TK_EOF) {
+					return eof_or_eol(token);
 				}
 			} else {
 				return SYNTAX_ERROR;
@@ -497,7 +497,7 @@ int arg_next_params(Token *token) {
 }
 
 /*
-42:  <assign> -> expr EOL
+42:  <assign> -> expr <eof-or-eol>
 43:  <assign> -> id <def-id>
 */
 int assign(Token *token) {
@@ -513,8 +513,8 @@ int assign(Token *token) {
 		if ((returnValue = expression(token)) == OK) {
 			if(!isRelational) {
 				GET_NEXT_TOKEN(token);
-				if (token->type == TK_EOL) {
-					return OK;
+				if (token->type == TK_EOL || token->type == TK_EOF) {
+					return eof_or_eol(token);
 				}
 			} else {
 				return SYNTAX_ERROR;
@@ -539,8 +539,8 @@ int assign(Token *token) {
 			if ((returnValue = expression(savedToken)) == OK) {
 				if(!isRelational) {
 					GET_NEXT_TOKEN(token);
-					if (token->type == TK_EOL) {
-						return OK;
+					if (token->type == TK_EOL || token->type == TK_EOF) {
+						return eof_or_eol(token);
 					}
 				} else {
 					return SYNTAX_ERROR;
@@ -569,8 +569,8 @@ int after_id(Token *token) {
 }
 
 /*
-44:  <def-id> -> ( <arg-params> EOL
-45:  <def-id> -> EOL
+44:  <def-id> -> ( <arg-params> <eof-or-eol>
+45:  <def-id> -> <eof-or-eol>
 */
 int def_id(Token *token) {
 	//TODO pridat generovanie atd...
@@ -578,28 +578,41 @@ int def_id(Token *token) {
 		GET_NEXT_TOKEN(token);
 		if (arg_params(token) == OK) {
 			GET_NEXT_TOKEN(token);
-			if (token->type == TK_EOL) {
-				return OK;
+			if (token->type == TK_EOL || token->type == TK_EOF) {
+				return eof_or_eol(token);
 			}
 		}
-	} else if (token->type == TK_EOL) {
-		return OK;
+	} else if (token->type == TK_EOL || token->type == TK_EOF) {
+		return eof_or_eol(token);
 	} 
 	return SYNTAX_ERROR;
 }
 
+/*
+	46:  <after-return> -> expr <eof-or-eol>
+	47:  <after-return> -> <eof-or-eol>
+*/
+int eof_or_eol(Token *token) {
+	if (token->type == TK_EOL || token->type == TK_EOF) {
+		return OK;
+	}
+	return SYNTAX_ERROR;
+}
+
+/*
+	48:  <eof-or-eol> -> EOL
+	49:  <eof-or-eol> -> EOF
+*/
 int after_return(Token *token) {
 	int returnValue = 0;
-	if (token->type == TK_EOL) {
-		return OK;
+	if (token->type == TK_EOL || token->type == TK_EOF) {
+		return eof_or_eol(token);
 	}
 	//if((returnValue = callExpression(token)) == OK) {
 	else if ((returnValue = expression(token)) == OK) {
 		if (!isRelational) {
 			GET_NEXT_TOKEN(token);
-			if (token->type == TK_EOL) {
-				return OK;
-			}
+			return eof_or_eol(token);
 		} else {
 			return SYNTAX_ERROR;
 		}
