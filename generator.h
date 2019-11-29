@@ -21,6 +21,7 @@
 #define INT2STR_SIZE 12 // vsetky cisla velkosti int sa dokazu zmestit do 12 znakov
 #define FLOAT2STR_SIZE 23 // mas rozsah floatu prebehnutym %a formatom
 int while_counter;
+int if_counter;
 
 SymTabNodePtr root; // ZMAZAT, zatial len kvoli prekladu
 LocalTableNode local_table; // ZMAZAT, zatial len kvoli prekladu
@@ -77,8 +78,9 @@ int gen_ord(); //
 int gen_chr(); //
 
 // podmienky
-//int gen_if();
-//int gen_else();
+int gen_if();
+int gen_else();
+int gen_if_end();
 
 // operacie mat
 int gen_expr();
@@ -92,20 +94,13 @@ int gen_stack_less();
 int gen_stack_lesseq();
 int gen_stack_greater();
 int gen_stack_greatereq();
-//int gen_add();
-//int gen_minus();
-//int gen_mult();
-//int gen_div();
-//int gen_idiv();
-//int gen_concat();
-
-// operacie relacne
-//int gen_less_than(char *op1, char *op2); //is_variable_defined
-//int gen_more_than(char *op1, char *op2);
-//int gen_equal(char *op1, char *op2);
-//int gen_equal_less(char *op1, char *op2);
-//int gen_equal_more(char *op1, char *op2);
-//int gen_not_equal(char *op1, char *op2);
+int assign_expr_rest(char *dest);
+int gen_add(char *op1, char *op2);
+int gen_minus(char *op1, char *op2);
+int gen_mult(char *op1, char *op2);
+int gen_div(char *op1, char *op2);
+int gen_idiv(char *op1, char *op2);
+int gen_concat(char *op1, char *op2);
 
 // while
 int gen_while_label(); //
