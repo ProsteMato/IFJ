@@ -16,9 +16,6 @@ clean:
 main.o: main.c main.h
 	${CC} ${CFLAGS} -c $< -o $@
 
-main.o: main.c main.h
-	${CC} ${CFLAGS} -c $< -o $@
-
 scanner.o: scanner.c scanner.h
 	${CC} ${CFLAGS} -c $< -o $@
 
