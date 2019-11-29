@@ -4680,7 +4680,7 @@ int gen_idiv(char *op1, char *op2){
 	// op2
 	if (add_code(code, " "))
 		return INTERNAL_ERROR;
-	if (is_variable_defined(root, local_table, param_list op2)){ // premenna 
+	if (is_variable_defined(root, local_table, param_list, op2)){ // premenna 
 		if (is_global_variable(root, op2)){ // globalna
 			if (add_code(code, "GF@\0"))
 				return INTERNAL_ERROR;
