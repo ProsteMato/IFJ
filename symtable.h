@@ -183,12 +183,15 @@ void LocalSetDefine(LocalTableNode, char *);
 void LocalSetType(LocalTableNode, char *, Data_type);
 
 /** nastavi typ globalni premmennej
-@param SymTabNodePtr - tabulka symbolu
+@param LocalTableNode - tabulka symbolu
 @param char - ukazatel na klic
 @param Data_type - datovy typ */
 void GlobalSetType(SymTabNodePtr, char *, Data_type);
 
-//vrati localnu tabulku symbolov z funkcie
+/** nastavi pocet paramentru
+@param SymTabNodePtr - tabulka symbolu
+@param char - ukazatel na klic
+@return pokud klic neni nalezen vraci NULL, jinak vraci lokalni tabulku symbolu */
 LocalTableNode FindLocalTable(SymTabNodePtr, char *);
 
 //vrati param list z funkcie
