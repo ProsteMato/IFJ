@@ -82,6 +82,16 @@ int gen_chr(); //
 
 // operacie mat
 int gen_expr();
+int gen_stack_plus();
+int gen_stack_mult();
+int gen_stack_div();
+int gen_stack_idiv();
+int gen_stack_equal();
+int gen_stack_notequal();
+int gen_stack_less();
+int gen_stack_lesseq();
+int gen_stack_greater();
+int gen_stack_greatereq();
 //int gen_add();
 //int gen_minus();
 //int gen_mult();
