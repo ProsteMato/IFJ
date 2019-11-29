@@ -259,8 +259,8 @@ int stat(Token *token) {
 			GET_NEXT_TOKEN(token);
 			//TODO priprava na generovanie...ziskat lables for if and else
 			//TODO urobit samotne generovanie...
-			//if ((returnValue = callExpression(token)) == OK) {
-			if ((returnValue = expression(token)) == OK) {
+			if ((returnValue = callExpression(token)) == OK) {
+			//if ((returnValue = expression(token)) == OK) {
 				GET_NEXT_TOKEN(token);
 				if (token->type == TK_COLON) {
 					GET_NEXT_TOKEN(token);

@@ -1,3 +1,8 @@
 def id(a, b, c):
     pass
 id(5, 7, 9)
+
+if 4 < 5 :
+    pass
+else :
+    pass

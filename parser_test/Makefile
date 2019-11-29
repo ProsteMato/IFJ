@@ -4,10 +4,19 @@ OBJ_SCANNER = scanner.o
 
 all: test-parser
 
-test-parser: parserTest.c parser.o scanner.o stack.o my_string.o generator.o symtable.o sematic_analysis.o
+test-parser: parserTest.c parser.o scanner.o stack.o my_string.o generator.o symtable.o sematic_analysis.o expretion_stack.o expretion_parser.o expretion_list.o
 	${CC} ${CFLAGS} $^ -o ./bin/$@ -g
 
 stack.o: ../stack.c ../stack.h
+	${CC} -c ${CFLAGS} $< -o $@
+
+expretion_parser.o: ../expression_parser.c ../expression_parser.h
+	${CC} -c ${CFLAGS} $< -o $@
+
+expretion_list.o: ../expression_list.c ../expression_list.h
+	${CC} -c ${CFLAGS} $< -o $@
+
+expretion_stack.o: ../expression_stack.c ../expression_stack.h
 	${CC} -c ${CFLAGS} $< -o $@
 
 generator.o: ../generator.c ../generator.h
