@@ -16,12 +16,12 @@
 #include <stdlib.h>
 #include <stdbool.h> 
 #include "symtable.h"
-//#include "sematic_analysis.h"
+#include "sematic_analysis.h"
+#include "generator.h"
 
 
 #define tableSize 19 
 bool isRelational;  //is operator relational? <, <=, >, >=, ==, != 
-Data_type finalType; // final type of expression 
 
 typedef enum {
   PT_PLUS,  // 0
@@ -131,7 +131,7 @@ int getIndex(Token *token) ;
  *         TYPE_STRING if it was string 
  *         TYPE_NONE if it wasn't defined or called function when it shouldnt 
  */
-Data_type getDataType(Token *token);
+//ata_type getDataType(Token *token);
 
 /**
  * @brief Function checks data type of operands
@@ -184,6 +184,22 @@ pRules findRule(int num, exprStack* sym1, exprStack* sym2, exprStack* sym3);
  * @return Numbers of symbol to reduce on stack (1 or 3)
  */
 int symbolsToReduce();
+
+/** 
+ * @brief Functin returs final type of operation
+ * 
+ * @param rule rule used for reduction 
+ * @param sym1 symbol on stack
+ * @param sym2 operation on stack
+ * @param sym3 symbol on stack 
+ * 
+ * @return TYPE_INT if final type of operation is INT
+ *          TYPE_FLOAT if final type of operation is FLOAT
+ *          TYPE_STRING if final type of operation is STRING
+ *          TYPE_BOOL if relational operation
+ *          TYPE_UNDEFINED if some error
+ */
+Data_Type getFinalType(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3);
 
 /**
  * @brief Function that covers expression parser 
