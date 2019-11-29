@@ -20,7 +20,7 @@ void listInitialize(exprList *eList)
     eList->last = NULL;
 }
 
-int listInsertFirst(exprList *eList, pTable symbol, Data_type dType)
+int listInsertFirst(exprList *eList, char *attribute, pTable symbol, Data_type dType)
 {
     item newItem = (struct listItem*) malloc (sizeof(struct listItem));
     if (newItem == NULL)
@@ -32,6 +32,7 @@ int listInsertFirst(exprList *eList, pTable symbol, Data_type dType)
     newItem->lptr= NULL;
     newItem->rptr = NULL;
     newItem->symbol = symbol;
+    newItem->attribute = attribute;
     newItem->dType = dType;
 
     if (eList->first != NULL)
@@ -44,7 +45,7 @@ int listInsertFirst(exprList *eList, pTable symbol, Data_type dType)
     return OK;
 }
 
-int listInsertAct(exprList *eList, pTable symbol, Data_type dType)
+int listInsertAct(exprList *eList, char *attribute, pTable symbol, Data_type dType)
 {
     if (eList->act == NULL)
     {
@@ -60,6 +61,7 @@ int listInsertAct(exprList *eList, pTable symbol, Data_type dType)
 
     newItem->symbol = symbol;
     newItem->dType = dType;
+    newItem->attribute = attribute;
     newItem->lptr = eList->act;
     newItem->rptr= NULL;
     eList->act->rptr = newItem;

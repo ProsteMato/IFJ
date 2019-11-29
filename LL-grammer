@@ -6,8 +6,8 @@ LL-grammer pre IFJ19
  3:  <st-list> -> EOF
  4:  <stat> -> def id ( <params> : EOL INDENT <func-nested-st-list>
  5:  <stat> -> id <after_id>
- 6:  <stat> -> expr EOL
- 7:  <stat> -> pass EOL
+ 6:  <stat> -> expr <eof-or-eol>
+ 7:  <stat> -> pass <eof-or-eol>
  8:  <stat> -> while expr : EOL INDENT <nested-st-list>
  9:  <stat> -> if expr : EOL INDENT <nested-st-list> else : EOL INDENT <nested-st-list>
 10:  <params> -> )
@@ -24,30 +24,32 @@ LL-grammer pre IFJ19
 21:  <value> -> int
 22:  <value> -> id
 23:  <func-nested-st-list> -> <func-nested-stat> <next-func-nested-st-list>
-24:  <func-nested-stat> -> pass EOL
+24:  <func-nested-stat> -> pass <eof-or-eol>
 25:  <func-nested-stat> -> if expr : EOL INDENT <func-nested-st-list> else : EOL INDENT <func-nested-st-list>
-26:  <func-nested-stat> -> expr EOL
+26:  <func-nested-stat> -> expr <eof-or-eol>
 27:  <func-nested-stat> -> while expr : EOL INDENT <func-nested-st-list>
 28:  <func-nested-stat> -> id <after_id>
 29:  <func-nested-stat> -> return <after-return>
 30:  <next-func-nested-st-list> -> DEDENT
 31:  <next-func-nested-st-list> -> <func-nested-st-list>
 32:  <nested-st-list> -> <nested-stat> <next-nested-st-list>
-33:  <nested-stat> -> pass EOL
+33:  <nested-stat> -> pass <eof-or-eol>
 34:  <nested-stat> -> if expr : EOL INDENT <nested-st-list> else : EOL INDENT <nested-st-list>
-35:  <nested-stat> -> expr EOL
+35:  <nested-stat> -> expr <eof-or-eol>
 36:  <nested-stat> -> while expr : EOL INDENT <nested-st-list>
 37:  <nested-stat> -> id <after_id>
 38:  <next-nested-st-list> -> DEDENT
 39:  <next-nested-st-list> -> <nested-st-list>
 40:  <after_id> -> = <assign>
 41:  <after_id> -> <def-id>
-42:  <assign> -> expr EOL
+42:  <assign> -> expr <eof-or-eol>
 43:  <assign> -> id <def-id>
-44:  <def-id> -> ( <arg-params> EOL
-45:  <def-id> -> EOL
-46:  <after-return> -> expr EOL
-47:  <after-return> -> EOL
+44:  <def-id> -> ( <arg-params> <eof-or-eol>
+45:  <def-id> -> <eof-or-eol>
+46:  <after-return> -> expr <eof-or-eol>
+47:  <after-return> -> <eof-or-eol>
+48:  <eof-or-eol> -> EOL
+49:  <eof-or-eol> -> EOF
 
 
 ---------------------------------------------------------------------------------------------
@@ -58,8 +60,8 @@ Pre program na tvorenie LL tabulky pre iný dovod to tu nieje
  3:   ST-LIST -> eof
  4:   STAT → def id ( PARAMS : eol indent NESTED-ST-LIST
  5:   STAT → id AFTED_ID
- 6:   STAT → expr eol
- 7:   STAT → pass eol
+ 6:   STAT → expr EOF-OR-EOL
+ 7:   STAT → pass EOF-OR-EOL
  8:   STAT → while expr : eol indent NESTED-ST-LIST
  9:   STAT → if expr : eol indent NESTED-ST-LIST else : eol indent NESTED-ST-LIST
 10:   PARAMS → )
@@ -76,28 +78,30 @@ Pre program na tvorenie LL tabulky pre iný dovod to tu nieje
 21:   VALUE → int
 22:   VALUE → id
 23:   FUNC-NESTED-ST-LIST -> FUNC-NESTED-STAT NEXT-FUNC-NESTED-ST-LIST
-24:   FUNC-NESTED-STAT -> pass eol
+24:   FUNC-NESTED-STAT -> pass EOF-OR-EOL
 25:   FUNC-NESTED-STAT -> if expr : eol indent FUNC-NESTED-STAT else : eol indent FUNC-NESTED-STAT
-26:   FUNC-NESTED-STAT -> expr eol
+26:   FUNC-NESTED-STAT -> expr EOF-OR-EOL
 27:   FUNC-NESTED-STAT -> while expr : eol indent FUNC-NESTED-STAT
 28:   FUNC-NESTED-STAT -> id AFTED_ID
 29:   FUNC-NESTED-STAT -> return AFTER-RETURN
 30:   NEXT-FUNC-NESTED-ST-LIST -> dedent
 31:   NEXT-FUNC-NESTED-ST-LIST -> FUNC-NESTED-ST-LIST
 32:   NESTED-ST-LIST → NESTED-STAT NEXT-NESTED-ST-LIST
-33:   NESTED-STAT → pass eol
+33:   NESTED-STAT → pass EOF-OR-EOL
 34:   NESTED-STAT → if expr : eol indent NESTED-ST-LIST else : eol indent NESTED-ST-LIST
-35:   NESTED-STAT → expr eol
+35:   NESTED-STAT → expr EOF-OR-EOL
 36:   NESTED-STAT → while expr : eol indent NESTED-ST-LIST
 37:   NESTED-STAT → id AFTED_ID
 38:   NEXT-NESTED-ST-LIST -> dedent
 39:   NEXT-NESTED-ST-LIST -> NESTED-ST-LIST
 40:   AFTED_ID -> = ASSIGN
 41:   AFTED_ID -> DEF-ID
-42:   ASSIGN → expr eol
+42:   ASSIGN → expr EOF-OR-EOL
 43:   ASSIGN -> id DEF-ID
-44:   DEF-ID -> ( ARG-PARAMS eol
+44:   DEF-ID -> ( ARG-PARAMS EOF-OR-EOL
 45:   DEF-ID -> eol
-46:   AFTER-RETURN -> expr eol
-47:   AFTER-RETURN -> eol
+46:   AFTER-RETURN -> expr EOF-OR-EOL
+47:   AFTER-RETURN -> EOF-OR-EOL
+48:   EOF-OR-EOL -> eol
+49:   EOF-OR-EOL -> eof
 -----------------------------------------------------------------------------------------------
