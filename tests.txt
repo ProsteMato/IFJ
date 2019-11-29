@@ -176,8 +176,8 @@ b = 0
 vysl = a // b
 print('Vysledek:', vysl, '\n')
 
-/// *** OSTATNI CHYBOVE TESTY - ZATIM NEZARAZENO *** ///
 /// CHYBA 4 - CHYBA DATOVE KOMPATIBILITY
+
 *** incomp_type_13 celocistne deleni necelych cisel 1., vraci chybu 4 ***
 a = 5
 b = 50.5
@@ -196,14 +196,16 @@ b = 'ahoj'
 vysl = a / b
 print('Vysledek:', vysl, '\n')
 
-*** 16. chyby prava zavorka (chyba 2?) ***
+/// *** OSTATNI CHYBOVE TESTY - ZATIM NEZARAZENO *** ///
+
+*** syntax_err_16 chyby prava zavorka (chyba 2?) ***
 a = 4
 b = 3
 c = 5
 vysl = (( a * b ) / c
 print('Vysledek:', vysl, '\n')
 
-*** 17. leva zavorka navic (chyba 2?) ***
+*** syntax_err_17 leva zavorka navic (chyba 2?) ***
 a = 4
 b = 3
 c = 5
