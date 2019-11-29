@@ -1,0 +1,4 @@
+if 'abc' < None : 
+    pass
+else :
+    pass
