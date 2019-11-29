@@ -11,6 +11,7 @@
 //TODO prepísať pravidla a upraviť ich tak aby fungovali s EOL..
 
 #include "parser.h"
+#include "main.h"
 
 #define UNGET_TOKEN(token) \
 		int token_return_value = 0; \
@@ -31,6 +32,7 @@ bool in_function = false;
 bool in_if_while = false;
 bool if_in_else = false;
 int depth = 0;
+Token *savedToken = NULL;
 
 int prog(Token *token) {
 
@@ -194,16 +196,12 @@ int next_st_list(Token *token) {
 			if (in_function && in_if_while && depth == 1) {
 				in_if_while = false;
 			} else if (in_function && !in_if_while && depth == 0) {
+				param_list = NULL;
+				local_table = NULL;
 				in_function = false;
 			} else if (!in_function && in_if_while && depth == 0) {
 				in_if_while = false;
 			}
-			return OK;
-		} else if (in_function && !in_if_while && depth == 0) {
-			/* TODO bude treba opravit este pre dogenerovanie funkcie následne
-			bude treba pridat asi lepšie kontrolu na dedent pre funckiu.
-			*/
-			printf("všetko spravne skončilo\n");
 			return OK;
 		}
 	} else {
@@ -222,10 +220,12 @@ int stat(Token *token) {
 		if (strcmp(token->attribute, "def") == 0 && !in_function && !in_if_while) {
 			GET_NEXT_TOKEN(token);
 			if (token->type == TK_ID) {
-				returnValue = define_function(root, token->attribute);
+				returnValue = define_function(&root, token->attribute);
 				if(returnValue != OK) {
 					return returnValue;
 				}
+				local_table = FindLocalTable(root, token->attribute);
+				param_list = FindParamList(root, token->attribute);
 				GET_NEXT_TOKEN(token);
 				if (token->type == TK_BRACKET_L) {
 					returnValue = params(token);
@@ -352,7 +352,7 @@ int stat(Token *token) {
 		6:  <stat> -> expr <eof-or-eol>
 	*/
 	} else if (token->type == TK_ID) {
-		Token *savedToken = token;
+		savedToken = token;
 		GET_NEXT_TOKEN(token);
 		if (
 			token->type == TK_MINUS ||
@@ -422,6 +422,10 @@ int params(Token *token) {
 		return OK;
 	} else if (token->type == TK_ID) {
 		GET_NEXT_TOKEN(token);
+		int returnValue = ParamInsert(param_list, token->attribute);
+		if (returnValue != OK) {
+			return returnValue;
+		}
 		return params_next(token);
 	} else {
 		return SYNTAX_ERROR;
@@ -434,9 +438,14 @@ int params(Token *token) {
 */
 int params_next(Token *token) {
 	//TODO pridat generovanie atd..
+	static int count = 1;
 	if (token->type == TK_COMMA) {
 		GET_NEXT_TOKEN(token);
 		if (token->type == TK_ID) {
+			int returnValue = ParamInsert(param_list, token->attribute);
+			if (returnValue != OK) {
+				return returnValue;
+			}
 			GET_NEXT_TOKEN(token);
 			return params_next(token);
 		}
@@ -528,7 +537,7 @@ int assign(Token *token) {
 			return returnValue;
 		}
 	} else if (token->type == TK_ID) {
-		Token *savedToken = token;
+		savedToken = token;
 		GET_NEXT_TOKEN(token);
 		if (savedToken->type == TK_BRACKET_L || savedToken->type == TK_EOL || savedToken->type == TK_EOF) {
 			return def_id(token);
@@ -580,6 +589,12 @@ int after_id(Token *token) {
 int def_id(Token *token) {
 	//TODO pridat generovanie atd...
 	if (token->type == TK_BRACKET_L) {
+		if(!is_function_defined(root, savedToken->attribute)) {
+			int returnValue = define_function(&root, savedToken->attribute);
+			if (returnValue != OK) {
+				return returnValue;
+			}
+		}
 		GET_NEXT_TOKEN(token);
 		if (arg_params(token) == OK) {
 			GET_NEXT_TOKEN(token);
@@ -588,6 +603,9 @@ int def_id(Token *token) {
 			}
 		}
 	} else if (token->type == TK_EOL || token->type == TK_EOF) {
+		if(!is_variable_defined(root, local_table, param_list, savedToken->attribute)) {
+			return SEM_FUNCTION_ERROR;
+		}
 		return eof_or_eol(token);
 	} 
 	return SYNTAX_ERROR;
