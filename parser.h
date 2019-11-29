@@ -135,6 +135,14 @@ int after_id(Token *token);
 int def_id(Token *token);
 
 /**
+ * @brief       This is checking if token is EOL or EXPR
+ * 
+ * @param       token   Token from scanner
+ * @return      Error code
+ */
+int after_return(Token *token);
+
+/**
  * @brief       Can be called only in function or if or while it is checking if next token is
  *              DEDENT or something else.
  * 
