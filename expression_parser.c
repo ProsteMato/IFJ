@@ -450,6 +450,7 @@ int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3
 
       return OK;
 }
+
 /**
 int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3  )
 {
@@ -457,40 +458,22 @@ int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3
       switch (rule)
       {
             case PR_EPLUSE:
-                  error = arithmetic_operation_check(sym1->dType, PR_EPLUSE, sym3->dType);
-                  return error;
             case PR_EMINUSE:
-                  error = arithmetic_operation_check(sym1->dType, PR_EMINUSE, sym3->dType);
-                  return error;
             case PR_EMULTE: 
-                  error = arithmetic_operation_check(sym1->dType, PR_EMULTE, sym3->dType);
-                  return error;
             case PR_EDIVE: 
-                  error = arithmetic_operation_check(sym1->dType, PR_EDIVE, sym3->dType);
-                  return error;
             case PR_EDIVDIVE: 
-                  error = arithmetic_operation_check(sym1->dType, PR_EDIVDIVE, sym3->dType);
+                  error = arithmetic_operation_check(sym1->dType, sym2->symbol, sym3->dType);
                   return error;
             case PR_ELESSE: 
-                  error = comparison_check(sym1->dType, PR_ELESSE, sym3->dType);
-                  return error; 
             case PR_ELESSEQE: 
-                  error = comparison_check(sym1->dType, PR_ELESSEQE, sym3->dType);
-                  return error; 
             case PR_EGREATE: 
-                  error = comparison_check(sym1->dType, PR_EGREATE, sym3->dType);
-                  return error; 
             case PR_EGREATEQE: 
-                  error = comparison_check(sym1->dType, PR_EGREATEQE, sym3->dType);
-                  return error; 
             case PR_EEQE: 
-                  error = comparison_check(sym1->dType, PR_EEQE, sym3->dType);
-                  return error; 
             case PR_ENOTEQE: 
-                  error = comparison_check(sym1->dType, PR_ENOTEQE, sym3->dType);
+                  error = comparison_check(sym1->dType, sym2->symbol, sym3->dType);
                   return error; 
             default: 
-                  error = -1;
+                  error = INTERNAL_ERROR;
                   return error;  
       }
 }
@@ -672,6 +655,8 @@ pRules findRule(int num, exprStack* sym1, exprStack* sym2, exprStack* sym3)
                               return PR_BIB;
                         case (PT_STRING):
                               return PR_BIB;
+                        case (PT_E):
+                              return PR_BIB;
                         default: 
                               return PR_NOTARULE;
                   }
@@ -738,15 +723,6 @@ int symbolsToReduce()
             top= top->next; 
             num += 1;  
       } 
-      if (num == 2) num++;
-      /**
-     while (top != NULL)
-     {
-           if (top->symbol != PT_SHIFT)
-           {
-                 num++;
-           }
-     } */
       return num; 
 }
 
@@ -878,10 +854,6 @@ int callExpression(Token *token)
   {
         precedenceRules[j] = -1;
   }
-  //exprStack* sym1 = NULL;
-  //exprStack* sym2 = NULL;
-  //exprStack* sym3 = NULL;
-  
   eList.act=eList.first;
   sPush(&stack, PT_DOLLAR, TYPE_UNDEFINED);
   do 
@@ -916,14 +888,6 @@ int callExpression(Token *token)
                         sPush(&stack, indexInput, TYPE_UNDEFINED);
 
                   }
-                  /**
-                  else 
-                  {
-                        sPop(&stack);
-                        sPush(&stack, PT_SHIFT, TYPE_UNDEFINED);
-                        sPush(&stack, PT_E, TYPE_UNDEFINED);
-                        sPush(&stack, indexInput, eList.act->dType);
-                  } */
                   eList.act=eList.act->rptr;
                   break;
             case ('>'):
@@ -968,7 +932,6 @@ int callExpression(Token *token)
                               sPush(&stack, PT_E, TYPE_UNDEFINED);
                         }
                   }
-                  printf("Rule is: %d \n", rule);
                   precedenceRules[i]=rule;
                   i++;
                   break;
@@ -979,7 +942,7 @@ int callExpression(Token *token)
             }
       } while ( stack.top->symbol != PT_DOLLAR || eList.act->symbol != PT_DOLLAR);
 
- //listDispose(&eList);
+ listDispose(&eList);
  //disposeStack(&stack);
  return OK;
 }
