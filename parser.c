@@ -178,7 +178,6 @@ int st_list(Token *token) {
 			return SEM_FUNCTION_ERROR;
 		}
 		pq_destroy();
-		printf("všetko skončilo spravne!\n");
 		return OK;
 	} else if (token->type == TK_STRING || 
 			   token->type == TK_FLOAT || token->type == TK_INT || 
@@ -228,13 +227,12 @@ int stat(Token *token) {
 		if (strcmp(token->attribute, "def") == 0 && !in_function && !in_if_while) {
 			GET_NEXT_TOKEN(token);
 			if (token->type == TK_ID) {
-				if(!is_function_defined(root, token->attribute)){
+				if((is_function_created(root, token->attribute) && is_function_defined(root, token->attribute)) ||
+				   (!is_function_created(root, token->attribute) && !is_function_defined(root, token->attribute))){
 					returnValue = define_function(&root, token->attribute);
 					if(returnValue != OK) {
 						return returnValue;
 					}
-				} else {
-					SetDefine(root, token->attribute);
 				}
 				saved_id = token->attribute;
 				local_table = FindLocalTable(root, token->attribute);
@@ -368,13 +366,13 @@ int stat(Token *token) {
 	*/
 	} else if (token->type == TK_ID) {
 		saved_id = token->attribute;
-		PRELOAD_TOKEN(&savedToken);
+		PRELOAD_TOKEN(token);
 		if (
-			savedToken.type == TK_MINUS ||
-			savedToken.type == TK_PLUS ||
-			savedToken.type == TK_MULT ||
-			savedToken.type == TK_DIV ||
-			savedToken.type == TK_DIV_DIV
+			token->type == TK_MINUS ||
+			token->type == TK_PLUS ||
+			token->type == TK_MULT ||
+			token->type == TK_DIV ||
+			token->type == TK_DIV_DIV
 			) {
 			
 			if((returnValue = callExpression(token)) == OK) {
@@ -391,10 +389,10 @@ int stat(Token *token) {
 				return returnValue;
 			}
 		} else if (
-				savedToken.type == TK_EOL ||
-				savedToken.type == TK_EOF ||
-				savedToken.type == TK_BRACKET_L ||
-				savedToken.type == TK_ASSIGN
+				token->type == TK_EOL ||
+				token->type == TK_EOF ||
+				token->type == TK_BRACKET_L ||
+				token->type == TK_ASSIGN
 			) {
 			GET_NEXT_TOKEN(token);
 			return after_id(token);
@@ -567,6 +565,7 @@ int assign(Token *token) {
 		token->type == TK_STRING ||
 		(token->type == TK_KW && strcmp(token->attribute, "None") == 0)
 		){
+		GET_NEXT_TOKEN(token);
 		if((returnValue = callExpression(token)) == OK) {
 		//if ((returnValue = expression(token)) == OK) {
 			if(!isRelational) {
@@ -597,19 +596,20 @@ int assign(Token *token) {
 		}
 	} else if (token->type == TK_ID) {
 		saved_id = token->attribute;
-		PRELOAD_TOKEN(&savedToken);
+		PRELOAD_TOKEN(token);
 		if (token->type == TK_BRACKET_L) {
 			GET_NEXT_TOKEN(token);
 			return def_id(token);
 		} else if (
-			savedToken.type == TK_PLUS ||
-			savedToken.type == TK_MINUS ||
-			savedToken.type == TK_MULT ||
-			savedToken.type == TK_DIV ||
-			savedToken.type == TK_DIV_DIV ||
-			savedToken.type == TK_EOL ||
-			savedToken.type == TK_EOF
+			token->type == TK_PLUS ||
+			token->type == TK_MINUS ||
+			token->type == TK_MULT ||
+			token->type == TK_DIV ||
+			token->type == TK_DIV_DIV ||
+			token->type == TK_EOL ||
+			token->type == TK_EOF
 		) {
+			GET_NEXT_TOKEN(token);
 			if((returnValue = callExpression(token)) == OK) {
 			//if ((returnValue = expression(savedToken)) == OK) {
 				if(!isRelational) {
@@ -650,7 +650,7 @@ int assign(Token *token) {
 int after_id(Token *token) {
 	// TODO pridat generovanie atd..
 	if(token->type == TK_ASSIGN) {
-		GET_NEXT_TOKEN(token);
+		PRELOAD_TOKEN(token);
 		copy_id = saved_id;
 		return assign(token);
 	} else if (token->type == TK_EOL || token->type == TK_EOF || token->type == TK_BRACKET_L) {

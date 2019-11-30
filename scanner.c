@@ -55,7 +55,8 @@ int tkq_queue(Token *token, int ret_val){
 		// internal ERROR
 		return INTERNAL_ERROR;
 	}
-	qtk->token = token;
+	qtk->token.attribute = token->attribute;
+	qtk->token.type = token->type;
 	qtk->ret_val = ret_val;
 	qtk->behind = NULL;
 	// no token in queue
@@ -70,7 +71,8 @@ int tkq_queue(Token *token, int ret_val){
 }
 
 int tkq_dequeue(Token* token){
-	token = q.first->token;
+	token->attribute = q.first->token.attribute;
+	token->type = q.first->token.type;
 	int ret_val = q.first->ret_val;
 	QToken *tmp = q.first;
 	// jeden element v queue
@@ -85,7 +87,8 @@ int tkq_dequeue(Token* token){
 }
 
 int tkq_first(Token *token){
-	token = q.first->token;
+	token->attribute = q.first->token.attribute;
+	token->type = q.first->token.type;
 	return q.first->ret_val;
 }
 
@@ -119,17 +122,13 @@ int preload_token(Token *token){
 		return INTERNAL_ERROR;
 	}
 	// queue je prazdna
-	if (q.first == NULL){
-		int ret_val = scan(token);
-		if (tkq_queue(token, ret_val) == INTERNAL_ERROR){
-			return INTERNAL_ERROR;
-		} else {
-			return ret_val;
-		}
-	// queue nie je prazdna
+	int ret_val = scan(token);
+	if (tkq_queue(token, ret_val) == INTERNAL_ERROR){
+		return INTERNAL_ERROR;
 	} else {
-		return tkq_first(token);
+		return ret_val;
 	}
+	// queue nie je prazdna
 }
 
 int get_next_token(Token *token){

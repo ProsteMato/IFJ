@@ -433,6 +433,11 @@ int callExpression(Token *token)
       }
       
   }
+  int err_unget= unget_token(token);
+  if (err_unget != OK)
+  {
+        return err_unget;
+  }
 
   if ( leftBracket != rightBracket) 
   {
@@ -581,11 +586,6 @@ int callExpression(Token *token)
 
             }
       } while ( stack.top->symbol != PT_DOLLAR || eList.act->symbol != PT_DOLLAR);
-  int errUnget= unget_token(token);
-  if (errUnget != OK)
-  {
-        return e;
-  }
   //gen_expr();
  listDispose(&eList);
  //disposeStack(&stack);

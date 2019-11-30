@@ -1,8 +1,12 @@
 a = 5 + 5
 
+a = a + a
+
 def b(a):
     pass
 
-b = a + a
+c = a
 
-b(a)
+b(c)
+
+

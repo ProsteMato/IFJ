@@ -65,7 +65,7 @@ typedef struct QToken QToken;
  * @brief      Structure representing element in token queue
  */
 struct QToken{
-	Token *token;
+	Token token;
 	int ret_val;
 	QToken *behind;
 };
