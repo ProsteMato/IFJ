@@ -32,7 +32,7 @@ bool in_function = false;
 bool in_if_while = false;
 bool if_in_else = false;
 int depth = 0;
-Token *savedToken = NULL;
+Token savedToken;
 char *saved_id = NULL;
 char *copy_id = NULL;
 
@@ -236,7 +236,6 @@ int stat(Token *token) {
 				} else {
 					SetDefine(root, token->attribute);
 				}
-				savedToken = token;
 				saved_id = token->attribute;
 				local_table = FindLocalTable(root, token->attribute);
 				param_list = FindParamList(root, token->attribute);
@@ -368,17 +367,16 @@ int stat(Token *token) {
 		6:  <stat> -> expr <eof-or-eol>
 	*/
 	} else if (token->type == TK_ID) {
-		savedToken = token;
 		saved_id = token->attribute;
-		GET_NEXT_TOKEN(token);
+		PRELOAD_TOKEN(&savedToken);
 		if (
-			token->type == TK_MINUS ||
-			token->type == TK_PLUS ||
-			token->type == TK_MULT ||
-			token->type == TK_DIV ||
-			token->type == TK_DIV_DIV
+			savedToken.type == TK_MINUS ||
+			savedToken.type == TK_PLUS ||
+			savedToken.type == TK_MULT ||
+			savedToken.type == TK_DIV ||
+			savedToken.type == TK_DIV_DIV
 			) {
-			UNGET_TOKEN(token);
+			
 			if((returnValue = callExpression(token)) == OK) {
 			//if ((returnValue = expression(savedToken)) == OK) {
 				if(!isRelational) {
@@ -393,11 +391,12 @@ int stat(Token *token) {
 				return returnValue;
 			}
 		} else if (
-				token->type == TK_EOL ||
-				token->type == TK_EOF ||
-				token->type == TK_BRACKET_L ||
-				token->type == TK_ASSIGN
+				savedToken.type == TK_EOL ||
+				savedToken.type == TK_EOF ||
+				savedToken.type == TK_BRACKET_L ||
+				savedToken.type == TK_ASSIGN
 			) {
+			GET_NEXT_TOKEN(token);
 			return after_id(token);
 		}
 	/*
@@ -597,21 +596,20 @@ int assign(Token *token) {
 			return returnValue;
 		}
 	} else if (token->type == TK_ID) {
-		savedToken = token;
 		saved_id = token->attribute;
-		GET_NEXT_TOKEN(token);
+		PRELOAD_TOKEN(&savedToken);
 		if (token->type == TK_BRACKET_L) {
+			GET_NEXT_TOKEN(token);
 			return def_id(token);
 		} else if (
-			token->type == TK_PLUS ||
-			token->type == TK_MINUS ||
-			token->type == TK_MULT ||
-			token->type == TK_DIV ||
-			token->type == TK_DIV_DIV ||
-			token->type == TK_EOL ||
-			token->type == TK_EOF
+			savedToken.type == TK_PLUS ||
+			savedToken.type == TK_MINUS ||
+			savedToken.type == TK_MULT ||
+			savedToken.type == TK_DIV ||
+			savedToken.type == TK_DIV_DIV ||
+			savedToken.type == TK_EOL ||
+			savedToken.type == TK_EOF
 		) {
-			UNGET_TOKEN(token);
 			if((returnValue = callExpression(token)) == OK) {
 			//if ((returnValue = expression(savedToken)) == OK) {
 				if(!isRelational) {
@@ -721,7 +719,6 @@ int def_id(Token *token) {
 */
 int eof_or_eol(Token *token) {
 	if (token->type == TK_EOL || token->type == TK_EOF) {
-		savedToken = NULL;
 		copy_id = NULL;
 		return OK;
 	}
