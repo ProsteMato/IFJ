@@ -130,7 +130,7 @@ Data_type get_type_from_token(SymTabNodePtr root, LocalTableNode local_table, To
     return TYPE_UNDEFINED;
 }
 
-int is_function_defined(SymTabNodePtr root, char *function_id) {
+int is_function_created(SymTabNodePtr root, char *function_id) {
     GlobalTableData *global_data;
     if (GlobalSymTabSearch(root, function_id, &global_data)) {
         return true;
@@ -163,7 +163,7 @@ int is_variable_defined(SymTabNodePtr root, LocalTableNode local_table, ParamLis
 }
 
 int define_function(SymTabNodePtr *root, char *function_id) {
-    if (is_function_defined(*root, function_id)) {
+    if (is_function_created(*root, function_id)) {
         return SEM_FUNCTION_ERROR;
     } else {
         GlobalTableData *data = malloc (sizeof(GlobalTableData));
@@ -174,14 +174,27 @@ int define_function(SymTabNodePtr *root, char *function_id) {
         data->localTableNode = local_table;
         data->paramList = list;
         data->funkce = true;
+        data->define = false;
+        data->type = TYPE_UNDEFINED;
         int returnValue = GlobalSymTabInsert(root, function_id, data);
         return returnValue;
     }
 }
 
+int is_function_defined(SymTabNodePtr root, char *function_id){
+    GlobalTableData *global_data;
+    if (GlobalSymTabSearch(root, function_id, &global_data)) {
+        if (global_data->define == true)
+            return true;
+    }
+    return false;
+}
+
 int define_local_variable(LocalTableNode *root, char *variable_id) {
     if (!is_variable_defined(NULL, *root, NULL, variable_id)) {
         LocalTableData *data = malloc (sizeof(GlobalTableData));
+        data->define = false;
+        data->type = TYPE_UNDEFINED;
         int returnValue = LocalSymTabInsert(root, variable_id, data);
         return returnValue;
     }
@@ -192,6 +205,11 @@ int define_global_variable(SymTabNodePtr *root, char *variable_id) {
     if (!is_variable_defined(*root, NULL, NULL, variable_id)) {
         GlobalTableData *data = malloc (sizeof(GlobalTableData));
         data->funkce = false;
+        data->define = false;
+        data->localTableNode = NULL;
+        data->paramList = NULL;
+        data->pocet_par = 0;
+        data->type = TYPE_UNDEFINED;
         int returnValue = GlobalSymTabInsert(root, variable_id, data);
         return returnValue;
     }

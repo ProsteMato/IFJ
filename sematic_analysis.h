@@ -93,13 +93,24 @@ Data_type arithmetic_operation_return_type(Data_type first_type, Data_type secod
 Data_type get_type_from_token(SymTabNodePtr root, LocalTableNode local_table, Token token);
 
 /**
+ * @brief This function will check if function was created.
+ * 
+ * @param root Pointer to global symtable
+ * @param function_id Name/ID of function
+ * @return SEM_FUNCTION_ERROR - if defined / OK - if not defined
+ */
+int is_function_created(SymTabNodePtr root, char *function_id);
+
+
+/**
  * @brief This function will check if function was defined.
  * 
  * @param root Pointer to global symtable
  * @param function_id Name/ID of function
  * @return SEM_FUNCTION_ERROR - if defined / OK - if not defined
  */
-int is_function_defined(SymTabNodePtr root, char *function_id); // doplniť parametre
+int is_function_defined(SymTabNodePtr root, char *function_id);
+
 
 /**
  * @brief 

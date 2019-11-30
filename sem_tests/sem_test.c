@@ -37,7 +37,7 @@ int main(int argc, char const *argv[])
 
     printf("Kontrola deklarácie build-in functions\n");
     for (int i = 0; i < 8; i++){
-        if(!is_function_defined(root, build_in[i])){
+        if(!is_function_created(root, build_in[i])){
             printf("chyba v \"%s\"\n", build_in[i]);
             return 0;
         }

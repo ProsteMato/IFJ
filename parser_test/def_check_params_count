@@ -1,4 +1,8 @@
-if (6 == 5):
+a = 5 + 5
+
+def b(a):
     pass
-else:
-    pass
+
+b = a + a
+
+b(a)

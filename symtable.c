@@ -247,7 +247,7 @@ bool ParamSearch (ParamList *L, char * id){
 		return false;
 	}
 	ParamFirst(L);
-	while ((L->act->id != id)){
+	while (strcmp(L->act->id, id) != 0){
 		ParamSucc(L);
 		if (L->act == NULL) return false; //došlo se na konec seznamu
 	} return true;
@@ -344,13 +344,16 @@ ParamList * FindParamList(SymTabNodePtr RootPtr, char * K){
 }
 
 char *UndefinedFunctionControl(SymTabNodePtr RootPtr){
-	if (RootPtr != NULL)
-	if (RootPtr->Data->funkce == true){ // symbol je funkce
-		if (RootPtr->Data->define == false){ // funkce nebyla definovana
-			return RootPtr->Key;
+	char *returnValue = NULL;
+	if (RootPtr != NULL) {
+		if (RootPtr->Data->funkce == true){ // symbol je funkce
+			if (RootPtr->Data->define == false){ // funkce nebyla definovana
+				return RootPtr->Key;
+			}
+			return NULL;
 		}
+		returnValue = UndefinedFunctionControl(RootPtr->LPtr);
+		returnValue = UndefinedFunctionControl(RootPtr->RPtr);
 	}
-	UndefinedFunctionControl(RootPtr->LPtr);
-	UndefinedFunctionControl(RootPtr->RPtr);
-	return NULL;
+	return returnValue;
 }

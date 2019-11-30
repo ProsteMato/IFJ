@@ -34,6 +34,7 @@ bool if_in_else = false;
 int depth = 0;
 Token *savedToken = NULL;
 char *saved_id = NULL;
+char *copy_id = NULL;
 
 int prog(Token *token) {
 	pq_init();
@@ -171,6 +172,12 @@ int st_list(Token *token) {
 	*/
 	 else if (token->type == TK_EOF) {
 		// TODO možno bude treba ešte upraviť teraz som si neni istý
+		char *key = UndefinedFunctionControl(root);
+		if (key != NULL) {
+			fprintf(stderr, "Funcia %s nieje definovaná\n", key);
+			return SEM_FUNCTION_ERROR;
+		}
+		pq_destroy();
 		printf("všetko skončilo spravne!\n");
 		return OK;
 	} else if (token->type == TK_STRING || 
@@ -221,9 +228,13 @@ int stat(Token *token) {
 		if (strcmp(token->attribute, "def") == 0 && !in_function && !in_if_while) {
 			GET_NEXT_TOKEN(token);
 			if (token->type == TK_ID) {
-				returnValue = define_function(&root, token->attribute);
-				if(returnValue != OK) {
-					return returnValue;
+				if(!is_function_defined(root, token->attribute)){
+					returnValue = define_function(&root, token->attribute);
+					if(returnValue != OK) {
+						return returnValue;
+					}
+				} else {
+					SetDefine(root, token->attribute);
 				}
 				savedToken = token;
 				saved_id = token->attribute;
@@ -242,6 +253,7 @@ int stat(Token *token) {
 									depth++;
 									in_function = true;
 									GET_NEXT_TOKEN(token);
+									SetDefine(root, saved_id);
 									return st_list(token);
 								}
 							}
@@ -424,11 +436,15 @@ int params(Token *token) {
 	//TODO spracovávanie kontrolovanie a generovanie funkcie
 	GET_NEXT_TOKEN(token);
 	if (token->type == TK_BRACKET_R) {
-		SetParamCount(root, saved_id, 0);
+		if(is_function_defined(root, saved_id)){
+			return check_function_param_count(root, saved_id, 0);
+		} else {
+			SetParamCount(root, saved_id, 0);
+		}
 		return OK;
 	} else if (token->type == TK_ID) {
-		GET_NEXT_TOKEN(token);
 		int returnValue = ParamInsert(param_list, token->attribute);
+		GET_NEXT_TOKEN(token);
 		if (returnValue != OK) {
 			return returnValue;
 		}
@@ -457,8 +473,13 @@ int params_next(Token *token) {
 			return params_next(token);
 		}
 	} else if (token->type == TK_BRACKET_R) {
-		SetParamCount(root, saved_id, count);
-		count = 1;
+		if(is_function_defined(root, saved_id)){
+			int returnValue = check_function_param_count(root, saved_id, count);
+			count = 1;
+			return returnValue;
+		} else {
+			SetParamCount(root, saved_id, count);
+		}
 		return OK;
 	}
 	return SYNTAX_ERROR;
@@ -484,7 +505,12 @@ int arg_params(Token *token) {
 				return returnValue;
 			}
 	} else if (token->type == TK_BRACKET_R) {
-		return check_function_param_count(root, saved_id, 0);
+		if(!is_function_defined(root, saved_id)) {
+			SetParamCount(root, saved_id, 0);
+			return OK;
+		} else {
+			return check_function_param_count(root, saved_id, 0);
+		}
 	} else {
 		return SYNTAX_ERROR;
 	}
@@ -516,7 +542,15 @@ int arg_next_params(Token *token) {
 			}
 		}
 	} else if (token->type == TK_BRACKET_R) {
-		return check_function_param_count(root, saved_id, count);
+		if(!is_function_defined(root, saved_id)) {
+			SetParamCount(root, saved_id, count);
+			count = 1;
+			return OK;
+		} else {
+			returnValue = check_function_param_count(root, saved_id, count);
+			count = 1;
+			return returnValue;
+		}
 	}
 	return SYNTAX_ERROR;
 }
@@ -538,6 +572,21 @@ int assign(Token *token) {
 		//if ((returnValue = expression(token)) == OK) {
 			if(!isRelational) {
 				GET_NEXT_TOKEN(token);
+				if(in_function){
+					returnValue = define_local_variable(&local_table, copy_id);
+					if (returnValue != OK){
+						return returnValue;
+					}
+					LocalSetDefine(local_table, copy_id);
+					LocalSetType(local_table, copy_id, finalType);
+				} else {
+					returnValue = define_global_variable(&root, copy_id);
+					if (returnValue != OK){
+						return returnValue;
+					}
+					SetDefine(root, copy_id);
+					GlobalSetType(root, copy_id, finalType);
+				}
 				if (token->type == TK_EOL || token->type == TK_EOF) {
 					return eof_or_eol(token);
 				}
@@ -551,19 +600,36 @@ int assign(Token *token) {
 		savedToken = token;
 		saved_id = token->attribute;
 		GET_NEXT_TOKEN(token);
-		if (token->type == TK_BRACKET_L || token->type == TK_EOL || token->type == TK_EOF) {
+		if (token->type == TK_BRACKET_L) {
 			return def_id(token);
 		} else if (
 			token->type == TK_PLUS ||
 			token->type == TK_MINUS ||
 			token->type == TK_MULT ||
 			token->type == TK_DIV ||
-			token->type == TK_DIV_DIV
+			token->type == TK_DIV_DIV ||
+			token->type == TK_EOL ||
+			token->type == TK_EOF
 		) {
 			UNGET_TOKEN(token);
-			if((returnValue = callExpression(savedToken)) == OK) {
+			if((returnValue = callExpression(token)) == OK) {
 			//if ((returnValue = expression(savedToken)) == OK) {
 				if(!isRelational) {
+					if(in_function){
+						returnValue = define_local_variable(&local_table, copy_id);
+						if (returnValue != OK){
+							return returnValue;
+						}
+						LocalSetDefine(local_table, copy_id);
+						LocalSetType(local_table, copy_id, finalType);
+					} else {
+						returnValue = define_global_variable(&root, copy_id);
+						if (returnValue != OK){
+							return returnValue;
+						}
+						SetDefine(root, copy_id);
+						GlobalSetType(root, copy_id, finalType);
+					}
 					GET_NEXT_TOKEN(token);
 					if (token->type == TK_EOL || token->type == TK_EOF) {
 						return eof_or_eol(token);
@@ -587,6 +653,7 @@ int after_id(Token *token) {
 	// TODO pridat generovanie atd..
 	if(token->type == TK_ASSIGN) {
 		GET_NEXT_TOKEN(token);
+		copy_id = saved_id;
 		return assign(token);
 	} else if (token->type == TK_EOL || token->type == TK_EOF || token->type == TK_BRACKET_L) {
 		return def_id(token);
@@ -602,15 +669,36 @@ int def_id(Token *token) {
 	//TODO pridat generovanie atd...
 	int returnValue = 0;
 	if (token->type == TK_BRACKET_L) {
-		if(!is_function_defined(root, saved_id)) {
-			int returnValue = define_function(&root, saved_id);
-			set_build_in_function_param_count(root, saved_id);
+		GET_NEXT_TOKEN(token);
+		if(!is_function_created(root, saved_id)) {
+			returnValue = define_function(&root, saved_id);
 			if (returnValue != OK) {
 				return returnValue;
 			}
+			if(is_build_in_function(saved_id))
+				set_build_in_function_param_count(root, saved_id);
+				//TODO gen build in
+		} else if(is_global_variable(root, saved_id)) {
+			return SEM_FUNCTION_ERROR;
 		}
-		GET_NEXT_TOKEN(token);
 		if ((returnValue = arg_params(token)) == OK) {
+			if (copy_id != NULL) {
+				if(in_function){
+					returnValue = define_local_variable(&local_table, copy_id);
+					if (returnValue != OK){
+						return returnValue;
+					}
+					LocalSetDefine(local_table, copy_id);
+					LocalSetType(local_table, copy_id, finalType);
+				} else {
+					returnValue = define_global_variable(&root, copy_id);
+					if (returnValue != OK){
+						return returnValue;
+					}
+					SetDefine(root, copy_id);
+					GlobalSetType(root, copy_id, finalType);
+				}
+			}
 			GET_NEXT_TOKEN(token);
 			if (token->type == TK_EOL || token->type == TK_EOF) {
 				return eof_or_eol(token);
@@ -618,12 +706,12 @@ int def_id(Token *token) {
 		} else {
 			return returnValue;
 		}
-	} else if (token->type == TK_EOL || token->type == TK_EOF) {
-		if(!is_variable_defined(root, local_table, param_list, saved_id)) {
-			return SEM_FUNCTION_ERROR;
-		}
-		return eof_or_eol(token);
-	} 
+	} //else if (token->type == TK_EOL || token->type == TK_EOF) {
+	// 	if(!is_variable_defined(root, local_table, param_list, saved_id)) {
+	// 		return SEM_FUNCTION_ERROR;
+	// 	}
+	// 	return eof_or_eol(token);
+	// } 
 	return SYNTAX_ERROR;
 }
 
@@ -633,6 +721,8 @@ int def_id(Token *token) {
 */
 int eof_or_eol(Token *token) {
 	if (token->type == TK_EOL || token->type == TK_EOF) {
+		savedToken = NULL;
+		copy_id = NULL;
 		return OK;
 	}
 	return SYNTAX_ERROR;
