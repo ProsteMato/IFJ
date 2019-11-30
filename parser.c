@@ -502,7 +502,18 @@ int arg_params(Token *token) {
 				return returnValue;
 			}
 	} else if (token->type == TK_BRACKET_R) {
-		if(!is_function_defined(root, saved_id)) {
+		if(!is_function_defined(root, saved_id) && is_function_created(root, saved_id)) {
+			if(!is_function_created(root, saved_id)) {
+				returnValue = define_function(&root, saved_id);
+				if (returnValue != OK) {
+					return returnValue;
+				}
+				if(is_build_in_function(saved_id))
+					set_build_in_function_param_count(root, saved_id);
+					//TODO gen build in
+			} else if(is_global_variable(root, saved_id)) {
+				return SEM_FUNCTION_ERROR;
+			}
 			SetParamCount(root, saved_id, 0);
 			return OK;
 		} else {
@@ -539,7 +550,17 @@ int arg_next_params(Token *token) {
 			}
 		}
 	} else if (token->type == TK_BRACKET_R) {
-		if(!is_function_defined(root, saved_id)) {
+		if(!is_function_defined(root, saved_id) && !is_function_created(root, saved_id)) {
+			if(!is_function_created(root, saved_id)) {
+				returnValue = define_function(&root, saved_id);
+				if (returnValue != OK) {
+					return returnValue;
+				}
+				if(is_build_in_function(saved_id))
+					set_build_in_function_param_count(root, saved_id);
+			} else if(is_global_variable(root, saved_id)) {
+				return SEM_FUNCTION_ERROR;
+			}
 			SetParamCount(root, saved_id, count);
 			count = 1;
 			return OK;
@@ -668,17 +689,6 @@ int def_id(Token *token) {
 	int returnValue = 0;
 	if (token->type == TK_BRACKET_L) {
 		GET_NEXT_TOKEN(token);
-		if(!is_function_created(root, saved_id)) {
-			returnValue = define_function(&root, saved_id);
-			if (returnValue != OK) {
-				return returnValue;
-			}
-			if(is_build_in_function(saved_id))
-				set_build_in_function_param_count(root, saved_id);
-				//TODO gen build in
-		} else if(is_global_variable(root, saved_id)) {
-			return SEM_FUNCTION_ERROR;
-		}
 		if ((returnValue = arg_params(token)) == OK) {
 			if (copy_id != NULL) {
 				if(in_function){

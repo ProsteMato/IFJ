@@ -2,8 +2,14 @@ a = 5 + 5
 
 a = a + a
 
-def b(a):
-    pass
+b(a)
+b(a, a)
+
+
+def b(a, a):
+    a = a + a
+    d = a
+
 
 c = a
 
