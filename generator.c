@@ -19,7 +19,8 @@ int pq_queue(Token *token, int ret_val){
 		// internal ERROR
 		return INTERNAL_ERROR;
 	}
-	qtk->token = token;
+	qtk->token.attribute = token->attribute;
+	qtk->token.type = token->type;
 	qtk->ret_val = ret_val;
 	qtk->behind = NULL;
 	// no token in queue
@@ -34,7 +35,8 @@ int pq_queue(Token *token, int ret_val){
 }
 
 int pq_dequeue(Token* token){
-	token = pq.first->token;
+	token->attribute = pq.first->token.attribute;
+	token->type = pq.first->token.type;
 	int ret_val = pq.first->ret_val;
 	QToken *tmp = pq.first;
 	// jeden element v queue
@@ -49,7 +51,8 @@ int pq_dequeue(Token* token){
 }
 
 int pq_first(Token *token){
-	token = pq.first->token;
+	token->attribute = pq.first->token.attribute;
+	token->type = pq.first->token.type;
 	return pq.first->ret_val;
 }
 
@@ -200,25 +203,8 @@ char* transform_for_write(char *str){
 // -------------------
 // generovacie funkcie
 // -------------------
-
-int defvar(char *var){
-	Code *code = create_code();
-	if (!code)
-		return INTERNAL_ERROR;
-	if (add_code(code, "DEFVAR \0"))
-		return INTERNAL_ERROR;
-	if(is_global_variable(root, var)){
-		if (add_code(code, "GF@\0"))
-			return INTERNAL_ERROR;
-	} else {
-		if (add_code(code, "LF@\0"))
-			return INTERNAL_ERROR;
-	}
-	if (add_code(code, var))
-		return INTERNAL_ERROR;
-	return OK;
-}
-
+// precedenceRules
+// operandList
 int gen_if(){
 	Code *code = create_code();
 	if (!code)
@@ -630,14 +616,14 @@ int gen_not_equal(char *op1, char *op2){
 }
 */
 
-int gen_while_label(){
+int gen_while_label(){  // doplnit o unique labely
 	Code *code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
 
 	if (add_code(code, "LABEL $while$\0"))
 		return INTERNAL_ERROR;
-	char *un_while_n = int_to_str(while_counter); // kvoli unique
+	char *un_while_n = int_to_str(while_counter);
 	if (un_while_n == NULL){
 		return INTERNAL_ERROR;
 	}
