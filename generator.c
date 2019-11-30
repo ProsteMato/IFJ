@@ -200,8 +200,25 @@ char* transform_for_write(char *str){
 // -------------------
 // generovacie funkcie
 // -------------------
-// precedenceRules
-// operandList
+
+int defvar(char *var){
+	Code *code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "DEFVAR \0"))
+		return INTERNAL_ERROR;
+	if(is_global_variable(root, var)){
+		if (add_code(code, "GF@\0"))
+			return INTERNAL_ERROR;
+	} else {
+		if (add_code(code, "LF@\0"))
+			return INTERNAL_ERROR;
+	}
+	if (add_code(code, var))
+		return INTERNAL_ERROR;
+	return OK;
+}
+
 int gen_if(){
 	Code *code = create_code();
 	if (!code)
@@ -613,14 +630,14 @@ int gen_not_equal(char *op1, char *op2){
 }
 */
 
-int gen_while_label(){  // doplnit o unique labely
+int gen_while_label(){
 	Code *code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
 
 	if (add_code(code, "LABEL $while$\0"))
 		return INTERNAL_ERROR;
-	char *un_while_n = int_to_str(while_counter);
+	char *un_while_n = int_to_str(while_counter); // kvoli unique
 	if (un_while_n == NULL){
 		return INTERNAL_ERROR;
 	}
