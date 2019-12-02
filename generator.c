@@ -272,77 +272,67 @@ int gen_if_end(){
 
 int gen_expr(){
 	int i = 0;
-	item operand = operandList.last;
+	item operand = operandList.first;
 	Code *code;
 	char *tmp;
-
 	while (precedenceRules[i] != -1){ // kym neprejdem cely zoznam
-		if (precedenceRules[i] == PR_OPERAND){ // var na stack
+		if (precedenceRules[i] == PR_OPERAND ||
+		    precedenceRules[i] == PR_INT ||
+		  	precedenceRules[i] == PR_FLOAT || 
+		  	precedenceRules[i] == PR_STRING ||
+		  	precedenceRules[i] == PR_NONE){ // hodnota na stack
+
 			code = create_code();
 			if (!code)
 				return INTERNAL_ERROR;
 			if (add_code(code, "PUSHS \0"))
 				return INTERNAL_ERROR;
-			if(is_global_variable(root, operand->attribute)){
-				if (add_code(code, "GF@\0"))
-				return INTERNAL_ERROR;
+
+			// typ operandu
+			if (operand->dType == TYPE_INT){
+				if (add_code(code, "int@\0"))
+					return INTERNAL_ERROR;
+				if (add_code(code, operand->attribute))
+					return INTERNAL_ERROR;
+			} else if (operand->dType == TYPE_FLOAT){
+				if (add_code(code, "float@\0"))
+					return INTERNAL_ERROR;
+				tmp = float_to_str(operand->attribute);
+				if (tmp == NULL)
+					return INTERNAL_ERROR;
+				if (add_code(code, tmp))
+					return INTERNAL_ERROR;
+				free(tmp);
+			} else if (operand->dType == TYPE_STRING){
+				if (add_code(code, "string@\0"))
+					return INTERNAL_ERROR;
+				tmp = transform_for_write(operand->attribute);
+				if (tmp == NULL)
+					return INTERNAL_ERROR;
+				if (add_code(code, tmp))
+					return INTERNAL_ERROR;
+				free(tmp);
+			} else if (operand->dType == TYPE_NONE){
+				if (add_code(code, "nil@nil\0"))
+					return INTERNAL_ERROR;
+			} else if (operand->dType == TYPE_PARAM){
+				if(is_global_variable(root, operand->attribute)){
+					if (add_code(code, "GF@\0"))
+						return INTERNAL_ERROR;
+				} else {
+					if (add_code(code, "LF@\0"))
+						return INTERNAL_ERROR;
+				}
+				if (add_code(code, operand->attribute))
+					return INTERNAL_ERROR;
 			} else {
-				if (add_code(code, "LF@\0"))
+				// ine by sa tu nemalo dostat ci??? mozno bool TODO
 				return INTERNAL_ERROR;
 			}
-			if (add_code(code, operand->attribute))
-				return INTERNAL_ERROR;
-			if (CL_add_line(code))
-				return INTERNAL_ERROR;
 
-		} else if (precedenceRules[i] == PR_INT){
-			code = create_code();
-			if (!code)
-				return INTERNAL_ERROR;
-			if (add_code(code, "PUSHS int@\0"))
-					return INTERNAL_ERROR;
-			if (add_code(code, operand->attribute))
-				return INTERNAL_ERROR;
 			if (CL_add_line(code))
 				return INTERNAL_ERROR;
-		} else if (precedenceRules[i] == PR_FLOAT){
-			code = create_code();
-			if (!code)
-				return INTERNAL_ERROR;
-			if (add_code(code, "PUSHS float@\0"))
-					return INTERNAL_ERROR;
-			tmp = float_to_str(operand->attribute);
-			if (tmp == NULL)
-				return INTERNAL_ERROR;
-			if (add_code(code, tmp))
-				return INTERNAL_ERROR;
-			if (CL_add_line(code))
-				return INTERNAL_ERROR;
-			free(tmp);
-
-		} else if (precedenceRules[i] == PR_STRING){
-			code = create_code();
-			if (!code)
-				return INTERNAL_ERROR;
-			if (add_code(code, "PUSHS string@\0"))
-					return INTERNAL_ERROR;
-			tmp = transform_for_write(operand->attribute);
-			if (tmp == NULL)
-				return INTERNAL_ERROR;
-			if (add_code(code, tmp))
-				return INTERNAL_ERROR;
-			if (CL_add_line(code))
-				return INTERNAL_ERROR;
-			free(tmp);
-
-		} else if (precedenceRules[i] == PR_NONE){ // typ nil
-			code = create_code();
-			if (!code)
-				return INTERNAL_ERROR;
-			if (add_code(code, "PUSHS nil@nil\0"))
-					return INTERNAL_ERROR;
-			if (CL_add_line(code))
-				return INTERNAL_ERROR;
+			operand = operand->rptr;
 
 		} else if (precedenceRules[i] == PR_EPLUSE){
 			code = create_code();
@@ -531,7 +521,7 @@ int gen_expr(){
 			if (CL_add_line(code))
 				return INTERNAL_ERROR;
 		}
-		operand = operand->rptr;
+		i++;
 	}
 	return OK;
 }
