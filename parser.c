@@ -660,6 +660,7 @@ int assign(Token *token) {
 			//TODO GEN-CODE - priradenie premennej do výslednej premenej.
 				if(!isRelational) {
 					if(in_function){
+						//TODO SEM-A kontrola či lokálna premenná náhodou sa nerovná funkcii
 						returnValue = define_local_variable(&local_table, copy_id);
 						if (returnValue != OK){
 							return returnValue;
@@ -667,6 +668,7 @@ int assign(Token *token) {
 						LocalSetDefine(local_table, copy_id);
 						LocalSetType(local_table, copy_id, finalType);
 					} else {
+						//TODO SEM-A kontrola či globálna premenná náhodou sa nerovná funkcii
 						returnValue = define_global_variable(&root, copy_id);
 						if (returnValue != OK){
 							return returnValue;
