@@ -243,6 +243,9 @@ int gen_else(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "LABEL %false%\0"))
 		return INTERNAL_ERROR;
+	tmp = int_to_str(if_counter);
+	if (tmp == NULL)
+		return INTERNAL_ERROR;
 	if (add_code(code, tmp))
 		return INTERNAL_ERROR;
 	if (CL_add_line(code))
@@ -966,8 +969,18 @@ int gen_f_start(char *id){
 	if (CL_add_line(code))
 		return INTERNAL_ERROR;
 
+	// MOVE LF@%retval nil@nil
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "MOVE LF@%retval nil@nil\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(code))
+		return INTERNAL_ERROR;
+
 	return OK;
 }
+
 int gen_f_end(char *id){
 	Code *code = create_code();
 	if (!code)
@@ -998,6 +1011,43 @@ int gen_f_end(char *id){
 		return INTERNAL_ERROR;
 	if (add_code(code, "RETURN\0"))
 		return INTERNAL_ERROR;
+	if (CL_add_line(code))
+		return INTERNAL_ERROR;
+
+	return OK;
+}
+
+int gen_f_return(*symb, type){
+	Code *code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "MOVE LF@%retval \0"))
+		return INTERNAL_ERROR;
+
+	/*
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (is_variable_defined(root, local_table, param_list, symb){
+		if (is_global_variable(root, symb)){
+			if (add_code(code, "LF@\0"))
+				return INTERNAL_ERROR;
+		} else {
+			if (add_code(code, "GF@\0"))
+				return INTERNAL_ERROR;
+		}
+	} else {
+
+	}
+	
+
+
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	*/
+
+	
 	if (CL_add_line(code))
 		return INTERNAL_ERROR;
 
