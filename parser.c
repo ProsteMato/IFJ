@@ -318,6 +318,7 @@ int stat(Token *token) {
 					}
 				}
 			} else {
+				printf("je to chyba v expr...\n");
 				return returnValue;
 			}
 		/*
