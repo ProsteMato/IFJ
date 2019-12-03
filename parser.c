@@ -8,7 +8,11 @@
  * 
  */
 
-//TODO prepísať pravidla a upraviť ich tak aby fungovali s EOL..
+
+//TODO SEM-A - kontrola pri definicii ID ci sa nerovná build-id function
+//TODO SEM-A - na začatku programu definovať všetky build-id funcie
+//TODO SEM-A - kontrolovať parametre build-id funkcii
+//TODO SEM-A - skontrolovať každú definíciu premennej
 
 #include "parser.h"
 #include "main.h"
@@ -88,7 +92,7 @@ int prog(Token *token) {
 
 int st_list(Token *token) {
 	
-	/* TODO opravit podľa novej LL tabulky a gramatiky
+	/*
 		2: <st-list> -> <stat> <st-list>
 		23: <func-nested-st-list> -> <func-nested-stat> <next-func-nested-st-list>
 		32:  <nested-st-list> -> <nested-stat> <next-nested-st-list>
@@ -107,6 +111,9 @@ int st_list(Token *token) {
 		} else if (strcmp(token->attribute, "if") == 0) {
 			returnValue = stat(token);
 			if (returnValue == OK) {
+				if((returnValue = gen_if_end()) != OK) {
+					return returnValue;
+				}
 				GET_NEXT_TOKEN(token);
 				if (!in_function && !in_if_while) {
 					return st_list(token);
@@ -171,7 +178,6 @@ int st_list(Token *token) {
 		3: <st-list> -> EOF
 	*/
 	 else if (token->type == TK_EOF) {
-		// TODO možno bude treba ešte upraviť teraz som si neni istý
 		char *key = UndefinedFunctionControl(root);
 		if (key != NULL) {
 			fprintf(stderr, "Funcia %s nieje definovaná\n", key);
@@ -197,7 +203,6 @@ int next_st_list(Token *token) {
 		31:  <next-func-nested-st-list> -> <func-nested-st-list>
 	*/
 	if (token->type == TK_DEDENT) {
-		//TODO skontrolovat este neskor potom tento if else statementy či sú spravne
 		if (in_if_while || in_function) {
 			depth--;
 			if (in_function && in_if_while && depth == 1) {
@@ -234,6 +239,7 @@ int stat(Token *token) {
 						return returnValue;
 					}
 				}
+				//TODO: GEN_CODE - generovanie lable pre začiatok funkcie...
 				saved_id = token->attribute;
 				local_table = FindLocalTable(root, token->attribute);
 				param_list = FindParamList(root, token->attribute);
@@ -268,10 +274,12 @@ int stat(Token *token) {
 		*/
 		} else if (strcmp(token->attribute, "if") == 0) {
 			GET_NEXT_TOKEN(token);
-			//TODO priprava na generovanie...ziskat lables for if and else
-			//TODO urobit samotne generovanie...
 			if ((returnValue = callExpression(token)) == OK) {
-			//if ((returnValue = expression(token)) == OK) {
+				//TODO: GEN-CODE = vygenerovanie ifu na kontrolu
+				//TODO: GEN-CODE = pripadne vygenerovat jump na else lable.
+				if((returnValue = gen_if()) != OK) {
+					return returnValue;
+				}
 				GET_NEXT_TOKEN(token);
 				if (token->type == TK_COLON) {
 					GET_NEXT_TOKEN(token);
@@ -285,6 +293,10 @@ int stat(Token *token) {
 							if (returnValue == OK) {
 								GET_NEXT_TOKEN(token);
 								if (token->type == TK_KW && strcmp(token->attribute, "else") == 0) {
+									//TODO: GEN-CODE = vygenerovat lable pre else
+									if((returnValue = gen_else()) != OK) {
+										return returnValue;
+									}
 									GET_NEXT_TOKEN(token);
 									if (token->type == TK_COLON) {
 										GET_NEXT_TOKEN(token);
@@ -306,6 +318,7 @@ int stat(Token *token) {
 					}
 				}
 			} else {
+				printf("je to chyba v expr...\n");
 				return returnValue;
 			}
 		/*
@@ -314,9 +327,11 @@ int stat(Token *token) {
 			36:  <nested-stat> -> while expr : EOL INDENT <nested-st-list>
 		*/
 		} else if (strcmp(token->attribute, "while") == 0) {
-			//TODO generovanie while ziskavanie uniq lable...
+			//TODO GEN-CODE = counter
+			//TODO GEN-CODE = uniq lable
+			GET_NEXT_TOKEN(token);
 			if ((returnValue = callExpression(token)) == OK) {
-			//if ((returnValue = expression(token)) == OK) {
+				//TODO GEN-CODE = if podmienka bud skočit preč z while alebo ostat. treba vedieť lable na koniec while.
 				GET_NEXT_TOKEN(token);
 				if (token->type == TK_COLON) {
 					GET_NEXT_TOKEN(token);
@@ -327,6 +342,7 @@ int stat(Token *token) {
 							GET_NEXT_TOKEN(token);
 							in_if_while = true;
 							return st_list(token);
+							//TODO GEN-CODE = lable na koniec while
 						}
 					}
 				}
@@ -341,16 +357,19 @@ int stat(Token *token) {
 		} else if (strcmp(token->attribute, "pass") == 0) {
 			GET_NEXT_TOKEN(token);
 			if (token->type == TK_EOL || token->type == TK_EOF) {
+				//TODO GEN-CODE pass
 				return eof_or_eol(token);
 			}
 		/*
 			29:  <func-nested-stat> -> return <after-return>
 		*/
 		} else if (strcmp(token->attribute, "return") == 0 && in_function) {
+			//TODO: GEN-CODE = return neviem ako to bude pracovat musim zistit bud vygenerujeme na začiatku funcie premennú ktorá bude return NULL
+			// a potom ak sa objaví return tak to zmeníme a vygenerujeme uvidíme...
 			int returnValue = 0;
 			GET_NEXT_TOKEN(token);
 			if((returnValue = after_return(token)) == OK) {
-				//TODO gen return
+				//TODO GEN-CODE return
 				return OK;
 			} else {
 				return returnValue;
@@ -374,9 +393,8 @@ int stat(Token *token) {
 			token->type == TK_DIV ||
 			token->type == TK_DIV_DIV
 			) {
-			
+			//TODO GEN-CODE - netreba generovať treba len vyhodnotit a vrátit OK
 			if((returnValue = callExpression(token)) == OK) {
-			//if ((returnValue = expression(savedToken)) == OK) {
 				if(!isRelational) {
 					GET_NEXT_TOKEN(token);
 					if (token->type == TK_EOL || token->type == TK_EOF) {
@@ -408,8 +426,8 @@ int stat(Token *token) {
 		token->type == TK_INT ||
 		(token->type == TK_KW && strcmp(token->attribute, "None") == 0)
 		) {
+		//TODO GEN-CODE - netreba generovať treba len vyhodnotit a vrátit OK
 		if((returnValue = callExpression(token)) == OK) {
-		//if ((returnValue = expression(token)) == OK) {
 			if(!isRelational) {
 				GET_NEXT_TOKEN(token);
 				if (token->type == TK_EOL || token->type == TK_EOF) {
@@ -430,7 +448,6 @@ int stat(Token *token) {
 11:  <params> -> id <next-param>
 */
 int params(Token *token) {
-	//TODO spracovávanie kontrolovanie a generovanie funkcie
 	GET_NEXT_TOKEN(token);
 	if (token->type == TK_BRACKET_R) {
 		if(is_function_defined(root, saved_id)){
@@ -456,7 +473,6 @@ int params(Token *token) {
 13:  <next-param> -> )
 */
 int params_next(Token *token) {
-	//TODO pridat generovanie atd..
 	static int count = 1;
 	if (token->type == TK_COMMA) {
 		GET_NEXT_TOKEN(token);
@@ -510,7 +526,7 @@ int arg_params(Token *token) {
 				}
 				if(is_build_in_function(saved_id))
 					set_build_in_function_param_count(root, saved_id);
-					//TODO gen build in
+					//TODO GEN-CODE vygenerovanie build in function
 			} else if(is_global_variable(root, saved_id)) {
 				return SEM_FUNCTION_ERROR;
 			}
@@ -529,7 +545,6 @@ int arg_params(Token *token) {
 17:  <arg-next-params> -> )
 */
 int arg_next_params(Token *token) {
-	//TODO pridat generovanie a kontrolovanie atd..
 	static int count = 1;
 	int returnValue = 0;
 	if (token->type == TK_COMMA) {
@@ -558,6 +573,7 @@ int arg_next_params(Token *token) {
 				}
 				if(is_build_in_function(saved_id))
 					set_build_in_function_param_count(root, saved_id);
+					//TODO GEN-CODE = vygenerovat build-in funckiu 
 			} else if(is_global_variable(root, saved_id)) {
 				return SEM_FUNCTION_ERROR;
 			}
@@ -578,7 +594,6 @@ int arg_next_params(Token *token) {
 43:  <assign> -> id <def-id>
 */
 int assign(Token *token) {
-	// TODO pridat generovanie, kontrolovanie atd...
 	int returnValue = 0;
 	if (token->type == TK_BRACKET_L ||
 		token->type == TK_FLOAT ||
@@ -588,7 +603,7 @@ int assign(Token *token) {
 		){
 		GET_NEXT_TOKEN(token);
 		if((returnValue = callExpression(token)) == OK) {
-		//if ((returnValue = expression(token)) == OK) {
+			//TODO GEN-CODE - vygenerovanie definicie premennej a priradenie jej hodnoty do nej.
 			if(!isRelational) {
 				GET_NEXT_TOKEN(token);
 				if(in_function){
@@ -620,7 +635,27 @@ int assign(Token *token) {
 		PRELOAD_TOKEN(token);
 		if (token->type == TK_BRACKET_L) {
 			GET_NEXT_TOKEN(token);
-			return def_id(token);
+			returnValue = def_id(token);
+			if (returnValue != OK) {
+				return returnValue;
+			}
+			// TODO GEN-CODE vratenie navratovej hodnoty funkcie do premennej.
+			if(in_function){
+				returnValue = define_local_variable(&local_table, copy_id);
+				if (returnValue != OK){
+					return returnValue;
+				}
+				LocalSetDefine(local_table, copy_id);
+				LocalSetType(local_table, copy_id, finalType);
+			} else {
+				returnValue = define_global_variable(&root, copy_id);
+				if (returnValue != OK){
+					return returnValue;
+				}
+				SetDefine(root, copy_id);
+				GlobalSetType(root, copy_id, finalType);
+			}
+			return OK;
 		} else if (
 			token->type == TK_PLUS ||
 			token->type == TK_MINUS ||
@@ -632,9 +667,10 @@ int assign(Token *token) {
 		) {
 			GET_NEXT_TOKEN(token);
 			if((returnValue = callExpression(token)) == OK) {
-			//if ((returnValue = expression(savedToken)) == OK) {
+			//TODO GEN-CODE - priradenie premennej do výslednej premenej.
 				if(!isRelational) {
 					if(in_function){
+						//TODO SEM-A kontrola či lokálna premenná náhodou sa nerovná funkcii
 						returnValue = define_local_variable(&local_table, copy_id);
 						if (returnValue != OK){
 							return returnValue;
@@ -642,6 +678,7 @@ int assign(Token *token) {
 						LocalSetDefine(local_table, copy_id);
 						LocalSetType(local_table, copy_id, finalType);
 					} else {
+						//TODO SEM-A kontrola či globálna premenná náhodou sa nerovná funkcii
 						returnValue = define_global_variable(&root, copy_id);
 						if (returnValue != OK){
 							return returnValue;
@@ -669,7 +706,6 @@ int assign(Token *token) {
 41:  <after_id> -> <def-id>
 */
 int after_id(Token *token) {
-	// TODO pridat generovanie atd..
 	if(token->type == TK_ASSIGN) {
 		PRELOAD_TOKEN(token);
 		copy_id = saved_id;
@@ -685,28 +721,11 @@ int after_id(Token *token) {
 45:  <def-id> -> <eof-or-eol>
 */
 int def_id(Token *token) {
-	//TODO pridat generovanie atd...
 	int returnValue = 0;
 	if (token->type == TK_BRACKET_L) {
 		GET_NEXT_TOKEN(token);
 		if ((returnValue = arg_params(token)) == OK) {
-			if (copy_id != NULL) {
-				if(in_function){
-					returnValue = define_local_variable(&local_table, copy_id);
-					if (returnValue != OK){
-						return returnValue;
-					}
-					LocalSetDefine(local_table, copy_id);
-					LocalSetType(local_table, copy_id, finalType);
-				} else {
-					returnValue = define_global_variable(&root, copy_id);
-					if (returnValue != OK){
-						return returnValue;
-					}
-					SetDefine(root, copy_id);
-					GlobalSetType(root, copy_id, finalType);
-				}
-			}
+			//TODO GEN-CODE = generate params or function call pripadne priradenie do premennej
 			GET_NEXT_TOKEN(token);
 			if (token->type == TK_EOL || token->type == TK_EOF) {
 				return eof_or_eol(token);
@@ -714,12 +733,12 @@ int def_id(Token *token) {
 		} else {
 			return returnValue;
 		}
-	} //else if (token->type == TK_EOL || token->type == TK_EOF) {
-	// 	if(!is_variable_defined(root, local_table, param_list, saved_id)) {
-	// 		return SEM_FUNCTION_ERROR;
-	// 	}
-	// 	return eof_or_eol(token);
-	// } 
+	} else if (token->type == TK_EOL || token->type == TK_EOF) {
+		if(!is_variable_defined(root, local_table, param_list, saved_id)) {
+			return SEM_FUNCTION_ERROR;
+		}
+		return eof_or_eol(token);
+	} 
 	return SYNTAX_ERROR;
 }
 
@@ -745,7 +764,6 @@ int after_return(Token *token) {
 		return eof_or_eol(token);
 	}
 	else if((returnValue = callExpression(token)) == OK) {
-	//else if ((returnValue = expression(token)) == OK) {
 		if (!isRelational) {
 			GET_NEXT_TOKEN(token);
 			return eof_or_eol(token);
@@ -766,7 +784,6 @@ int after_return(Token *token) {
 */
 int value(Token *token) {
 	switch(token->type) {
-		//TODO spracovanie každeho parametru pri volaní funkcie.. 
 		case TK_KW:
 			if (strcmp(token->attribute, "None") == 0) {
 				pq_queue(token, 0);
