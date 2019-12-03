@@ -194,7 +194,7 @@ int gen_assing_const_to_val(char *var, Token *token);
  * @return     OK if successfull, INTERNAL_ERROR in case of internal error
  *             occurrence
  */
-int defvar(char *var);
+int gen_defvar(char *var);
 
 //----------------------------------------
 //          BUILT-IN FUNCTIONS           -

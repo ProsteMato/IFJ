@@ -270,6 +270,26 @@ int gen_if_end(){
 	return OK;
 }
 
+int gen_defvar(char *var){
+	Code *code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "DEFVAR \0"))
+		return INTERNAL_ERROR;
+	if (is_global_variable(root, var)){
+		if (add_code(code, "GF@\0"))
+			return INTERNAL_ERROR;
+	} else {
+		if (add_code(code, "LF@\0"))
+			return INTERNAL_ERROR;
+	}
+	if (add_code(code, var))
+		return INTERNAL_ERROR;
+	if (CL_add_line(code))
+		return INTERNAL_ERROR;
+	return OK;
+}
+
 int gen_expr(){
 	int i = 0;
 	item operand = operandList.first;
@@ -289,12 +309,12 @@ int gen_expr(){
 				return INTERNAL_ERROR;
 
 			// typ operandu
-			if (operand->dType == TYPE_INT){
+			if (operand->symbol == PT_INT){
 				if (add_code(code, "int@\0"))
 					return INTERNAL_ERROR;
 				if (add_code(code, operand->attribute))
 					return INTERNAL_ERROR;
-			} else if (operand->dType == TYPE_FLOAT){
+			} else if (operand->symbol == PT_FLOAT){
 				if (add_code(code, "float@\0"))
 					return INTERNAL_ERROR;
 				tmp = float_to_str(operand->attribute);
@@ -303,7 +323,7 @@ int gen_expr(){
 				if (add_code(code, tmp))
 					return INTERNAL_ERROR;
 				free(tmp);
-			} else if (operand->dType == TYPE_STRING){
+			} else if (operand->symbol == PT_STRING){
 				if (add_code(code, "string@\0"))
 					return INTERNAL_ERROR;
 				tmp = transform_for_write(operand->attribute);
@@ -312,10 +332,11 @@ int gen_expr(){
 				if (add_code(code, tmp))
 					return INTERNAL_ERROR;
 				free(tmp);
-			} else if (operand->dType == TYPE_NONE){
+			/*} else if (operand->symbol == TYPE_NONE){  // toto asi nenastane po kontrole len za behu a to by uz bola premenna TODO
 				if (add_code(code, "nil@nil\0"))
 					return INTERNAL_ERROR;
-			} else if (operand->dType == TYPE_PARAM){
+			*/
+			} else if (operand->symbol == PT_ID){
 				if(is_global_variable(root, operand->attribute)){
 					if (add_code(code, "GF@\0"))
 						return INTERNAL_ERROR;
@@ -904,7 +925,20 @@ int gen_f_prep_params(){ // parametre cez TKQueue, pridavane v spravnom poradi, 
 
 int gen_f_start(char *id){
 	Code *code = create_code();
+	// JUMP na koniec funckie, kvoli preskoceniu, generuje sa hned na mieste volania
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "JUMP $\0"))
+		return INTERNAL_ERROR;
+	if (add_code(code, id))
+		return INTERNAL_ERROR;
+	if (add_code(code, "_end\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(code))
+		return INTERNAL_ERROR;
+
 	// LABEL $id
+	code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
 	if (add_code(code, "LABEL $\0"))
@@ -991,6 +1025,14 @@ int gen_header(){
 	if (!header)
 		return INTERNAL_ERROR;
 	if (add_code(header, "DEFVAR GF@&res1"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(header))
+		return INTERNAL_ERROR;
+
+	header = create_code();
+	if (!header)
+		return INTERNAL_ERROR;
+	if (add_code(header, "CREATEFRAME"))
 		return INTERNAL_ERROR;
 	if (CL_add_line(header))
 		return INTERNAL_ERROR;
