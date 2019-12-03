@@ -213,7 +213,7 @@ int define_global_variable(SymTabNodePtr *root, char *variable_id) {
         int returnValue = GlobalSymTabInsert(root, variable_id, data);
         return returnValue;
     }
-    return OK;
+    return SEM_FUNCTION_ERROR;
 }
 
 char * expr_parser_gen_uniq_id(SymTabNodePtr *root, LocalTableNode local_table) {
