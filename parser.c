@@ -111,6 +111,9 @@ int st_list(Token *token) {
 		} else if (strcmp(token->attribute, "if") == 0) {
 			returnValue = stat(token);
 			if (returnValue == OK) {
+				if((returnValue = gen_if_end()) != OK) {
+					return returnValue;
+				}
 				GET_NEXT_TOKEN(token);
 				if (!in_function && !in_if_while) {
 					return st_list(token);
@@ -274,6 +277,9 @@ int stat(Token *token) {
 			if ((returnValue = callExpression(token)) == OK) {
 				//TODO: GEN-CODE = vygenerovanie ifu na kontrolu
 				//TODO: GEN-CODE = pripadne vygenerovat jump na else lable.
+				if((returnValue = gen_if()) != OK) {
+					return returnValue;
+				}
 				GET_NEXT_TOKEN(token);
 				if (token->type == TK_COLON) {
 					GET_NEXT_TOKEN(token);
@@ -288,6 +294,9 @@ int stat(Token *token) {
 								GET_NEXT_TOKEN(token);
 								if (token->type == TK_KW && strcmp(token->attribute, "else") == 0) {
 									//TODO: GEN-CODE = vygenerovat lable pre else
+									if((returnValue = gen_else()) != OK) {
+										return returnValue;
+									}
 									GET_NEXT_TOKEN(token);
 									if (token->type == TK_COLON) {
 										GET_NEXT_TOKEN(token);
