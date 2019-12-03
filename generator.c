@@ -1016,7 +1016,7 @@ int gen_f_end(char *id){
 
 	return OK;
 }
-
+/*
 int gen_f_return(*symb, type){
 	Code *code = create_code();
 	if (!code)
@@ -1024,7 +1024,7 @@ int gen_f_return(*symb, type){
 	if (add_code(code, "MOVE LF@%retval \0"))
 		return INTERNAL_ERROR;
 
-	/*
+	
 	code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
@@ -1045,7 +1045,7 @@ int gen_f_return(*symb, type){
 	code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
-	*/
+	
 
 	
 	if (CL_add_line(code))
@@ -1053,7 +1053,7 @@ int gen_f_return(*symb, type){
 
 	return OK;
 }
-
+*/
 int gen_header(){
 	Code *header = create_code();
 	if (!header)
