@@ -148,16 +148,18 @@ int define_function(SymTabNodePtr *root, char *function_id);
  * @brief This function will create local varibale in local sym table of function
  * 
  * @param root Local sym table of function
- * @param function_id ID of variable
+ * @param variable_id ID of variable
+ * @param function_call Bool if this is a function call
  * @return Error code 
  */
-int define_local_variable(LocalTableNode *root, char *variable_id);
+int define_local_variable(LocalTableNode *root, bool function_call, char *variable_id);
 
 /**
  * @brief This function will create global variable in global sym table
  * 
  * @param root poiner to a gloal sym table
- * @param function_id id of variable
+ * @param variable_id id of variable
+ * @param function_call Bool if this is a function call
  * @return Error code
  */
 int define_global_variable(SymTabNodePtr *root, char *variable_id);

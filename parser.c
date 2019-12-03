@@ -607,14 +607,14 @@ int assign(Token *token) {
 			if(!isRelational) {
 				GET_NEXT_TOKEN(token);
 				if(in_function){
-					returnValue = define_local_variable(&local_table, copy_id);
+					returnValue = define_local_variable(&local_table, false, copy_id);
 					if (returnValue != OK){
 						return returnValue;
 					}
 					LocalSetDefine(local_table, copy_id);
 					LocalSetType(local_table, copy_id, finalType);
 				} else {
-					returnValue = define_global_variable(&root, copy_id);
+					returnValue = define_global_variable(&root, false, copy_id);
 					if (returnValue != OK){
 						return returnValue;
 					}
@@ -639,21 +639,26 @@ int assign(Token *token) {
 			if (returnValue != OK) {
 				return returnValue;
 			}
-			// TODO GEN-CODE vratenie navratovej hodnoty funkcie do premennej.
+			if((returnValue = gen_f_prep_params()) != OK) {
+				return returnValue;
+			}
+			if((returnValue = gen_f_call(saved_id)) != OK) {
+				return returnValue;
+			}
 			if(in_function){
-				returnValue = define_local_variable(&local_table, copy_id);
+				returnValue = define_local_variable(&local_table, true, copy_id);
 				if (returnValue != OK){
 					return returnValue;
 				}
 				LocalSetDefine(local_table, copy_id);
-				LocalSetType(local_table, copy_id, finalType);
+				LocalSetType(local_table, copy_id, TYPE_UNDEFINED);
 			} else {
-				returnValue = define_global_variable(&root, copy_id);
+				returnValue = define_global_variable(&root, true, copy_id);
 				if (returnValue != OK){
 					return returnValue;
 				}
 				SetDefine(root, copy_id);
-				GlobalSetType(root, copy_id, finalType);
+				GlobalSetType(root, copy_id, TYPE_UNDEFINED);
 			}
 			return OK;
 		} else if (
@@ -671,7 +676,7 @@ int assign(Token *token) {
 				if(!isRelational) {
 					if(in_function){
 						//TODO SEM-A kontrola či lokálna premenná náhodou sa nerovná funkcii
-						returnValue = define_local_variable(&local_table, copy_id);
+						returnValue = define_local_variable(&local_table, false, copy_id);
 						if (returnValue != OK){
 							return returnValue;
 						}
@@ -679,7 +684,7 @@ int assign(Token *token) {
 						LocalSetType(local_table, copy_id, finalType);
 					} else {
 						//TODO SEM-A kontrola či globálna premenná náhodou sa nerovná funkcii
-						returnValue = define_global_variable(&root, copy_id);
+						returnValue = define_global_variable(&root, false, copy_id);
 						if (returnValue != OK){
 							return returnValue;
 						}
@@ -725,7 +730,6 @@ int def_id(Token *token) {
 	if (token->type == TK_BRACKET_L) {
 		GET_NEXT_TOKEN(token);
 		if ((returnValue = arg_params(token)) == OK) {
-			//TODO GEN-CODE = generate params or function call pripadne priradenie do premennej
 			GET_NEXT_TOKEN(token);
 			if (token->type == TK_EOL || token->type == TK_EOF) {
 				return eof_or_eol(token);
