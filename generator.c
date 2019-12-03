@@ -1016,6 +1016,7 @@ int gen_f_end(char *id){
 
 	return OK;
 }
+
 /*
 int gen_f_return(*symb, type){
 	Code *code = create_code();
