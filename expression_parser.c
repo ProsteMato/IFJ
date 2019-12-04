@@ -103,7 +103,6 @@ int checkDivisionByZero(Token *token)
       fprintf(stderr,"Error with getting next token.\n");
       return l; 
   }
-
   if ( (strcmp(token -> attribute, "0")) == 0)
   {
     return DIVISION_BY_ZERO_ERROR;
@@ -293,23 +292,25 @@ int callExpression(Token *token)
   int rightBracket =0; 
   pTable symbol= getIndex(token);
   exprList eList;
-  Data_type dType = get_type_from_token(root, local_table,*token);
+ // Data_type dType = get_type_from_token(root, local_table,*token);
   if (symbol == -1 )
   {
       return INTERNAL_ERROR;
   }
   listInitialize(&eList);
   listInitialize(&operandList);
-  if (symbol == PT_ID || symbol == PT_INT || symbol == PT_FLOAT ||symbol == PT_STRING)
-  {
-      listInsertFirst(&operandList,token->attribute, symbol, dType);
-  }
+  /**
   if (token->type == TK_ID)
   {
       if (!is_variable_defined(root, local_table, NULL, token->attribute))
       {
             return SEM_FUNCTION_ERROR;
       }
+  }
+
+  if (symbol == PT_ID || symbol == PT_INT || symbol == PT_FLOAT ||symbol == PT_STRING)
+  {
+      listInsertFirst(&operandList,token->attribute, symbol, dType);
   }
   if (token->type == TK_BRACKET_L)
   {
@@ -326,10 +327,17 @@ int callExpression(Token *token)
   if  (e != OK)
   {     
       return e;
-  } 
+  } */
   // Load tokens into list, count brackets, control division by 0
    while ( token->type != TK_EOL && token->type != TK_EOF && token->type != TK_COLON)
   {
+      if (token->type == TK_ID)
+      {
+            if (!is_variable_defined(root, local_table, NULL, token->attribute))
+            {
+                  return SEM_FUNCTION_ERROR;
+            }
+      }
       symbol= getIndex(token);
       if (symbol == -1 )
       {
@@ -343,13 +351,6 @@ int callExpression(Token *token)
             { 
                   listDispose(&eList);
                   return SYNTAX_ERROR;
-            }
-      }
-      if (token->type == TK_ID)
-      {
-            if (!is_variable_defined(root, local_table, NULL, token->attribute))
-            {
-                  return SEM_FUNCTION_ERROR;
             }
       }
       //count number of brackets - must be even
@@ -409,7 +410,14 @@ int callExpression(Token *token)
                   return DIVISION_BY_ZERO_ERROR;
             }
       }
-      listInsertAct(&eList,token->attribute, symbol, dType);
+      if (eList.act == NULL)
+      {
+            listInsertFirst(&eList, token->attribute, symbol, dType);
+      } else 
+      {
+             listInsertAct(&eList,token->attribute, symbol, dType);
+      }
+     
      
       if ( symbol == PT_ID || symbol == PT_INT || symbol == PT_FLOAT || symbol == PT_STRING || symbol == PT_NONE)
       {
