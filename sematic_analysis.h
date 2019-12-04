@@ -112,6 +112,7 @@ int is_function_created(SymTabNodePtr root, char *function_id);
 int is_function_defined(SymTabNodePtr root, char *function_id);
 
 
+
 /**
  * @brief 
  * 
@@ -130,9 +131,23 @@ int is_global_variable(SymTabNodePtr root, char *id);
  * @param params if is the function this will be pointer to a params of functiou otherwise NULL
  * @param variable_id Name/ID of variable
  * 
- * @return Error code SEM_FUNCTION_ERROR - if is not defined / OK - is defined
+ * @return bool
  */
 int is_variable_defined(SymTabNodePtr root,  LocalTableNode local_table, ParamList *params, char *variable_id); // doplniť parametre
+
+
+/**
+ * @brief This function will check if the variable is defined if variable is not defined in local table of function or params
+ *        it will find global table and its local table and try find there.
+ * 
+ * @param root This is pointer to a global sym table 
+ * @param local_table If we are in definition of function this is local table of this function otherwise NULL
+ * @param params if is the function this will be pointer to a params of functiou otherwise NULL
+ * @param variable_id Name/ID of variable
+ * 
+ * @return bool
+ */
+int is_constant(SymTabNodePtr root,  LocalTableNode local_table, ParamList *params, char *variable_id); // doplniť parametre
 
 /**
  * @brief This function will define function in global sym table

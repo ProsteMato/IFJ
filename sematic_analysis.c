@@ -218,7 +218,7 @@ int define_local_variable(LocalTableNode *root, bool function_call, char *variab
             return returnValue;
         }
     }
-    if(!function_call && (returnValue = gen_assign_expr_rest(variable_id)) != OK) {
+    if(!function_call && (returnValue = gen_assign_expr_res(variable_id)) != OK) {
         return returnValue;
     }
     if(function_call && (returnValue = gen_f_return(variable_id)) != OK) {
@@ -245,7 +245,7 @@ int define_global_variable(SymTabNodePtr *root, bool function_call, char *variab
             return returnValue;
         }
     }
-    if(!function_call && (returnValue = gen_assign_expr_rest(variable_id)) != OK) {
+    if(!function_call && (returnValue = gen_assign_expr_res(variable_id)) != OK) {
         return returnValue;
     }
     if(function_call && (returnValue = gen_f_return(variable_id)) != OK) {
