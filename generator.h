@@ -132,7 +132,8 @@ void pq_init();
  * @param      token    The token
  * @param[in]  ret_val  The ret value
  *
- * @return     { description_of_the_return_value }
+ * @return     OK if successfull, INTERNAL_ERROR in case of internal error
+ *             occurrence
  */
 int pq_queue(Token *token, int ret_val);
 /**
@@ -140,7 +141,8 @@ int pq_queue(Token *token, int ret_val);
  *
  * @param      token  The token
  *
- * @return     { description_of_the_return_value }
+ * @return     OK if successfull, INTERNAL_ERROR in case of internal error
+ *             occurrence
  */
 int pq_dequeue(Token* token);
 /**
@@ -148,11 +150,12 @@ int pq_dequeue(Token* token);
  *
  * @param      token  The token
  *
- * @return     { description_of_the_return_value }
+ * @return     OK if successfull, INTERNAL_ERROR in case of internal error
+ *             occurrence
  */
 int pq_first(Token *token);
 /**
- * @brief      { function_description }
+ * @brief      Deallocates the memory of param queue
  */
 void pq_destroy();
 
@@ -160,6 +163,13 @@ void pq_destroy();
 //     FUNCTIONS FOR CODE GENERATION     -
 //----------------------------------------
 
+/**
+ * @brief      Generates return inside the function, move value from top of the stack to the retval
+ *
+ * @return     OK if successfull, INTERNAL_ERROR in case of internal error
+ *             occurrence
+ */
+int gen_return_();
 /**
  * @brief      Generates the header of IFJcode19 file
  *
@@ -519,6 +529,16 @@ int gen_f_call(char *id);
  *             occurrence
  */
 int gen_f_prep_params();
+
+/**
+ * @brief      Generates code to store the return of function to the variable
+ *
+ * @param      var   String containing variable name
+ *
+ * @return     OK if successfull, INTERNAL_ERROR in case of internal error
+ *             occurrence
+ */
+int gen_f_return(char* var);
 
 
 // unique labely
