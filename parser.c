@@ -39,6 +39,7 @@ int depth = 0;
 Token savedToken;
 char *saved_id = NULL;
 char *copy_id = NULL;
+char *funtion_id = NULL;
 
 int prog(Token *token) {
 	pq_init();
@@ -103,6 +104,10 @@ int st_list(Token *token) {
 		if (strcmp(token->attribute, "def") == 0 && !in_function && !in_if_while) {
 			returnValue = stat(token);
 			if (returnValue == OK) {
+				if((returnValue = gen_f_end(funtion_id)) != OK) {
+					return returnValue;
+				}
+				funtion_id = NULL;
 				GET_NEXT_TOKEN(token);
 				return st_list(token);
 			} else {
@@ -239,7 +244,10 @@ int stat(Token *token) {
 						return returnValue;
 					}
 				}
-				//TODO: GEN_CODE - generovanie lable pre začiatok funkcie...
+				funtion_id = token->attribute;
+				if((returnValue = gen_f_start(funtion_id)) != OK){
+					return returnValue;
+				}
 				saved_id = token->attribute;
 				local_table = FindLocalTable(root, token->attribute);
 				param_list = FindParamList(root, token->attribute);
@@ -275,8 +283,6 @@ int stat(Token *token) {
 		} else if (strcmp(token->attribute, "if") == 0) {
 			GET_NEXT_TOKEN(token);
 			if ((returnValue = callExpression(token)) == OK) {
-				//TODO: GEN-CODE = vygenerovanie ifu na kontrolu
-				//TODO: GEN-CODE = pripadne vygenerovat jump na else lable.
 				if((returnValue = gen_if()) != OK) {
 					return returnValue;
 				}
@@ -293,7 +299,6 @@ int stat(Token *token) {
 							if (returnValue == OK) {
 								GET_NEXT_TOKEN(token);
 								if (token->type == TK_KW && strcmp(token->attribute, "else") == 0) {
-									//TODO: GEN-CODE = vygenerovat lable pre else
 									if((returnValue = gen_else()) != OK) {
 										return returnValue;
 									}
@@ -356,13 +361,12 @@ int stat(Token *token) {
 		*/
 		} else if (strcmp(token->attribute, "pass") == 0) {
 			GET_NEXT_TOKEN(token);
-			if (token->type == TK_EOL || token->type == TK_EOF) {
-				//TODO GEN-CODE pass
+			if (token->type == TK_EOL || token->type == TK_EOF) {\
 				return eof_or_eol(token);
 			}
 		/*
 			29:  <func-nested-stat> -> return <after-return>
-		*/
+		*/		
 		} else if (strcmp(token->attribute, "return") == 0 && in_function) {
 			//TODO: GEN-CODE = return neviem ako to bude pracovat musim zistit bud vygenerujeme na začiatku funcie premennú ktorá bude return NULL
 			// a potom ak sa objaví return tak to zmeníme a vygenerujeme uvidíme...
@@ -603,7 +607,6 @@ int assign(Token *token) {
 		){
 		GET_NEXT_TOKEN(token);
 		if((returnValue = callExpression(token)) == OK) {
-			//TODO GEN-CODE - vygenerovanie definicie premennej a priradenie jej hodnoty do nej.
 			if(!isRelational) {
 				GET_NEXT_TOKEN(token);
 				if(in_function){
@@ -672,7 +675,6 @@ int assign(Token *token) {
 		) {
 			GET_NEXT_TOKEN(token);
 			if((returnValue = callExpression(token)) == OK) {
-			//TODO GEN-CODE - priradenie premennej do výslednej premenej.
 				if(!isRelational) {
 					if(in_function){
 						//TODO SEM-A kontrola či lokálna premenná náhodou sa nerovná funkcii
