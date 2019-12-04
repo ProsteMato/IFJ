@@ -169,7 +169,7 @@ void pq_destroy();
  * @return     OK if successfull, INTERNAL_ERROR in case of internal error
  *             occurrence
  */
-int gen_return_();
+int gen_return();
 /**
  * @brief      Generates the header of IFJcode19 file
  *
