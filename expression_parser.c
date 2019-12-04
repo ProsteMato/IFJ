@@ -287,7 +287,8 @@ int symbolsToReduce()
 
 int callExpression(Token *token)
 {
-  void tkq_init(); 
+  void tkq_init();
+  isRelational = false;
   int leftBracket = 0;
   int rightBracket =0; 
   pTable symbol= getIndex(token);
@@ -434,10 +435,7 @@ int callExpression(Token *token)
       
   }
   int err_unget= unget_token(token);
-  if (err_unget != OK)
-  {
-        return err_unget;
-  }
+  
 
   if ( leftBracket != rightBracket) 
   {
@@ -586,7 +584,11 @@ int callExpression(Token *token)
 
             }
       } while ( stack.top->symbol != PT_DOLLAR || eList.act->symbol != PT_DOLLAR);
-  //gen_expr();
+ if (err_unget != OK)
+ {
+        return err_unget;
+ }
+ gen_expr();
  listDispose(&eList);
  //disposeStack(&stack);
  return OK;
