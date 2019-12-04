@@ -952,7 +952,7 @@ int gen_f_end(char *id){ // label na koniec
 	return OK;
 }
 
-int gen_return_(){ // tu sme skoncili
+int gen_return(){ // tu sme skoncili
 	Code *code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
