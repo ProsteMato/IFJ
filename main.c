@@ -14,6 +14,9 @@
 int main (int argc, char * argv[]){
 	// init globalnej tabulky symbolov
 	GlobalSymTabInit(&root);
+	if (init_generator()){
+		return INTERNAL_ERROR;
+	}
 	Token token;
 	int ret_val;
 	ret_val = get_next_token(&token);
