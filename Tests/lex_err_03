@@ -2,4 +2,4 @@ ahoj = 5
 svete = 4
 whilee ( ahoj > svete)
     svete = svete + 1
-    print('Zdravim', svete, '\n')
+    print('Prosel program s chybou \n')
