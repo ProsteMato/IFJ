@@ -565,6 +565,9 @@ int gen_assign_expr_res(char *dest){
 	}
 	if (add_code(code, dest))
 		return INTERNAL_ERROR;
+	
+	if (CL_add_line(code))
+		return INTERNAL_ERROR;
 
 	return OK;
 }
