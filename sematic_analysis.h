@@ -162,7 +162,7 @@ int define_local_variable(LocalTableNode *root, bool function_call, char *variab
  * @param function_call Bool if this is a function call
  * @return Error code
  */
-int define_global_variable(SymTabNodePtr *root, char *variable_id);
+int define_global_variable(SymTabNodePtr *root, bool function_call, char *variable_id);
 
 /**
  * @brief This function will generate uniq id for expr_parser
