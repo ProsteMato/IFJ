@@ -131,6 +131,9 @@ int st_list(Token *token) {
 		} else if (strcmp(token->attribute, "while") == 0) {
 			returnValue = stat(token);
 			if (returnValue == OK) {
+				if((returnValue = gen_while_end()) != OK) {
+					return returnValue;
+				}
 				GET_NEXT_TOKEN(token);
 				if (!in_function && !in_if_while) {
 					return st_list(token);
@@ -334,9 +337,15 @@ int stat(Token *token) {
 		} else if (strcmp(token->attribute, "while") == 0) {
 			//TODO GEN-CODE = counter
 			//TODO GEN-CODE = uniq lable
+			if((returnValue = gen_while_label()) != OK) {
+				return returnValue;
+			}
 			GET_NEXT_TOKEN(token);
 			if ((returnValue = callExpression(token)) == OK) {
 				//TODO GEN-CODE = if podmienka bud skočit preč z while alebo ostat. treba vedieť lable na koniec while.
+				if((returnValue = gen_while_begin()) != OK) {
+					return returnValue;
+				}
 				GET_NEXT_TOKEN(token);
 				if (token->type == TK_COLON) {
 					GET_NEXT_TOKEN(token);
@@ -368,12 +377,9 @@ int stat(Token *token) {
 			29:  <func-nested-stat> -> return <after-return>
 		*/		
 		} else if (strcmp(token->attribute, "return") == 0 && in_function) {
-			//TODO: GEN-CODE = return neviem ako to bude pracovat musim zistit bud vygenerujeme na začiatku funcie premennú ktorá bude return NULL
-			// a potom ak sa objaví return tak to zmeníme a vygenerujeme uvidíme...
 			int returnValue = 0;
 			GET_NEXT_TOKEN(token);
 			if((returnValue = after_return(token)) == OK) {
-				//TODO GEN-CODE return
 				return OK;
 			} else {
 				return returnValue;
@@ -771,6 +777,9 @@ int after_return(Token *token) {
 	}
 	else if((returnValue = callExpression(token)) == OK) {
 		if (!isRelational) {
+			if((returnValue = gen_return()) != OK) {
+				return returnValue;
+			}
 			GET_NEXT_TOKEN(token);
 			return eof_or_eol(token);
 		} else {
