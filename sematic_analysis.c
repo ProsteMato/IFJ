@@ -230,9 +230,6 @@ int define_local_variable(LocalTableNode *root, bool function_call, char *variab
 int define_global_variable(SymTabNodePtr *root, bool function_call, char *variable_id) {
     int returnValue = 0;
     if (!is_variable_defined(*root, NULL, NULL, variable_id)) {
-        if((returnValue = gen_defvar(variable_id)) != OK) {
-            return returnValue;
-        }
         GlobalTableData *data = malloc (sizeof(GlobalTableData));
         data->funkce = false;
         data->define = false;
@@ -242,6 +239,9 @@ int define_global_variable(SymTabNodePtr *root, bool function_call, char *variab
         data->type = TYPE_UNDEFINED;
         int returnValue = GlobalSymTabInsert(root, variable_id, data);
         if(returnValue != OK) {
+            return returnValue;
+        }
+        if((returnValue = gen_defvar(variable_id)) != OK) {
             return returnValue;
         }
     }
