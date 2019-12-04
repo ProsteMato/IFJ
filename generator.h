@@ -403,7 +403,7 @@ int gen_stack_greatereq();
  * @return     OK if successfull, INTERNAL_ERROR in case of internal error
  *             occurrence
  */
-int assign_expr_rest(char *dest);
+int gen_assign_expr_rest(char *dest);
 /**
  * @brief      Generetes the addition of two floats or ints
  *
