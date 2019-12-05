@@ -362,8 +362,7 @@ char *UndefinedFunctionControl(SymTabNodePtr RootPtr){
 		if (RootPtr->Data->funkce == true){ // symbol je funkce
 			if (RootPtr->Data->define == false){ // funkce nebyla definovana
 				return RootPtr->Key;
-			}
-			return NULL;
+			}	
 		}
 		returnValue = UndefinedFunctionControl(RootPtr->LPtr);
 		returnValue = UndefinedFunctionControl(RootPtr->RPtr);
