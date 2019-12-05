@@ -378,6 +378,10 @@ int callExpression(Token *token)
                   return SYNTAX_ERROR;
             }
       }
+       if (token->type ==TK_ASSIGN)
+       {
+             return SYNTAX_ERROR;
+       }
       if (token->type == TK_EQUAL)
       {
             isRelational = true; 
