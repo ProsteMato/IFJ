@@ -1,5 +1,5 @@
-a = 0
-while a < 1:
-        b = a
-a = a + 1
+a = 5
+b = 3
+    def fce (a):
+c = a + b
 print('Prosel program s chybou \n')

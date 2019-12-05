@@ -1,5 +1,2 @@
-a = 5
-b = 3
-def fce (a):
-c = a + b
+while = 24
 print('Prosel program s chybou \n')

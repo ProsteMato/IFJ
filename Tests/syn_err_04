@@ -1,5 +1,2 @@
-a = 5
-b = 3
-def fce (a):
-c = a + b
+if = 5
 print('Prosel program s chybou \n')

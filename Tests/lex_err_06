@@ -1,5 +1,1 @@
-a = 0
-        while a < 1:
-    b = a
-    a = a + 1
-print('Prosel program s chybou \n')
+@nxx = 5

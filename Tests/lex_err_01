@@ -1,4 +1,5 @@
-ahoj = 5
-svete = 5
-fi ( ahoj == svete)
-    print('Prosel program s chybou\n')
+a = 0
+while a < 1:
+b = a
+    a = a + 1
+print('Prosel program s chybou \n')
