@@ -1,0 +1,3 @@
+a = 5
+def if (a)
+print('Prosel program s chybou \n')

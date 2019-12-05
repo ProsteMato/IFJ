@@ -42,7 +42,6 @@ int depth = 0;
 Token savedToken;
 char *saved_id = NULL;
 char *copy_id = NULL;
-char *funtion_id = NULL;
 
 int prog(Token *token) {
 	pq_init();
@@ -107,10 +106,10 @@ int st_list(Token *token) {
 		if (strcmp(token->attribute, "def") == 0 && !in_function && !in_if_while) {
 			returnValue = stat(token);
 			if (returnValue == OK) {
-				if((returnValue = gen_f_end(funtion_id)) != OK) {
+				if((returnValue = gen_f_end(saved_id)) != OK) {
 					return returnValue;
 				}
-				funtion_id = NULL;
+				saved_id = NULL;
 				GET_NEXT_TOKEN(token);
 				return st_list(token);
 			} else {
@@ -243,24 +242,24 @@ int stat(Token *token) {
 		if (strcmp(token->attribute, "def") == 0 && !in_function && !in_if_while) {
 			GET_NEXT_TOKEN(token);
 			if (token->type == TK_ID) {
-				if((is_function_created(root, token->attribute) && is_function_defined(root, token->attribute)) ||
-				   (!is_function_created(root, token->attribute) && !is_function_defined(root, token->attribute))){
-					returnValue = define_function(&root, token->attribute);
+				saved_id = token->attribute;
+				if((returnValue = gen_f_start(saved_id)) != OK){
+					return returnValue;
+				}
+				if((is_function_created(root, saved_id) && is_function_defined(root, saved_id)) ||
+				(!is_function_created(root, saved_id) && !is_function_defined(root, saved_id))){
+					returnValue = define_function(&root, saved_id);
 					if(returnValue != OK) {
 						return returnValue;
 					}
 				}
-				funtion_id = token->attribute;
-				if((returnValue = gen_f_start(funtion_id)) != OK){
-					return returnValue;
-				}
-				saved_id = token->attribute;
-				local_table = FindLocalTable(root, token->attribute);
-				param_list = FindParamList(root, token->attribute);
+				local_table = FindLocalTable(root, saved_id);
+				param_list = FindParamList(root, saved_id);
 				GET_NEXT_TOKEN(token);
 				if (token->type == TK_BRACKET_L) {
 					returnValue = params(token);
 					if (returnValue == OK) {
+						SetDefine(root, saved_id);
 						GET_NEXT_TOKEN(token);
 						if (token->type == TK_COLON) {
 							GET_NEXT_TOKEN(token);
@@ -270,7 +269,6 @@ int stat(Token *token) {
 									depth++;
 									in_function = true;
 									GET_NEXT_TOKEN(token);
-									SetDefine(root, saved_id);
 									return st_list(token);
 								}
 							}
@@ -329,7 +327,6 @@ int stat(Token *token) {
 					}
 				}
 			} else {
-				printf("je to chyba v expr...\n");
 				return returnValue;
 			}
 		/*
@@ -463,7 +460,7 @@ int stat(Token *token) {
 int params(Token *token) {
 	GET_NEXT_TOKEN(token);
 	if (token->type == TK_BRACKET_R) {
-		if(is_function_defined(root, saved_id)){
+		if(WasCalled(root, saved_id)){
 			return check_function_param_count(root, saved_id, 0);
 		} else {
 			SetParamCount(root, saved_id, 0);
@@ -499,13 +496,13 @@ int params_next(Token *token) {
 			return params_next(token);
 		}
 	} else if (token->type == TK_BRACKET_R) {
-		if(is_function_defined(root, saved_id)){
+		if(WasCalled(root, saved_id)){
 			int returnValue = check_function_param_count(root, saved_id, count);
-			count = 1;
 			return returnValue;
 		} else {
 			SetParamCount(root, saved_id, count);
 		}
+		count = 1;
 		return OK;
 	}
 	return SYNTAX_ERROR;
@@ -531,19 +528,18 @@ int arg_params(Token *token) {
 				return returnValue;
 			}
 	} else if (token->type == TK_BRACKET_R) {
-		if(!is_function_defined(root, saved_id) && is_function_created(root, saved_id)) {
+		if(!is_function_defined(root, saved_id)) {
 			if(!is_function_created(root, saved_id)) {
+				if(is_global_variable(root, saved_id)) {
+					return SEM_FUNCTION_ERROR;
+				}
 				returnValue = define_function(&root, saved_id);
 				if (returnValue != OK) {
 					return returnValue;
 				}
-				if(is_build_in_function(saved_id))
-					set_build_in_function_param_count(root, saved_id);
-					//TODO GEN-CODE vygenerovanie build in function
-			} else if(is_global_variable(root, saved_id)) {
-				return SEM_FUNCTION_ERROR;
+				SetParamCount(root, saved_id, 0);
+				SetCalled(root, saved_id);
 			}
-			SetParamCount(root, saved_id, 0);
 			return OK;
 		} else {
 			return check_function_param_count(root, saved_id, 0);
@@ -580,17 +576,16 @@ int arg_next_params(Token *token) {
 	} else if (token->type == TK_BRACKET_R) {
 		if(!is_function_defined(root, saved_id) && !is_function_created(root, saved_id)) {
 			if(!is_function_created(root, saved_id)) {
+				if(is_global_variable(root, saved_id)) {
+					return SEM_FUNCTION_ERROR;
+				}
 				returnValue = define_function(&root, saved_id);
 				if (returnValue != OK) {
 					return returnValue;
 				}
-				if(is_build_in_function(saved_id))
-					set_build_in_function_param_count(root, saved_id);
-					//TODO GEN-CODE = vygenerovat build-in funckiu 
-			} else if(is_global_variable(root, saved_id)) {
-				return SEM_FUNCTION_ERROR;
+				SetParamCount(root, saved_id, count);
+				SetCalled(root, saved_id);
 			}
-			SetParamCount(root, saved_id, count);
 			count = 1;
 			return OK;
 		} else {
@@ -614,7 +609,6 @@ int assign(Token *token) {
 		token->type == TK_STRING ||
 		(token->type == TK_KW && strcmp(token->attribute, "None") == 0)
 		){
-		GET_NEXT_TOKEN(token);
 		if((returnValue = callExpression(token)) == OK) {
 			if(!isRelational) {
 				GET_NEXT_TOKEN(token);
@@ -691,7 +685,7 @@ int assign(Token *token) {
 						if (returnValue != OK){
 							return returnValue;
 						}
-						LocalSetDefine(local_table, copy_id);
+					LocalSetDefine(local_table, copy_id);
 						LocalSetType(local_table, copy_id, finalType);
 					} else {
 						//TODO SEM-A kontrola či globálna premenná náhodou sa nerovná funkcii
@@ -723,7 +717,7 @@ int assign(Token *token) {
 */
 int after_id(Token *token) {
 	if(token->type == TK_ASSIGN) {
-		PRELOAD_TOKEN(token);
+		GET_NEXT_TOKEN(token);
 		copy_id = saved_id;
 		return assign(token);
 	} else if (token->type == TK_EOL || token->type == TK_EOF || token->type == TK_BRACKET_L) {

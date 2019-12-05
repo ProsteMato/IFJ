@@ -1,4 +1,4 @@
 ahoj = 5
 svete = 5
 ifi ( ahoj == svete)
-    print('Zdravim', svete, '\n')
+    print('Prosel program s chybou \n')

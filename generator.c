@@ -549,7 +549,7 @@ int gen_expr(){
 	}
 	return OK;
 }
-int gen_assign_expr_res(char *dest){
+int assign_expr_res(char *dest){
 	Code *code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
@@ -568,6 +568,67 @@ int gen_assign_expr_res(char *dest){
 
 	return OK;
 }
+/*
+int gen_less_than(char *op1, char *op2){
+	Code *code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+
+	// LT GF@&expr&val op1 op2
+	if (add_code(code, "LT GF@&expr&val "))
+		return INTERNAL_ERROR;
+
+	// op1 je premenna
+	if (is_variable_defined(root,op1)){
+		if (is_global_variable(root,op1){
+			if (add_code(code, "GF@"))
+				return INTERNAL_ERROR;
+		} else {
+			if (add_code(code, "LF@"))
+				return INTERNAL_ERROR;
+		}
+		if (add_code(code, op1))
+				return INTERNAL_ERROR;
+	// op1 je konst
+	} else {
+		if (add_code(code, op1))
+			return INTERNAL_ERROR;
+	}
+
+	// op2 je premenna
+	if (is_variable_defined(root,op2)){
+		if (is_global_variable(root,op2){
+			if (add_code(code, " GF@"))
+				return INTERNAL_ERROR;
+		} else {
+			if (add_code(code, " LF@"))
+				return INTERNAL_ERROR;
+		}
+		if (add_code(code, op2))
+				return INTERNAL_ERROR;
+	// op1 je konst
+	} else {
+		if (add_code(code, op))
+			return INTERNAL_ERROR;
+	}
+}
+
+int gen_more_than(char *op1, char *op2){
+
+}
+int gen_equal(char *op1, char *op2){
+
+}
+int gen_equal_less(char *op1, char *op2){
+
+}
+int gen_equal_more(char *op1, char *op2){
+
+}
+int gen_not_equal(char *op1, char *op2){
+
+}
+*/
 
 int gen_while_label(){  // doplnit o unique labely
 	Code *code = create_code();
@@ -683,7 +744,7 @@ int gen_print(char *symb){
 		return INTERNAL_ERROR;
 
 	// zistenie ci je symb premenna abo konst
-	if (is_constant(root, local_table, param_list, symb)){ // premenna
+	if (is_variable_defined(root, local_table, param_list, symb)){ // premenna
 		if (is_global_variable(root, symb)){ // global
 			if (add_code(code, "GF@\0"))
 				return INTERNAL_ERROR;
@@ -920,8 +981,24 @@ int gen_f_start(char *id){
 	return OK;
 }
 
-int gen_f_end(char *id){ // label na koniec
+int gen_f_end(char *id){
 	Code *code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "LABEL $\0"))
+		return INTERNAL_ERROR;
+	if (add_code(code, id))
+		return INTERNAL_ERROR;
+	if (add_code(code, "_end\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(code))
+		return INTERNAL_ERROR;
+
+	code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
 	if (add_code(code, "POPFRAME\0"))
@@ -937,105 +1014,47 @@ int gen_f_end(char *id){ // label na koniec
 	if (CL_add_line(code))
 		return INTERNAL_ERROR;
 
-	code = create_code();
-	if (!code)
-		return INTERNAL_ERROR;
-	if (add_code(code, "LABEL $\0"))
-		return INTERNAL_ERROR;
-	if (add_code(code, id))
-		return INTERNAL_ERROR;
-	if (add_code(code, "_end\0"))
-		return INTERNAL_ERROR;
-	if (CL_add_line(code))
-		return INTERNAL_ERROR;
-
 	return OK;
 }
 
-int gen_return(){ // tu sme skoncili
-	Code *code = create_code();
-	if (!code)
-		return INTERNAL_ERROR;
-	if (add_code(code, "POPS LF@%retval\0"))
-		return INTERNAL_ERROR;
-	if (CL_add_line(code))
-		return INTERNAL_ERROR;
-	return OK;
-}
 /*
-	char *tmp;
+int gen_f_return(*symb, type){
 	Code *code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
-
 	if (add_code(code, "MOVE LF@%retval \0"))
 		return INTERNAL_ERROR;
 
-	if (token->type == TK_ID){
-		if (is_global_variable(root, token->attribute)){
-			if (add_code(code, "GF@%\0"))
-				return INTERNAL_ERROR;
-		} else {
+	
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (is_variable_defined(root, local_table, param_list, symb){
+		if (is_global_variable(root, symb)){
 			if (add_code(code, "LF@\0"))
 				return INTERNAL_ERROR;
+		} else {
+			if (add_code(code, "GF@\0"))
+				return INTERNAL_ERROR;
 		}
-		if (add_code(code, token->attribute))
-			return INTERNAL_ERROR;
-	} else if (token->type == TK_KW){
-		if (add_code(code, "nil@nil\0"))
-			return INTERNAL_ERROR;
-	} else if (token->type == TK_INT){
-		if (add_code(code, "int@\0"))
-			return INTERNAL_ERROR;
-		if (add_code(code, token->attribute))
-			return INTERNAL_ERROR;
-	} else if (token->type == TK_FLOAT){
-		if (add_code(code, "float@\0"))
-			return INTERNAL_ERROR;
-		tmp = float_to_str(token->attribute);
-		if (add_code(code, tmp))
-			return INTERNAL_ERROR;
-		free(tmp);
-	} else if (token->type == TK_STRING){
-		if (add_code(code, "string@\0"))
-			return INTERNAL_ERROR;
-		tmp = transform_for_write(token->attribute);
-		if (add_code(code, tmp))
-			return INTERNAL_ERROR;
-		free(tmp);
-	} else { // sem by sa nic ine nemalo dostat
-		return INTERNAL_ERROR;
-	}
+	} else {
 
+	}
+	
+
+
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	
+
+	
 	if (CL_add_line(code))
 		return INTERNAL_ERROR;
+
 	return OK;
 }
 */
-
-int gen_f_return(char* var){
-	Code *code = create_code();
-	if (!code)
-		return INTERNAL_ERROR;
-	if (add_code(code, "MOVE \0"))
-		return INTERNAL_ERROR;
-
-	if (is_global_variable(root, var)){
-		if (add_code(code, "GF@\0"))
-			return INTERNAL_ERROR;
-	} else {
-		if (add_code(code, "LF@\0"))
-			return INTERNAL_ERROR;
-	}
-	if (add_code(code, var))
-		return INTERNAL_ERROR;
-	if (add_code(code, " TF@%retval\0"))
-		return INTERNAL_ERROR;
-	if (CL_add_line(code))
-		return INTERNAL_ERROR;
-	return OK;
-}
-
 int gen_header(){
 	Code *header = create_code();
 	if (!header)
@@ -4576,7 +4595,7 @@ int gen_add(char *op1, char *op2){
 	if (add_code(code, "ADD GF@&res1 \0"))
 		return INTERNAL_ERROR;
 	// op1
-	if (is_constant(root, local_table, param_list, op1)){ // premenna 
+	if (is_variable_defined(root, local_table, param_list, op1)){ // premenna 
 		if (is_global_variable(root, op1)){ // globalna
 			if (add_code(code, "GF@\0"))
 				return INTERNAL_ERROR;
@@ -4593,7 +4612,7 @@ int gen_add(char *op1, char *op2){
 	// op2
 	if (add_code(code, " "))
 		return INTERNAL_ERROR;
-	if (is_constant(root, local_table, param_list, op2)){ // premenna 
+	if (is_variable_defined(root, local_table, param_list, op2)){ // premenna 
 		if (is_global_variable(root, op2)){ // globalna
 			if (add_code(code, "GF@\0"))
 				return INTERNAL_ERROR;
@@ -4629,7 +4648,7 @@ int gen_minus(char *op1, char *op2){
 	if (add_code(code, "SUB GF@&res1 \0"))
 		return INTERNAL_ERROR;
 	// op1
-	if (is_constant(root, local_table, param_list, op1)){ // premenna 
+	if (is_variable_defined(root, local_table, param_list, op1)){ // premenna 
 		if (is_global_variable(root, op1)){ // globalna
 			if (add_code(code, "GF@\0"))
 				return INTERNAL_ERROR;
@@ -4646,7 +4665,7 @@ int gen_minus(char *op1, char *op2){
 	// op2
 	if (add_code(code, " "))
 		return INTERNAL_ERROR;
-	if (is_constant(root, local_table, param_list, op2)){ // premenna 
+	if (is_variable_defined(root, local_table, param_list, op2)){ // premenna 
 		if (is_global_variable(root, op2)){ // globalna
 			if (add_code(code, "GF@\0"))
 				return INTERNAL_ERROR;
@@ -4681,7 +4700,7 @@ int gen_mult(char *op1, char *op2){
 	if (add_code(code, "MUL GF@&res1 \0"))
 		return INTERNAL_ERROR;
 	// op1
-	if (is_constant(root, local_table, param_list, op1)){ // premenna 
+	if (is_variable_defined(root, local_table, param_list, op1)){ // premenna 
 		if (is_global_variable(root, op1)){ // globalna
 			if (add_code(code, "GF@\0"))
 				return INTERNAL_ERROR;
@@ -4698,7 +4717,7 @@ int gen_mult(char *op1, char *op2){
 	// op2
 	if (add_code(code, " "))
 		return INTERNAL_ERROR;
-	if (is_constant(root, local_table, param_list, op2)){ // premenna 
+	if (is_variable_defined(root, local_table, param_list, op2)){ // premenna 
 		if (is_global_variable(root, op2)){ // globalna
 			if (add_code(code, "GF@\0"))
 				return INTERNAL_ERROR;
@@ -4733,7 +4752,7 @@ int gen_div(char *op1, char *op2){
 	if (add_code(code, "DIV GF@&res1 \0"))
 		return INTERNAL_ERROR;
 	// op1
-	if (is_constant(root, local_table, param_list, op1)){ // premenna 
+	if (is_variable_defined(root, local_table, param_list, op1)){ // premenna 
 		if (is_global_variable(root, op1)){ // globalna
 			if (add_code(code, "GF@\0"))
 				return INTERNAL_ERROR;
@@ -4750,7 +4769,7 @@ int gen_div(char *op1, char *op2){
 	// op2
 	if (add_code(code, " "))
 		return INTERNAL_ERROR;
-	if (is_constant(root, local_table, param_list, op2)){ // premenna 
+	if (is_variable_defined(root, local_table, param_list, op2)){ // premenna 
 		if (is_global_variable(root, op2)){ // globalna
 			if (add_code(code, "GF@\0"))
 				return INTERNAL_ERROR;
@@ -4785,7 +4804,7 @@ int gen_idiv(char *op1, char *op2){
 	if (add_code(code, "IDIV GF@&res1 \0"))
 		return INTERNAL_ERROR;
 	// op1
-	if (is_constant(root, local_table, param_list, op1)){ // premenna 
+	if (is_variable_defined(root, local_table, param_list, op1)){ // premenna 
 		if (is_global_variable(root, op1)){ // globalna
 			if (add_code(code, "GF@\0"))
 				return INTERNAL_ERROR;
@@ -4802,7 +4821,7 @@ int gen_idiv(char *op1, char *op2){
 	// op2
 	if (add_code(code, " "))
 		return INTERNAL_ERROR;
-	if (is_constant(root, local_table, param_list, op2)){ // premenna 
+	if (is_variable_defined(root, local_table, param_list, op2)){ // premenna 
 		if (is_global_variable(root, op2)){ // globalna
 			if (add_code(code, "GF@\0"))
 				return INTERNAL_ERROR;
@@ -4837,7 +4856,7 @@ int gen_concat(char *op1, char *op2){
 	if (add_code(code, "CONCAT GF@&res1 \0"))
 		return INTERNAL_ERROR;
 	// op1
-	if (is_constant(root, local_table, param_list, op1)){ // premenna 
+	if (is_variable_defined(root, local_table, param_list, op1)){ // premenna 
 		if (is_global_variable(root, op1)){ // globalna
 			if (add_code(code, "GF@\0"))
 				return INTERNAL_ERROR;
@@ -4854,7 +4873,7 @@ int gen_concat(char *op1, char *op2){
 	// op2
 	if (add_code(code, " "))
 		return INTERNAL_ERROR;
-	if (is_constant(root, local_table, param_list, op2)){ // premenna 
+	if (is_variable_defined(root, local_table, param_list, op2)){ // premenna 
 		if (is_global_variable(root, op2)){ // globalna
 			if (add_code(code, "GF@\0"))
 				return INTERNAL_ERROR;

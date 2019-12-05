@@ -2,4 +2,4 @@ a = 0
 while a < 1:
         b = a
 a = a + 1
-print('Vysledek je:', b, '\n')
+print('Prosel program s chybou \n')

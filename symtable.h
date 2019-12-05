@@ -55,6 +55,7 @@ typedef struct GlobalTableData{
   Data_type type; //typ symbolu
   bool define;
   bool funkce; //funkce
+  bool wasCalled;
   int pocet_par; //pouze u fce
   LocalTableNode *localTableNode;
   ParamList *paramList; //0. parametr (pouze u fce)
@@ -107,6 +108,14 @@ void GlobalSymTabDispose (SymTabNodePtr *);
 @param SymTabNodePtr - tabulka symbolu
 @char - klic symbolu u ktereho mam provest zmenu */
 void SetDefine(SymTabNodePtr, char *);
+
+//TODO dokumentacia
+//nastavuje premennu wascalled ci je funkcia definovana
+void SetCalled(SymTabNodePtr RootPtr, char * K);
+
+//TODO dokumentacia
+//vracia premennu wascalled ci bola funkcia definovana 
+bool WasCalled(SymTabNodePtr RootPtr, char * K);
 
 /** nastavi typ globalni premmennej
 @param LocalTableNode - tabulka symbolu
