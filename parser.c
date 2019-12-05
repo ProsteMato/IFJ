@@ -13,6 +13,9 @@
 //TODO SEM-A - na začatku programu definovať všetky build-id funcie
 //TODO SEM-A - kontrolovať parametre build-id funkcii
 //TODO SEM-A - skontrolovať každú definíciu premennej
+//TODO GEN - prida5 premennu aby sa negeneroval kod pri nejakých sytuáciach
+//TODO GEN - pridat generoť generovanie volania funkcie aj ked to nieje v a = 
+
 
 #include "parser.h"
 #include "main.h"
