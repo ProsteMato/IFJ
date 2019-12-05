@@ -10,6 +10,9 @@ cifj19: ${OBJ}
 clean:
 	rm *.o cifj19
 
+test: 
+	./run_tests.sh
+
 # --------------------------#
 #         Object files      #
 # --------------------------#
