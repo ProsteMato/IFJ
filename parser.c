@@ -328,14 +328,11 @@ int stat(Token *token) {
 			36:  <nested-stat> -> while expr : EOL INDENT <nested-st-list>
 		*/
 		} else if (strcmp(token->attribute, "while") == 0) {
-			//TODO GEN-CODE = counter
-			//TODO GEN-CODE = uniq lable
 			if((returnValue = gen_while_label()) != OK) {
 				return returnValue;
 			}
 			GET_NEXT_TOKEN(token);
 			if ((returnValue = callExpression(token)) == OK) {
-				//TODO GEN-CODE = if podmienka bud skočit preč z while alebo ostat. treba vedieť lable na koniec while.
 				if((returnValue = gen_while_begin()) != OK) {
 					return returnValue;
 				}
@@ -349,7 +346,6 @@ int stat(Token *token) {
 							GET_NEXT_TOKEN(token);
 							in_if_while = true;
 							return st_list(token);
-							//TODO GEN-CODE = lable na koniec while
 						}
 					}
 				}
@@ -691,7 +687,6 @@ int assign(Token *token) {
 			if((returnValue = callExpression(token)) == OK) {
 				if(!isRelational) {
 					if(in_function){
-						//TODO SEM-A kontrola či lokálna premenná náhodou sa nerovná funkcii
 						returnValue = define_local_variable(&local_table, false, copy_id);
 						if (returnValue != OK){
 							return returnValue;
@@ -699,7 +694,6 @@ int assign(Token *token) {
 					LocalSetDefine(local_table, copy_id);
 						LocalSetType(local_table, copy_id, finalType);
 					} else {
-						//TODO SEM-A kontrola či globálna premenná náhodou sa nerovná funkcii
 						returnValue = define_global_variable(&root, false, copy_id);
 						if (returnValue != OK){
 							return returnValue;
@@ -746,6 +740,13 @@ int def_id(Token *token) {
 	if (token->type == TK_BRACKET_L) {
 		GET_NEXT_TOKEN(token);
 		if ((returnValue = arg_params(token)) == OK) {
+			//TODO GEN vygenerovat call na funkciu a pripravit parametre
+			if((returnValue = gen_f_prep_params()) != OK) {
+				return returnValue;
+			}
+			if((returnValue = gen_f_call(saved_id)) != OK) {
+				return returnValue;
+			}
 			GET_NEXT_TOKEN(token);
 			if (token->type == TK_EOL || token->type == TK_EOF) {
 				return eof_or_eol(token);
