@@ -66,12 +66,12 @@ void pq_destroy(){
 	pq.last = NULL;
 }
 
-void CL_init(){
-	code_list.first = NULL;
-	code_list.last = NULL;
+void CL_init(Code_list *code_list){
+	code_list->first = NULL;
+	code_list->last = NULL;
 }
 
-int CL_add_line(Code *line){
+int CL_add_line(Code_list *code_list, Code *line){
 	if (line == NULL){
 		return INTERNAL_ERROR;
 	}
@@ -85,13 +85,13 @@ int CL_add_line(Code *line){
 	}
 	new->code = line;
 	new->next = NULL;
-	if (code_list.first == NULL && code_list.last == NULL){
+	if (code_list->first == NULL && code_list->last == NULL){
 		// ziaden prvok v liste
-		code_list.first = new;
-		code_list.last = new;
+		code_list->first = new;
+		code_list->last = new;
 	} else{
-		code_list.last->next = new;
-		code_list.last = new;
+		code_list->last->next = new;
+		code_list->last = new;
 	}
 	return OK;
 }
@@ -114,7 +114,7 @@ void CL_destroy(Code_line *line){
 int init_generator(){
 	while_counter = 0;
 	if_counter = 0;
-	CL_init();
+	CL_init(&code_list);
 	if (gen_header()){
 		return INTERNAL_ERROR;
 	}
@@ -218,7 +218,7 @@ int gen_if(){
 		return INTERNAL_ERROR;
 	if (add_code(code, " GF@&expr&val bool@true"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 	free(tmp);
 	return OK;
@@ -235,7 +235,7 @@ int gen_else(){
 		return INTERNAL_ERROR;
 	if (add_code(code, tmp))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -248,7 +248,7 @@ int gen_else(){
 		return INTERNAL_ERROR;
 	if (add_code(code, tmp))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	free(tmp);
@@ -266,7 +266,7 @@ int gen_if_end(){
 		return INTERNAL_ERROR;
 	if (add_code(code, tmp))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 	if_counter++;
 	free(tmp);
@@ -288,7 +288,7 @@ int gen_defvar(char *var){
 	}
 	if (add_code(code, var))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 	return OK;
 }
@@ -354,17 +354,25 @@ int gen_expr(){
 				return INTERNAL_ERROR;
 			}
 
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 			operand = operand->rptr;
 
 		} else if (precedenceRules[i] == PR_EPLUSE){
+			static int used = 0;
+			if (!used){
+				printf("sme tu\n");
+				if (gen_stack_plus()){
+					return INTERNAL_ERROR;
+				}
+				used = 1;
+			}
 			code = create_code();
 			if (!code)
 				return INTERNAL_ERROR;
 			if (add_code(code, "CREATEFRAME\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -372,7 +380,7 @@ int gen_expr(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "CALL $expr_plus$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 		} else if (precedenceRules[i] == PR_EMINUSE){
@@ -381,7 +389,7 @@ int gen_expr(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "CREATEFRAME\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -389,7 +397,7 @@ int gen_expr(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "CALL $expr_minus$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 			
 		} else if (precedenceRules[i] == PR_EMULTE){
@@ -398,7 +406,7 @@ int gen_expr(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "CREATEFRAME\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -406,7 +414,7 @@ int gen_expr(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "CALL $expr_mult$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 		} else if (precedenceRules[i] == PR_EDIVE){
@@ -415,7 +423,7 @@ int gen_expr(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "CREATEFRAME\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -423,7 +431,7 @@ int gen_expr(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "CALL $expr_div$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 		} else if (precedenceRules[i] == PR_EDIVDIVE){
@@ -432,7 +440,7 @@ int gen_expr(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "CREATEFRAME\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -440,7 +448,7 @@ int gen_expr(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "CALL $expr_idiv$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 		} else if (precedenceRules[i] == PR_ELESSE){
@@ -449,7 +457,7 @@ int gen_expr(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "CREATEFRAME\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -457,7 +465,7 @@ int gen_expr(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "CALL $expr_less$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 		} else if (precedenceRules[i] == PR_ELESSEQE){
@@ -466,7 +474,7 @@ int gen_expr(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "CREATEFRAME\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -474,7 +482,7 @@ int gen_expr(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "CALL $expr_lesseq$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 		} else if (precedenceRules[i] == PR_EGREATE){
@@ -483,7 +491,7 @@ int gen_expr(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "CREATEFRAME\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -491,7 +499,7 @@ int gen_expr(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "CALL $expr_greater$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 		} else if (precedenceRules[i] == PR_EGREATEQE){
@@ -500,7 +508,7 @@ int gen_expr(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "CREATEFRAME\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -508,7 +516,7 @@ int gen_expr(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "CALL $expr_greatereq$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 		} else if (precedenceRules[i] == PR_EEQE){
@@ -517,7 +525,7 @@ int gen_expr(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "CREATEFRAME\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -525,7 +533,7 @@ int gen_expr(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "CALL $expr_equal$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 		} else if (precedenceRules[i] == PR_ENOTEQE){
@@ -534,7 +542,7 @@ int gen_expr(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "CREATEFRAME\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -542,14 +550,14 @@ int gen_expr(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "CALL $expr_notequal$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 		}
 		i++;
 	}
 	return OK;
 }
-int assign_expr_res(char *dest){
+int gen_assign_expr_res(char *dest){
 	Code *code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
@@ -565,70 +573,12 @@ int assign_expr_res(char *dest){
 	}
 	if (add_code(code, dest))
 		return INTERNAL_ERROR;
+	
+	if (CL_add_line(&code_list, code))
+		return INTERNAL_ERROR;
 
 	return OK;
 }
-/*
-int gen_less_than(char *op1, char *op2){
-	Code *code = create_code();
-	if (!code)
-		return INTERNAL_ERROR;
-
-	// LT GF@&expr&val op1 op2
-	if (add_code(code, "LT GF@&expr&val "))
-		return INTERNAL_ERROR;
-
-	// op1 je premenna
-	if (is_variable_defined(root,op1)){
-		if (is_global_variable(root,op1){
-			if (add_code(code, "GF@"))
-				return INTERNAL_ERROR;
-		} else {
-			if (add_code(code, "LF@"))
-				return INTERNAL_ERROR;
-		}
-		if (add_code(code, op1))
-				return INTERNAL_ERROR;
-	// op1 je konst
-	} else {
-		if (add_code(code, op1))
-			return INTERNAL_ERROR;
-	}
-
-	// op2 je premenna
-	if (is_variable_defined(root,op2)){
-		if (is_global_variable(root,op2){
-			if (add_code(code, " GF@"))
-				return INTERNAL_ERROR;
-		} else {
-			if (add_code(code, " LF@"))
-				return INTERNAL_ERROR;
-		}
-		if (add_code(code, op2))
-				return INTERNAL_ERROR;
-	// op1 je konst
-	} else {
-		if (add_code(code, op))
-			return INTERNAL_ERROR;
-	}
-}
-
-int gen_more_than(char *op1, char *op2){
-
-}
-int gen_equal(char *op1, char *op2){
-
-}
-int gen_equal_less(char *op1, char *op2){
-
-}
-int gen_equal_more(char *op1, char *op2){
-
-}
-int gen_not_equal(char *op1, char *op2){
-
-}
-*/
 
 int gen_while_label(){  // doplnit o unique labely
 	Code *code = create_code();
@@ -643,7 +593,7 @@ int gen_while_label(){  // doplnit o unique labely
 	}
 	if (add_code(code, un_while_n))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	return OK;
@@ -663,7 +613,7 @@ int gen_while_begin(){
 		return INTERNAL_ERROR;
 	if (add_code(code, " GF@&expr&val bool@false\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	return OK;
@@ -681,7 +631,7 @@ int gen_while_end(){
 		return INTERNAL_ERROR;
 	if (add_code(code, unq_while_n))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -692,7 +642,7 @@ int gen_while_end(){
 	}
 	if (add_code(code, unq_while_n))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	while_counter++;
@@ -729,7 +679,7 @@ int gen_int2float(char *var){
 	if (add_code(code, var))
 		return INTERNAL_ERROR;
 
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	return OK;
@@ -744,7 +694,7 @@ int gen_print(char *symb){
 		return INTERNAL_ERROR;
 
 	// zistenie ci je symb premenna abo konst
-	if (is_variable_defined(root, local_table, param_list, symb)){ // premenna
+	if (is_constant(root, local_table, param_list, symb)){ // premenna
 		if (is_global_variable(root, symb)){ // global
 			if (add_code(code, "GF@\0"))
 				return INTERNAL_ERROR;
@@ -762,7 +712,7 @@ int gen_print(char *symb){
 			return INTERNAL_ERROR;
 	}
 
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	return OK;
@@ -777,7 +727,7 @@ int gen_f_call(char *id){
 		return INTERNAL_ERROR;
 	if (add_code(code, id))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	return OK;
@@ -792,7 +742,7 @@ int gen_assing_const_to_val(char *var, Token *token){
 		return INTERNAL_ERROR;
 	if (add_code(code, var))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -827,13 +777,14 @@ int gen_assing_const_to_val(char *var, Token *token){
 		return INTERNAL_ERROR;
 	}
 
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	return OK;
 }
 
 int gen_f_prep_params(){ // parametre cez TKQueue, pridavane v spravnom poradi, teda 1. vlozeny ako 1., posledny ako posledny
+	int empty = 0;
 	Token* token = malloc(sizeof(Token));
 	if(token == NULL)
 		return INTERNAL_ERROR;
@@ -845,12 +796,20 @@ int gen_f_prep_params(){ // parametre cez TKQueue, pridavane v spravnom poradi, 
 	// CREATEFRAME
 	if (add_code(code, "CREATEFRAME\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	// vytvaranie parametrov v cykle
-	if (pq_dequeue(token)){ // otestovat
-		return INTERNAL_ERROR;
+	if (pq.first == pq.last && pq.first == NULL){ // ziadne parametre
+		free(token);
+		token = NULL;
+		empty = 1;
+	} else {
+		if (pq.first == pq.last){
+			empty = 1;
+		}
+		if (pq_dequeue(token))
+			return INTERNAL_ERROR;
 	}
 	for (int i = 1; token != NULL; i++){
 		code = create_code();
@@ -866,7 +825,7 @@ int gen_f_prep_params(){ // parametre cez TKQueue, pridavane v spravnom poradi, 
 			return INTERNAL_ERROR;
 		if (add_code(code, tmp))
 			return INTERNAL_ERROR;
-		if (CL_add_line(code))
+		if (CL_add_line(&code_list, code))
 			return INTERNAL_ERROR;
 
 		code = create_code();
@@ -914,13 +873,20 @@ int gen_f_prep_params(){ // parametre cez TKQueue, pridavane v spravnom poradi, 
 			return INTERNAL_ERROR;
 		}
 
-		if (CL_add_line(code))
+		if (CL_add_line(&code_list, code))
 			return INTERNAL_ERROR;
 
-		if (pq_dequeue(token)){
-			return INTERNAL_ERROR;
+		if (empty){ // prazdny queue
+			free(token);
+			token = NULL;
+		} else {
+			if (pq.first == pq.last){ // posledny v queue
+				empty = 1;
+			}
+			if (pq_dequeue(token)){
+				return INTERNAL_ERROR;
+			}
 		}
-
 		free(tmp);
 	}
 	return OK;
@@ -937,7 +903,7 @@ int gen_f_start(char *id){
 		return INTERNAL_ERROR;
 	if (add_code(code, "_end\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	// LABEL $id
@@ -948,7 +914,7 @@ int gen_f_start(char *id){
 		return INTERNAL_ERROR;
 	if (add_code(code, id))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	// PUSHFRAME
@@ -957,7 +923,7 @@ int gen_f_start(char *id){
 		return INTERNAL_ERROR;
 	if (add_code(code, "PUSHFRAME\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	// DEFVAR LF@%retval
@@ -966,7 +932,7 @@ int gen_f_start(char *id){
 		return INTERNAL_ERROR;
 	if (add_code(code, "DEFVAR LF@%retval\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	// MOVE LF@%retval nil@nil
@@ -975,15 +941,27 @@ int gen_f_start(char *id){
 		return INTERNAL_ERROR;
 	if (add_code(code, "MOVE LF@%retval nil@nil\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	return OK;
 }
 
-int gen_f_end(char *id){
+int gen_f_end(char *id){ // label na koniec
 	Code *code = create_code();
 	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "POPFRAME\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&code_list, code))
+		return INTERNAL_ERROR;
+
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "RETURN\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -995,73 +973,103 @@ int gen_f_end(char *id){
 		return INTERNAL_ERROR;
 	if (add_code(code, "_end\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
-		return INTERNAL_ERROR;
-
-	code = create_code();
-	if (!code)
-		return INTERNAL_ERROR;
-	if (add_code(code, "POPFRAME\0"))
-		return INTERNAL_ERROR;
-	if (CL_add_line(code))
-		return INTERNAL_ERROR;
-
-	code = create_code();
-	if (!code)
-		return INTERNAL_ERROR;
-	if (add_code(code, "RETURN\0"))
-		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	return OK;
 }
 
-/*
-int gen_f_return(*symb, type){
+int gen_return(){ // tu sme skoncili
 	Code *code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
+	if (add_code(code, "POPS LF@%retval\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&code_list, code))
+		return INTERNAL_ERROR;
+	return OK;
+}
+/*
+	char *tmp;
+	Code *code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+
 	if (add_code(code, "MOVE LF@%retval \0"))
 		return INTERNAL_ERROR;
 
-	
-	code = create_code();
-	if (!code)
-		return INTERNAL_ERROR;
-	if (is_variable_defined(root, local_table, param_list, symb){
-		if (is_global_variable(root, symb)){
-			if (add_code(code, "LF@\0"))
+	if (token->type == TK_ID){
+		if (is_global_variable(root, token->attribute)){
+			if (add_code(code, "GF@%\0"))
 				return INTERNAL_ERROR;
 		} else {
-			if (add_code(code, "GF@\0"))
+			if (add_code(code, "LF@\0"))
 				return INTERNAL_ERROR;
 		}
-	} else {
-
+		if (add_code(code, token->attribute))
+			return INTERNAL_ERROR;
+	} else if (token->type == TK_KW){
+		if (add_code(code, "nil@nil\0"))
+			return INTERNAL_ERROR;
+	} else if (token->type == TK_INT){
+		if (add_code(code, "int@\0"))
+			return INTERNAL_ERROR;
+		if (add_code(code, token->attribute))
+			return INTERNAL_ERROR;
+	} else if (token->type == TK_FLOAT){
+		if (add_code(code, "float@\0"))
+			return INTERNAL_ERROR;
+		tmp = float_to_str(token->attribute);
+		if (add_code(code, tmp))
+			return INTERNAL_ERROR;
+		free(tmp);
+	} else if (token->type == TK_STRING){
+		if (add_code(code, "string@\0"))
+			return INTERNAL_ERROR;
+		tmp = transform_for_write(token->attribute);
+		if (add_code(code, tmp))
+			return INTERNAL_ERROR;
+		free(tmp);
+	} else { // sem by sa nic ine nemalo dostat
+		return INTERNAL_ERROR;
 	}
-	
 
-
-	code = create_code();
-	if (!code)
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
-	
-
-	
-	if (CL_add_line(code))
-		return INTERNAL_ERROR;
-
 	return OK;
 }
 */
+
+int gen_f_return(char* var){
+	Code *code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "MOVE \0"))
+		return INTERNAL_ERROR;
+
+	if (is_global_variable(root, var)){
+		if (add_code(code, "GF@\0"))
+			return INTERNAL_ERROR;
+	} else {
+		if (add_code(code, "LF@\0"))
+			return INTERNAL_ERROR;
+	}
+	if (add_code(code, var))
+		return INTERNAL_ERROR;
+	if (add_code(code, " TF@%retval\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&code_list, code))
+		return INTERNAL_ERROR;
+	return OK;
+}
+
 int gen_header(){
 	Code *header = create_code();
 	if (!header)
 		return INTERNAL_ERROR;
 	if (add_code(header, ".IFJcode19\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(header))
+	if (CL_add_line(&code_list, header))
 		return INTERNAL_ERROR;
 
 	header = create_code();
@@ -1069,7 +1077,7 @@ int gen_header(){
 		return INTERNAL_ERROR;
 	if (add_code(header, "DEFVAR GF@&expr&val"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(header))
+	if (CL_add_line(&code_list, header))
 		return INTERNAL_ERROR;
 
 	header = create_code();
@@ -1077,7 +1085,7 @@ int gen_header(){
 		return INTERNAL_ERROR;
 	if (add_code(header, "DEFVAR GF@&res1"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(header))
+	if (CL_add_line(&code_list, header))
 		return INTERNAL_ERROR;
 
 	header = create_code();
@@ -1085,7 +1093,7 @@ int gen_header(){
 		return INTERNAL_ERROR;
 	if (add_code(header, "CREATEFRAME"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(header))
+	if (CL_add_line(&code_list, header))
 		return INTERNAL_ERROR;
 
 	return OK;
@@ -1113,7 +1121,7 @@ int gen_inputs(char *dest){
 
 	if (add_code(code, " string\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 	return OK;
 }
@@ -1141,7 +1149,7 @@ int gen_inputi(char *dest){
 
 	if (add_code(code, " int\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 	return OK;
 }
@@ -1169,7 +1177,7 @@ int gen_inputf(char *dest){
 
 	if (add_code(code, " float\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 	return OK;
 }
@@ -1180,7 +1188,7 @@ int gen_len(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "# Built-in function len - returns lenght of string\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1188,7 +1196,7 @@ int gen_len(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "LABEL $len\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1196,7 +1204,7 @@ int gen_len(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "PUSHFRAME\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1204,7 +1212,7 @@ int gen_len(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "DEFVAR LF@%retval\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1212,7 +1220,7 @@ int gen_len(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "STRLEN LF@$retval LF@%1\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1220,7 +1228,7 @@ int gen_len(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "POPFRAME\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1228,7 +1236,7 @@ int gen_len(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "RETURN\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 	return OK;
 }
@@ -1239,7 +1247,7 @@ int gen_ord(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "# Built-in function ord - returns ordinal value of char in s string on i index\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1247,7 +1255,7 @@ int gen_ord(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "LABEL $ord\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1255,7 +1263,7 @@ int gen_ord(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "PUSHFRAME\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1263,7 +1271,7 @@ int gen_ord(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "DEFVAR LF@%retval\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	// kontrola i -> musi byt v rozmedzi retazca inak return None
@@ -1273,7 +1281,7 @@ int gen_ord(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "DEFVAR LF@len\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1281,7 +1289,7 @@ int gen_ord(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "CREATEFRAME\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1289,7 +1297,7 @@ int gen_ord(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "DEFVAR TF@%1\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1297,7 +1305,7 @@ int gen_ord(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "MOVE TF@%1 LF@%1\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1305,7 +1313,7 @@ int gen_ord(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "CALL $len\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1313,7 +1321,7 @@ int gen_ord(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "MOVE LF@len TF@%retval\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1321,7 +1329,7 @@ int gen_ord(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "DEFVAR LF@cond_val\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	// len < 0
@@ -1330,7 +1338,7 @@ int gen_ord(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "LT LF@cond_val LF@len int@0\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1338,7 +1346,7 @@ int gen_ord(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "JUMPIFEQ $ord_return_none LF@cond_val bool@true\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	// i > len-1
@@ -1347,7 +1355,7 @@ int gen_ord(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "SUB LF@len LF@len int@1\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1355,7 +1363,7 @@ int gen_ord(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "GT LF@cond_val LF@%2 LF@len\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1363,7 +1371,7 @@ int gen_ord(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "JUMPIFEQ $ord_return_none LF@cond_val bool@true\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1371,7 +1379,7 @@ int gen_ord(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "STRI2INT LF@%retval LF@%1 LF@%2\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1379,7 +1387,7 @@ int gen_ord(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "LABEL %ord_end\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1387,7 +1395,7 @@ int gen_ord(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "POPFRAME\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1395,7 +1403,7 @@ int gen_ord(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "RETURN\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1403,7 +1411,7 @@ int gen_ord(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "LABEL $ord_return_none\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1411,7 +1419,7 @@ int gen_ord(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "MOVE LF@%retval nil@nil\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1419,7 +1427,7 @@ int gen_ord(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "JUMP $ord_end\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 
@@ -1434,7 +1442,7 @@ int gen_chr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "# Built-in function chr - returns char whose ASCII value is i\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1442,7 +1450,7 @@ int gen_chr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "LABEL $chr\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1450,7 +1458,7 @@ int gen_chr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "PUSHFRAME\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1458,7 +1466,7 @@ int gen_chr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "DEFVAR LF@%retval\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1466,7 +1474,7 @@ int gen_chr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "INT2CHAR LF@%retval LF@%1 LF@%2\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1474,7 +1482,7 @@ int gen_chr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "POPFRAME\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1482,7 +1490,7 @@ int gen_chr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "RETURN\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 	return OK;
 }
@@ -1493,7 +1501,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "# Built-in function substr - returns substring of string\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1501,7 +1509,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "LABEL $substr\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1509,7 +1517,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "PUSHFRAME\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1517,7 +1525,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "DEFVAR LF@%retval\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1525,7 +1533,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "MOVE LF@%retval string@\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 	// -----vytvoreny prazdny string v retval
 	
@@ -1535,7 +1543,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "DEFVAR LF@len_str\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1543,7 +1551,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "CREATEFRAME\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1551,7 +1559,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "DEFVAR TF@%1\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1559,7 +1567,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "MOVE TF@%1 LF@%1\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1567,7 +1575,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "CALL $len\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	// ziskanie retval -> dlzky stringu s
@@ -1576,7 +1584,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "MOVE LF@len_str LF@%retval\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1584,7 +1592,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "DEFVAR LF@cond_val\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	// len(s) < 0 -> prazdny substr  ?????? mozno hlasit chybu !!!!!
@@ -1594,7 +1602,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "LT LF@cond_val LF@len_str int@0\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1602,7 +1610,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "JUMPIFEQ $substr_end LF@cond_val bool@true\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 	*/
 
@@ -1612,7 +1620,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "EQ LF@cond_val LF@len_str int@0\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1620,7 +1628,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "JUMPIFEQ $substr_end LF@cond_val bool@true\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	// dlzka subst - n < 0 -> prazdny substr
@@ -1629,7 +1637,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "LT LF@cond_val LF@%3 int@0\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1637,7 +1645,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "JUMPIFEQ $substr_end LF@cond_val bool@true\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	// dlzka subst - n == 0 -> prazdny substr
@@ -1646,7 +1654,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "EQ LF@cond_val LF@%3 int@0\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1654,7 +1662,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "JUMPIFEQ $substr_end LF@cond_val bool@true\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	// index zac subsrt i > len(s)
@@ -1663,7 +1671,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "GT LF@ret_cond LF@%2 LF@len_str\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1671,7 +1679,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "JUMPIFEQ $substr_end LF@cond_val bool@true\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	// i < 0
@@ -1680,7 +1688,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "LT LF@ret_cond LF@%2 int@0\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1688,7 +1696,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "JUMPIFEQ $substr_end LF@cond_val bool@true\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 	// ------ kontroly vstupov hotove
 
@@ -1698,7 +1706,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "DEFVAR LF@max_len\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1706,7 +1714,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "MOVE LF@max_len LF@%2\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1714,7 +1722,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "SUB LF@max_len LF@max_len LF@%2\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1722,7 +1730,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "DEFVAR LF@max_cond\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1730,7 +1738,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "GT LF@max_cond LF@%3 LF@max_n\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1738,7 +1746,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "JUMPIFEQ $substr_setmax LF@max_cond bool@true\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1746,7 +1754,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "JUMP %substr_concating\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1754,7 +1762,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "LABEL $substr_setmax\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1762,7 +1770,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "MOVE LF@%3 LF@max_len\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1770,7 +1778,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "LABEL %substr_concating\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1778,7 +1786,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "DEFVAR LF@idx\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1786,7 +1794,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "MOVE LF@idx LF@%2\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	// premenne pre cyklus
@@ -1795,7 +1803,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "DEFVAR LF@loop_cond\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1803,7 +1811,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "DEFVAR LF@char\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	// zaciatok cyklu pridavania pismen
@@ -1812,7 +1820,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "LABEL $substr_loop\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1820,7 +1828,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "GETCHAR LF@char LF@%1 LF@idx\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1828,7 +1836,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "CONCAT LF@%retval LF@%retval LF@char\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1836,7 +1844,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "ADD LF@idx LF@idx int@1\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1844,7 +1852,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "SUB LF@%3 LF@%3 int@1\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	// ak je n uz nula koniec cyklu
@@ -1853,7 +1861,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "GT LF@loop_cond LF@%3 int@0\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	// skok na zac cyklu
@@ -1862,7 +1870,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "JUMPIFEQ $substr_loop LF@loop_cond bool@true\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1870,7 +1878,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "LABEL $substr_end\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1878,7 +1886,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "POPFRAME\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -1886,7 +1894,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "RETURN\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 	return OK;
 }
@@ -1897,7 +1905,7 @@ int gen_stack_plus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $expr_plus$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -1905,7 +1913,7 @@ int gen_stack_plus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "PUSHFRAME\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -1913,7 +1921,7 @@ int gen_stack_plus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -1921,7 +1929,7 @@ int gen_stack_plus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -1929,7 +1937,7 @@ int gen_stack_plus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$type1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -1937,7 +1945,7 @@ int gen_stack_plus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$type2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -1945,7 +1953,7 @@ int gen_stack_plus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "POPS LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -1953,7 +1961,7 @@ int gen_stack_plus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "POPS LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -1961,7 +1969,7 @@ int gen_stack_plus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "TYPE LF@$type1$ LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -1969,7 +1977,7 @@ int gen_stack_plus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "TYPE LF@$type2$ LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -1977,7 +1985,7 @@ int gen_stack_plus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFNEQ $plus_not_same_type$ LF@$type1$ LF@$type2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -1985,7 +1993,7 @@ int gen_stack_plus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $plus_concat$ LF@$type1$ string@string\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
 			// tu uz mozu byt len dva inty/float -> jump na add
@@ -1994,7 +2002,7 @@ int gen_stack_plus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMP $plus_add$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
 			// concat
@@ -2003,15 +2011,15 @@ int gen_stack_plus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $plus_concat$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
 			if (!code)
 				return INTERNAL_ERROR;
-			if (add_code(code, "CONCAT ADD LF@$op1$ LF@$op1$ LF@$op2$\0"))
+			if (add_code(code, "CONCAT LF@$op1$ LF@$op1$ LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2019,7 +2027,7 @@ int gen_stack_plus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMP $plus_end$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2027,7 +2035,7 @@ int gen_stack_plus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $plus_two_floats$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
 			// rozdielne typy
@@ -2036,7 +2044,7 @@ int gen_stack_plus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $plus_not_same_type$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
 			// rozdielne typy
@@ -2045,7 +2053,7 @@ int gen_stack_plus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $plus_not_same_type$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
 			// ak je ktorykolvek z nich neda sa vykonat operacia
@@ -2054,7 +2062,7 @@ int gen_stack_plus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $plus_fail$ LF@$type1$ string@string\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2062,7 +2070,7 @@ int gen_stack_plus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $plus_fail$ LF@$type2$ string@string\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
 			// jeden je float a druhy int, trepa zistit ktory je int a pretypovat ho na float
@@ -2072,7 +2080,7 @@ int gen_stack_plus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $plus_int2float_op1$ LF@$type1$ string@int\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
 			// druhy operator je int
@@ -2081,7 +2089,7 @@ int gen_stack_plus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "INT2FLOAT LF@$op2$ LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2089,7 +2097,7 @@ int gen_stack_plus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMP $plus_add$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2097,7 +2105,7 @@ int gen_stack_plus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $plus_int2float_op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2105,7 +2113,7 @@ int gen_stack_plus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "INT2FLOAT LF@$op1$ LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2113,7 +2121,7 @@ int gen_stack_plus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMP $plus_add$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2121,7 +2129,7 @@ int gen_stack_plus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $plus_fail$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2129,7 +2137,7 @@ int gen_stack_plus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "EXIT int@4\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2137,7 +2145,7 @@ int gen_stack_plus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $plus_add$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2145,7 +2153,7 @@ int gen_stack_plus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "ADD LF@$op1$ LF@$op1$ LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2153,7 +2161,7 @@ int gen_stack_plus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $plus_end$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2161,7 +2169,7 @@ int gen_stack_plus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "PUSHS LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2169,7 +2177,7 @@ int gen_stack_plus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "POPFRAME\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2177,7 +2185,7 @@ int gen_stack_plus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "RETURN\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
 			return OK;
@@ -2189,7 +2197,7 @@ int gen_stack_minus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABERL $expr_minus$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2197,7 +2205,7 @@ int gen_stack_minus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "PUSHFRAME\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2205,7 +2213,7 @@ int gen_stack_minus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2213,7 +2221,7 @@ int gen_stack_minus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2221,7 +2229,7 @@ int gen_stack_minus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$type1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2229,7 +2237,7 @@ int gen_stack_minus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$type2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2237,7 +2245,7 @@ int gen_stack_minus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "POPS LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2245,7 +2253,7 @@ int gen_stack_minus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "POPS LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2253,7 +2261,7 @@ int gen_stack_minus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "TYPE LF@$type1$ LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2261,7 +2269,7 @@ int gen_stack_minus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "TYPE LF@$type2$ LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2269,7 +2277,7 @@ int gen_stack_minus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFNEQ $minus_diff_types$ LF@$type1$ LF@$type2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			// rovnake typy
@@ -2278,7 +2286,7 @@ int gen_stack_minus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $minus_exit_4$ LF@$type1$ string@string\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2286,7 +2294,7 @@ int gen_stack_minus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMP $minus_sub$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			// rozdielne typy
@@ -2295,7 +2303,7 @@ int gen_stack_minus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $minus_diff_type$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			// ak je ktorykolvek z nich string neda sa vykonat operacia
@@ -2304,7 +2312,7 @@ int gen_stack_minus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $minus_exit_4$ LF@$type1$ string@string\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2312,7 +2320,7 @@ int gen_stack_minus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $minus_exit_4$ LF@$type2$ string@string\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			// jeden je float a druhy int, trepa zistit ktory je int a pretypovat ho na float
@@ -2321,7 +2329,7 @@ int gen_stack_minus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $minus_int2float_op1$ LF@$type1$ string@int\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			// druhy operator je int
@@ -2330,7 +2338,7 @@ int gen_stack_minus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "INT2FLOAT LF@$op2$ LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2338,7 +2346,7 @@ int gen_stack_minus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMP $minus_sub$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2346,7 +2354,7 @@ int gen_stack_minus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $minus_int2float_op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2354,7 +2362,7 @@ int gen_stack_minus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "INT2FLOAT LF@$op1$ LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2362,7 +2370,7 @@ int gen_stack_minus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMP $minus_sub$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2370,7 +2378,7 @@ int gen_stack_minus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $minus_exit_4$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2378,7 +2386,7 @@ int gen_stack_minus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "EXIT int@4\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2386,7 +2394,7 @@ int gen_stack_minus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $minus_sub$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2394,7 +2402,7 @@ int gen_stack_minus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "SUB LF@$op1$ LF@$op2$ LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2402,7 +2410,7 @@ int gen_stack_minus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "PUSHS LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2410,7 +2418,7 @@ int gen_stack_minus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "POPFRAME\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2418,7 +2426,7 @@ int gen_stack_minus(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "RETURN\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			return OK;
@@ -2430,7 +2438,7 @@ int gen_stack_mult(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $expr_mult$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2438,7 +2446,7 @@ int gen_stack_mult(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "PUSHFRAME\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2446,7 +2454,7 @@ int gen_stack_mult(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2454,7 +2462,7 @@ int gen_stack_mult(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2462,7 +2470,7 @@ int gen_stack_mult(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$type1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2470,7 +2478,7 @@ int gen_stack_mult(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$type2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2478,7 +2486,7 @@ int gen_stack_mult(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "POPS LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2486,7 +2494,7 @@ int gen_stack_mult(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "POPS LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2494,7 +2502,7 @@ int gen_stack_mult(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "TYPE LF@$type1$ LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2502,7 +2510,7 @@ int gen_stack_mult(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "TYPE LF@$type2$ LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2510,7 +2518,7 @@ int gen_stack_mult(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFNEQ $times_diff_types$ LF@$type1$ LF@$type2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			// rovnake typy
@@ -2519,7 +2527,7 @@ int gen_stack_mult(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $times_exit_4$ LF@$type1$ string@string\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2527,7 +2535,7 @@ int gen_stack_mult(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMP $times_mult$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			// rozdielne typy
@@ -2536,7 +2544,7 @@ int gen_stack_mult(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $times_diff_type$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			// ak je ktorykolvek z nich string neda sa vykonat operacia
@@ -2545,7 +2553,7 @@ int gen_stack_mult(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $times_exit_4$ LF@$type1$ string@string\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2553,7 +2561,7 @@ int gen_stack_mult(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $times_exit_4$ LF@$type2$ string@string\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			// jeden je float a druhy int, trepa zistit ktory je int a pretypovat ho na float
@@ -2562,7 +2570,7 @@ int gen_stack_mult(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $times_int2float_op1$ LF@$type1$ string@int\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			// druhy operator je int
@@ -2571,7 +2579,7 @@ int gen_stack_mult(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "INT2FLOAT LF@$op2$ LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2579,7 +2587,7 @@ int gen_stack_mult(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMP $times_mult$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2587,7 +2595,7 @@ int gen_stack_mult(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $times_int2float_op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2595,7 +2603,7 @@ int gen_stack_mult(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "INT2FLOAT LF@$op1$ LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2603,7 +2611,7 @@ int gen_stack_mult(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMP $times_mult$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2611,7 +2619,7 @@ int gen_stack_mult(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $times_exit_4$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2619,7 +2627,7 @@ int gen_stack_mult(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "EXIT int@4\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2627,7 +2635,7 @@ int gen_stack_mult(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $times_mult$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2635,7 +2643,7 @@ int gen_stack_mult(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "MUL LF@$op1$ LF@$op2$ LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2643,7 +2651,7 @@ int gen_stack_mult(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "PUSHS LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2651,7 +2659,7 @@ int gen_stack_mult(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "POPFRAME\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2659,7 +2667,7 @@ int gen_stack_mult(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "RETURN\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			return OK;
@@ -2671,7 +2679,7 @@ int gen_stack_div(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $expr_div$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2679,7 +2687,7 @@ int gen_stack_div(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "PUSHFRAME\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2687,7 +2695,7 @@ int gen_stack_div(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2695,7 +2703,7 @@ int gen_stack_div(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2703,7 +2711,7 @@ int gen_stack_div(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$type1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2711,7 +2719,7 @@ int gen_stack_div(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$type2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2719,7 +2727,7 @@ int gen_stack_div(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "POPS LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2727,7 +2735,7 @@ int gen_stack_div(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "POPS LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2735,7 +2743,7 @@ int gen_stack_div(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "TYPE LF@$type1$ LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2743,7 +2751,7 @@ int gen_stack_div(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "TYPE LF@$type2$ LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2751,7 +2759,7 @@ int gen_stack_div(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $div_fail$ LF@$type1$ string@string\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2759,7 +2767,7 @@ int gen_stack_div(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $div_fail$ LF@$type2$ string@string\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2767,7 +2775,7 @@ int gen_stack_div(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFNEQ $div_not_same$ LF@$type1$ LF@$type2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2775,7 +2783,7 @@ int gen_stack_div(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $div_div$ LF@$type1$ string@float\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2783,7 +2791,7 @@ int gen_stack_div(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "INT2FLOAT LF@$op1$ LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2791,7 +2799,7 @@ int gen_stack_div(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "INT2FLOAT LF@$op2$ LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2799,7 +2807,7 @@ int gen_stack_div(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $div_div$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2807,7 +2815,7 @@ int gen_stack_div(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $div_zero$ LF@$op1$ float@0x0p+0\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2815,7 +2823,7 @@ int gen_stack_div(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DIV LF@$op1$ LF@$op2$ LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2823,7 +2831,7 @@ int gen_stack_div(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMP $div_end$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2831,7 +2839,7 @@ int gen_stack_div(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $div_zero$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2839,7 +2847,7 @@ int gen_stack_div(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "EXIT int@9\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2847,7 +2855,7 @@ int gen_stack_div(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $div_fail$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2855,7 +2863,7 @@ int gen_stack_div(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "EXIT int@4\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			// druhy operator je int
@@ -2864,7 +2872,7 @@ int gen_stack_div(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $div_not_same$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2872,7 +2880,7 @@ int gen_stack_div(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFNEQ $div_int2float_op2$ LF@$type2$ string@float\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2880,7 +2888,7 @@ int gen_stack_div(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "INT2FLOAT LF@$op1$ LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2888,7 +2896,7 @@ int gen_stack_div(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMP $div_div$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2896,7 +2904,7 @@ int gen_stack_div(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $div_int2float_op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2904,7 +2912,7 @@ int gen_stack_div(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "INT2FLOAT LF@$op2$ LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2912,7 +2920,7 @@ int gen_stack_div(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMP $div_div$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2920,7 +2928,7 @@ int gen_stack_div(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $div_end$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2928,7 +2936,7 @@ int gen_stack_div(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "PUSHS LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2936,7 +2944,7 @@ int gen_stack_div(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "POPFRAME\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2944,7 +2952,7 @@ int gen_stack_div(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "RETURN\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			return OK;
@@ -2956,7 +2964,7 @@ int gen_stack_idiv(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $expr_idiv$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2964,7 +2972,7 @@ int gen_stack_idiv(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "PUSHFRAME\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2972,7 +2980,7 @@ int gen_stack_idiv(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2980,7 +2988,7 @@ int gen_stack_idiv(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2988,7 +2996,7 @@ int gen_stack_idiv(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$type1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -2996,7 +3004,7 @@ int gen_stack_idiv(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$type2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3004,7 +3012,7 @@ int gen_stack_idiv(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "POPS LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3012,7 +3020,7 @@ int gen_stack_idiv(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "POPS LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3020,7 +3028,7 @@ int gen_stack_idiv(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "TYPE LF@$type1$ LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3028,7 +3036,7 @@ int gen_stack_idiv(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "TYPE LF@$type2$ LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3036,7 +3044,7 @@ int gen_stack_idiv(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFNEQ $idiv_fail$ LF@$type1$ LF@$type2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			// rovnake typy
@@ -3045,7 +3053,7 @@ int gen_stack_idiv(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFNEQ $idiv_fail$ LF@$type1$ string@int\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3053,7 +3061,7 @@ int gen_stack_idiv(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFNEQ $idiv_zero$ LF@$op1$ int@0\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3061,14 +3069,14 @@ int gen_stack_idiv(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "IDIV LF@$op1$ LF@$op2$ LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 					code = create_code();
 			if (!code)
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMP $idiv_end$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3076,7 +3084,7 @@ int gen_stack_idiv(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $idiv_fail$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3084,7 +3092,7 @@ int gen_stack_idiv(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "EXIT int@4\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3092,7 +3100,7 @@ int gen_stack_idiv(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $idiv_zero$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3100,7 +3108,7 @@ int gen_stack_idiv(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "EXIT int@9\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3108,7 +3116,7 @@ int gen_stack_idiv(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $idiv_end$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3116,7 +3124,7 @@ int gen_stack_idiv(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "PUSHS LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3124,7 +3132,7 @@ int gen_stack_idiv(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "POPFRAME\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3132,7 +3140,7 @@ int gen_stack_idiv(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "RETURN\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			return OK;
@@ -3144,7 +3152,7 @@ int gen_stack_equal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $expr_equal$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3152,7 +3160,7 @@ int gen_stack_equal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "PUSHFRAME\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3160,7 +3168,7 @@ int gen_stack_equal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3168,7 +3176,7 @@ int gen_stack_equal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3176,7 +3184,7 @@ int gen_stack_equal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$type1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3184,7 +3192,7 @@ int gen_stack_equal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$type2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3192,7 +3200,7 @@ int gen_stack_equal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "POPS LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3200,7 +3208,7 @@ int gen_stack_equal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "POPS LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3208,7 +3216,7 @@ int gen_stack_equal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "TYPE LF@$type1$ LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3216,7 +3224,7 @@ int gen_stack_equal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "TYPE LF@$type2$ LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3224,7 +3232,7 @@ int gen_stack_equal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $equal_eq$ LF@$type1$ LF@$type2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			// rozdielne typy
@@ -3234,7 +3242,7 @@ int gen_stack_equal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $equal_eq$ LF@$type1$ string@nil\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3242,7 +3250,7 @@ int gen_stack_equal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $equal_eq$ LF@$type2$ string@nil\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			// ak je jeden z nich string ta sele zle
@@ -3251,7 +3259,7 @@ int gen_stack_equal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $equal_fail$ LF@$type1$ string@string\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3259,7 +3267,7 @@ int gen_stack_equal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $equal_fail$ LF@$type2$ string@string\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			// druhy op je int a prvy float
@@ -3268,7 +3276,7 @@ int gen_stack_equal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $equal_int2float_op2$ LF@$type2$ string@int\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			// prvy op je int a druhy float
@@ -3277,7 +3285,7 @@ int gen_stack_equal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "INT2FLOAT LF@$op1$ LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3285,7 +3293,7 @@ int gen_stack_equal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $equal_eq$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3293,7 +3301,7 @@ int gen_stack_equal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "EQ LF@$op1$ LF@$op2$ LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3301,7 +3309,7 @@ int gen_stack_equal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMP $equal_eq$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3309,7 +3317,7 @@ int gen_stack_equal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $equal_fail$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3317,7 +3325,7 @@ int gen_stack_equal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "EXIT int@4\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3325,7 +3333,7 @@ int gen_stack_equal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $equal_int2float_op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3333,7 +3341,7 @@ int gen_stack_equal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "INT2FLOAT LF@$op2$ LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3341,7 +3349,7 @@ int gen_stack_equal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMP $equal_eq$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3349,7 +3357,7 @@ int gen_stack_equal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $equal_end$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3357,7 +3365,7 @@ int gen_stack_equal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "PUSHS LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3365,7 +3373,7 @@ int gen_stack_equal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "POPFRAME\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3373,7 +3381,7 @@ int gen_stack_equal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "RETURN\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			return OK;
@@ -3385,7 +3393,7 @@ int gen_stack_notequal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $expr_notequal$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3393,7 +3401,7 @@ int gen_stack_notequal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "PUSHFRAME\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3401,7 +3409,7 @@ int gen_stack_notequal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3409,7 +3417,7 @@ int gen_stack_notequal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3417,7 +3425,7 @@ int gen_stack_notequal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$type1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3425,7 +3433,7 @@ int gen_stack_notequal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$type2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3433,7 +3441,7 @@ int gen_stack_notequal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "POPS LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3441,7 +3449,7 @@ int gen_stack_notequal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "POPS LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3449,7 +3457,7 @@ int gen_stack_notequal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "TYPE LF@$type1$ LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3457,7 +3465,7 @@ int gen_stack_notequal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "TYPE LF@$type2$ LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3465,7 +3473,7 @@ int gen_stack_notequal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $notequal_eq$ LF@$type1$ LF@$type2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			// rozdielne typy
@@ -3475,7 +3483,7 @@ int gen_stack_notequal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $notequal_eq$ LF@$type1$ string@nil\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3483,7 +3491,7 @@ int gen_stack_notequal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $notequal_eq$ LF@$type2$ string@nil\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			// ak je jeden z nich string ta sele zle
@@ -3492,7 +3500,7 @@ int gen_stack_notequal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $notequal_fail$ LF@$type1$ string@string\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3500,7 +3508,7 @@ int gen_stack_notequal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $notequal_fail$ LF@$type2$ string@string\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			// druhy op je int a prvy float
@@ -3509,7 +3517,7 @@ int gen_stack_notequal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $notequal_int2float_op2$ LF@$type2$ string@int\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			// prvy op je int a druhy float
@@ -3518,7 +3526,7 @@ int gen_stack_notequal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "INT2FLOAT LF@$op1$ LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3526,7 +3534,7 @@ int gen_stack_notequal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $notequal_eq$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3534,7 +3542,7 @@ int gen_stack_notequal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "EQ LF@$op1$ LF@$op2$ LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3542,7 +3550,7 @@ int gen_stack_notequal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMP $notequal_eq$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3550,7 +3558,7 @@ int gen_stack_notequal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $notequal_fail$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3558,7 +3566,7 @@ int gen_stack_notequal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "EXIT int@4\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3566,7 +3574,7 @@ int gen_stack_notequal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $notequal_int2float_op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3574,7 +3582,7 @@ int gen_stack_notequal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "INT2FLOAT LF@$op2$ LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3582,7 +3590,7 @@ int gen_stack_notequal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMP $notequal_eq$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3590,7 +3598,7 @@ int gen_stack_notequal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $notequal_end$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3598,7 +3606,7 @@ int gen_stack_notequal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "NOT LF@$op1$ LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3606,7 +3614,7 @@ int gen_stack_notequal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "PUSHS LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3614,7 +3622,7 @@ int gen_stack_notequal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "POPFRAME\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3622,7 +3630,7 @@ int gen_stack_notequal(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "RETURN\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			return OK;
@@ -3634,7 +3642,7 @@ int gen_stack_less(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $expr_less$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3642,7 +3650,7 @@ int gen_stack_less(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "PUSHFRAME\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3650,7 +3658,7 @@ int gen_stack_less(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3658,7 +3666,7 @@ int gen_stack_less(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3666,7 +3674,7 @@ int gen_stack_less(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$type1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3674,7 +3682,7 @@ int gen_stack_less(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$type2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3682,7 +3690,7 @@ int gen_stack_less(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "POPS LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3690,7 +3698,7 @@ int gen_stack_less(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "POPS LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3698,7 +3706,7 @@ int gen_stack_less(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "TYPE LF@$type1$ LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3706,7 +3714,7 @@ int gen_stack_less(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "TYPE LF@$type2$ LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3714,7 +3722,7 @@ int gen_stack_less(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $less_less$ LF@$type1$ LF@$type2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			// rozdielne typy
@@ -3724,7 +3732,7 @@ int gen_stack_less(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $less_fail$ LF@$type1$ string@string\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3732,7 +3740,7 @@ int gen_stack_less(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $less_fail$ LF@$type2$ string@string\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			// druhy op je int a prvy float
@@ -3741,7 +3749,7 @@ int gen_stack_less(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $less_int2float_op2$ LF@$type2$ string@int\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			// prvy op je int a druhy float
@@ -3750,7 +3758,7 @@ int gen_stack_less(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "INT2FLOAT LF@$op1$ LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3758,7 +3766,7 @@ int gen_stack_less(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $less_less$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3766,7 +3774,7 @@ int gen_stack_less(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LT LF@$op1$ LF@$op2$ LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3774,7 +3782,7 @@ int gen_stack_less(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMP $less_end$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3782,7 +3790,7 @@ int gen_stack_less(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $less_fail$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3790,7 +3798,7 @@ int gen_stack_less(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "EXIT int@4\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3798,7 +3806,7 @@ int gen_stack_less(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $less_int2float_op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3806,7 +3814,7 @@ int gen_stack_less(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "INT2FLOAT LF@$op2$ LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3814,7 +3822,7 @@ int gen_stack_less(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMP $less_less$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3822,7 +3830,7 @@ int gen_stack_less(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $less_end$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3830,7 +3838,7 @@ int gen_stack_less(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "PUSHS LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3838,7 +3846,7 @@ int gen_stack_less(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "POPFRAME\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3846,7 +3854,7 @@ int gen_stack_less(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "RETURN\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			return OK;
@@ -3858,7 +3866,7 @@ int gen_stack_lesseq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $expr_lesseq$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3866,7 +3874,7 @@ int gen_stack_lesseq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "PUSHFRAME\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3874,7 +3882,7 @@ int gen_stack_lesseq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3882,7 +3890,7 @@ int gen_stack_lesseq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3890,7 +3898,7 @@ int gen_stack_lesseq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$res_less$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3898,7 +3906,7 @@ int gen_stack_lesseq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$res_eq$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3906,7 +3914,7 @@ int gen_stack_lesseq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$type1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3914,7 +3922,7 @@ int gen_stack_lesseq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$type2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3922,7 +3930,7 @@ int gen_stack_lesseq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "POPS LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3930,7 +3938,7 @@ int gen_stack_lesseq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "POPS LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3938,7 +3946,7 @@ int gen_stack_lesseq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "TYPE LF@$type1$ LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3946,7 +3954,7 @@ int gen_stack_lesseq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "TYPE LF@$type2$ LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3954,7 +3962,7 @@ int gen_stack_lesseq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $lesseq_lteq$ LF@$type1$ LF@$type2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			// rozdielne typy
@@ -3964,7 +3972,7 @@ int gen_stack_lesseq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $lesseq_fail$ LF@$type1$ string@string\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3972,7 +3980,7 @@ int gen_stack_lesseq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $lesseq_fail$ LF@$type2$ string@string\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			// druhy op je int a prvy float
@@ -3981,7 +3989,7 @@ int gen_stack_lesseq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $lesseq_int2float_op2$ LF@$type2$ string@int\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			// prvy op je int a druhy float
@@ -3990,7 +3998,7 @@ int gen_stack_lesseq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "INT2FLOAT LF@$op1$ LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -3998,7 +4006,7 @@ int gen_stack_lesseq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $lesseq_lteq$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4006,7 +4014,7 @@ int gen_stack_lesseq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LT LF@$res_less$ LF@$op2$ LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4014,7 +4022,7 @@ int gen_stack_lesseq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "EQ LF@$res_eq$ LF@$op2$ LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4022,7 +4030,7 @@ int gen_stack_lesseq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMP $lesseq_end$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4030,7 +4038,7 @@ int gen_stack_lesseq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $lesseq_fail$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4038,7 +4046,7 @@ int gen_stack_lesseq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "EXIT int@4\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4046,7 +4054,7 @@ int gen_stack_lesseq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $lesseq_int2float_op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4054,7 +4062,7 @@ int gen_stack_lesseq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "INT2FLOAT LF@$op2$ LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4062,7 +4070,7 @@ int gen_stack_lesseq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMP $lesseq_lteq$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4070,7 +4078,7 @@ int gen_stack_lesseq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $lesseq_end$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4078,7 +4086,7 @@ int gen_stack_lesseq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "OR LF@$op1$ LF@$res_less$ LS@$res_eq$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4086,7 +4094,7 @@ int gen_stack_lesseq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "PUSHS LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4094,7 +4102,7 @@ int gen_stack_lesseq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "POPFRAME\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4102,7 +4110,7 @@ int gen_stack_lesseq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "RETURN\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			return OK;
@@ -4114,7 +4122,7 @@ int gen_stack_greater(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $expr_greater$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4122,7 +4130,7 @@ int gen_stack_greater(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "PUSHFRAME\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4130,7 +4138,7 @@ int gen_stack_greater(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4138,7 +4146,7 @@ int gen_stack_greater(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4146,7 +4154,7 @@ int gen_stack_greater(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$type1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4154,7 +4162,7 @@ int gen_stack_greater(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$type2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4162,7 +4170,7 @@ int gen_stack_greater(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "POPS LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4170,7 +4178,7 @@ int gen_stack_greater(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "POPS LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4178,7 +4186,7 @@ int gen_stack_greater(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "TYPE LF@$type1$ LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4186,7 +4194,7 @@ int gen_stack_greater(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "TYPE LF@$type2$ LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4194,7 +4202,7 @@ int gen_stack_greater(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $greater_gt$ LF@$type1$ LF@$type2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			// rozdielne typy
@@ -4204,7 +4212,7 @@ int gen_stack_greater(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $greater_fail$ LF@$type1$ string@string\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4212,7 +4220,7 @@ int gen_stack_greater(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $greater_fail$ LF@$type2$ string@string\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			// druhy op je int a prvy float
@@ -4221,7 +4229,7 @@ int gen_stack_greater(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $greater_int2float_op2$ LF@$type2$ string@int\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			// prvy op je int a druhy float
@@ -4230,7 +4238,7 @@ int gen_stack_greater(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "INT2FLOAT LF@$op1$ LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4238,7 +4246,7 @@ int gen_stack_greater(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $greater_gt$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4246,7 +4254,7 @@ int gen_stack_greater(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "GT LF@$op1$ LF@$op2$ LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4254,7 +4262,7 @@ int gen_stack_greater(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMP $greater_end$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4262,7 +4270,7 @@ int gen_stack_greater(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $greater_fail$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4270,7 +4278,7 @@ int gen_stack_greater(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "EXIT int@4\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4278,7 +4286,7 @@ int gen_stack_greater(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $greater_int2float_op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4286,7 +4294,7 @@ int gen_stack_greater(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "INT2FLOAT LF@$op2$ LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4294,7 +4302,7 @@ int gen_stack_greater(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMP $greater_gt$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4302,7 +4310,7 @@ int gen_stack_greater(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $greater_end$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4310,7 +4318,7 @@ int gen_stack_greater(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "PUSHS LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4318,7 +4326,7 @@ int gen_stack_greater(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "POPFRAME\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4326,7 +4334,7 @@ int gen_stack_greater(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "RETURN\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			return OK;
@@ -4338,7 +4346,7 @@ int gen_stack_greatereq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $expr_greatereq$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4346,7 +4354,7 @@ int gen_stack_greatereq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "PUSHFRAME\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4354,7 +4362,7 @@ int gen_stack_greatereq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4362,7 +4370,7 @@ int gen_stack_greatereq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4370,7 +4378,7 @@ int gen_stack_greatereq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$res_greater$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4378,7 +4386,7 @@ int gen_stack_greatereq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$res_eq$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4386,7 +4394,7 @@ int gen_stack_greatereq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$type1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4394,7 +4402,7 @@ int gen_stack_greatereq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "DEFVAR LF@$type2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4402,7 +4410,7 @@ int gen_stack_greatereq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "POPS LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4410,7 +4418,7 @@ int gen_stack_greatereq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "POPS LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4418,7 +4426,7 @@ int gen_stack_greatereq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "TYPE LF@$type1$ LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4426,7 +4434,7 @@ int gen_stack_greatereq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "TYPE LF@$type2$ LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4434,7 +4442,7 @@ int gen_stack_greatereq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $greateq_gteq$ LF@$type1$ LF@$type2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			// rozdielne typy
@@ -4444,7 +4452,7 @@ int gen_stack_greatereq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $greateq_fail$ LF@$type1$ string@string\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4452,7 +4460,7 @@ int gen_stack_greatereq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $greateq_fail$ LF@$type2$ string@string\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			// druhy op je int a prvy float
@@ -4461,7 +4469,7 @@ int gen_stack_greatereq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMPIFEQ $greateq_int2float_op2$ LF@$type2$ string@int\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			// prvy op je int a druhy float
@@ -4470,7 +4478,7 @@ int gen_stack_greatereq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "INT2FLOAT LF@$op1$ LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4478,7 +4486,7 @@ int gen_stack_greatereq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $greateq_gteq$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4486,7 +4494,7 @@ int gen_stack_greatereq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "GT LF@$res_greater$ LF@$op2$ LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4494,7 +4502,7 @@ int gen_stack_greatereq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "EQ LF@$res_eq$ LF@$op2$ LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4502,7 +4510,7 @@ int gen_stack_greatereq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMP $greateq_end$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4510,7 +4518,7 @@ int gen_stack_greatereq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $greateq_fail$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4518,7 +4526,7 @@ int gen_stack_greatereq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "EXIT int@4\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4526,7 +4534,7 @@ int gen_stack_greatereq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $greateq_int2float_op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4534,7 +4542,7 @@ int gen_stack_greatereq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "INT2FLOAT LF@$op2$ LF@$op2$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4542,7 +4550,7 @@ int gen_stack_greatereq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMP $greateq_gteq$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4550,7 +4558,7 @@ int gen_stack_greatereq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $greateq_end$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4558,7 +4566,7 @@ int gen_stack_greatereq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "OR LF@$op1$ LF@$res_less$ LS@$res_eq$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4566,7 +4574,7 @@ int gen_stack_greatereq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "PUSHS LF@$op1$\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4574,7 +4582,7 @@ int gen_stack_greatereq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "POPFRAME\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			code = create_code();
@@ -4582,7 +4590,7 @@ int gen_stack_greatereq(){
 				return INTERNAL_ERROR;
 			if (add_code(code, "RETURN\0"))
 				return INTERNAL_ERROR;
-			if (CL_add_line(code))
+			if (CL_add_line(&code_list, code))
 				return INTERNAL_ERROR;
 
 			return OK;
@@ -4595,7 +4603,7 @@ int gen_add(char *op1, char *op2){
 	if (add_code(code, "ADD GF@&res1 \0"))
 		return INTERNAL_ERROR;
 	// op1
-	if (is_variable_defined(root, local_table, param_list, op1)){ // premenna 
+	if (is_constant(root, local_table, param_list, op1)){ // premenna 
 		if (is_global_variable(root, op1)){ // globalna
 			if (add_code(code, "GF@\0"))
 				return INTERNAL_ERROR;
@@ -4612,7 +4620,7 @@ int gen_add(char *op1, char *op2){
 	// op2
 	if (add_code(code, " "))
 		return INTERNAL_ERROR;
-	if (is_variable_defined(root, local_table, param_list, op2)){ // premenna 
+	if (is_constant(root, local_table, param_list, op2)){ // premenna 
 		if (is_global_variable(root, op2)){ // globalna
 			if (add_code(code, "GF@\0"))
 				return INTERNAL_ERROR;
@@ -4626,7 +4634,7 @@ int gen_add(char *op1, char *op2){
 		if (add_code(code, op2))
 			return INTERNAL_ERROR;
 	}
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -4634,7 +4642,7 @@ int gen_add(char *op1, char *op2){
 		return INTERNAL_ERROR;
 	if (add_code(code, "PUSHS GF@&res1"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	return OK;
@@ -4648,7 +4656,7 @@ int gen_minus(char *op1, char *op2){
 	if (add_code(code, "SUB GF@&res1 \0"))
 		return INTERNAL_ERROR;
 	// op1
-	if (is_variable_defined(root, local_table, param_list, op1)){ // premenna 
+	if (is_constant(root, local_table, param_list, op1)){ // premenna 
 		if (is_global_variable(root, op1)){ // globalna
 			if (add_code(code, "GF@\0"))
 				return INTERNAL_ERROR;
@@ -4665,7 +4673,7 @@ int gen_minus(char *op1, char *op2){
 	// op2
 	if (add_code(code, " "))
 		return INTERNAL_ERROR;
-	if (is_variable_defined(root, local_table, param_list, op2)){ // premenna 
+	if (is_constant(root, local_table, param_list, op2)){ // premenna 
 		if (is_global_variable(root, op2)){ // globalna
 			if (add_code(code, "GF@\0"))
 				return INTERNAL_ERROR;
@@ -4679,7 +4687,7 @@ int gen_minus(char *op1, char *op2){
 		if (add_code(code, op2))
 			return INTERNAL_ERROR;
 	}
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -4687,7 +4695,7 @@ int gen_minus(char *op1, char *op2){
 		return INTERNAL_ERROR;
 	if (add_code(code, "PUSHS GF@&res1"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	return OK;
@@ -4700,7 +4708,7 @@ int gen_mult(char *op1, char *op2){
 	if (add_code(code, "MUL GF@&res1 \0"))
 		return INTERNAL_ERROR;
 	// op1
-	if (is_variable_defined(root, local_table, param_list, op1)){ // premenna 
+	if (is_constant(root, local_table, param_list, op1)){ // premenna 
 		if (is_global_variable(root, op1)){ // globalna
 			if (add_code(code, "GF@\0"))
 				return INTERNAL_ERROR;
@@ -4717,7 +4725,7 @@ int gen_mult(char *op1, char *op2){
 	// op2
 	if (add_code(code, " "))
 		return INTERNAL_ERROR;
-	if (is_variable_defined(root, local_table, param_list, op2)){ // premenna 
+	if (is_constant(root, local_table, param_list, op2)){ // premenna 
 		if (is_global_variable(root, op2)){ // globalna
 			if (add_code(code, "GF@\0"))
 				return INTERNAL_ERROR;
@@ -4731,7 +4739,7 @@ int gen_mult(char *op1, char *op2){
 		if (add_code(code, op2))
 			return INTERNAL_ERROR;
 	}
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -4739,7 +4747,7 @@ int gen_mult(char *op1, char *op2){
 		return INTERNAL_ERROR;
 	if (add_code(code, "PUSHS GF@&res1"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	return OK;
@@ -4752,7 +4760,7 @@ int gen_div(char *op1, char *op2){
 	if (add_code(code, "DIV GF@&res1 \0"))
 		return INTERNAL_ERROR;
 	// op1
-	if (is_variable_defined(root, local_table, param_list, op1)){ // premenna 
+	if (is_constant(root, local_table, param_list, op1)){ // premenna 
 		if (is_global_variable(root, op1)){ // globalna
 			if (add_code(code, "GF@\0"))
 				return INTERNAL_ERROR;
@@ -4769,7 +4777,7 @@ int gen_div(char *op1, char *op2){
 	// op2
 	if (add_code(code, " "))
 		return INTERNAL_ERROR;
-	if (is_variable_defined(root, local_table, param_list, op2)){ // premenna 
+	if (is_constant(root, local_table, param_list, op2)){ // premenna 
 		if (is_global_variable(root, op2)){ // globalna
 			if (add_code(code, "GF@\0"))
 				return INTERNAL_ERROR;
@@ -4783,7 +4791,7 @@ int gen_div(char *op1, char *op2){
 		if (add_code(code, op2))
 			return INTERNAL_ERROR;
 	}
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -4791,7 +4799,7 @@ int gen_div(char *op1, char *op2){
 		return INTERNAL_ERROR;
 	if (add_code(code, "PUSHS GF@&res1"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	return OK;
@@ -4804,7 +4812,7 @@ int gen_idiv(char *op1, char *op2){
 	if (add_code(code, "IDIV GF@&res1 \0"))
 		return INTERNAL_ERROR;
 	// op1
-	if (is_variable_defined(root, local_table, param_list, op1)){ // premenna 
+	if (is_constant(root, local_table, param_list, op1)){ // premenna 
 		if (is_global_variable(root, op1)){ // globalna
 			if (add_code(code, "GF@\0"))
 				return INTERNAL_ERROR;
@@ -4821,7 +4829,7 @@ int gen_idiv(char *op1, char *op2){
 	// op2
 	if (add_code(code, " "))
 		return INTERNAL_ERROR;
-	if (is_variable_defined(root, local_table, param_list, op2)){ // premenna 
+	if (is_constant(root, local_table, param_list, op2)){ // premenna 
 		if (is_global_variable(root, op2)){ // globalna
 			if (add_code(code, "GF@\0"))
 				return INTERNAL_ERROR;
@@ -4835,7 +4843,7 @@ int gen_idiv(char *op1, char *op2){
 		if (add_code(code, op2))
 			return INTERNAL_ERROR;
 	}
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -4843,7 +4851,7 @@ int gen_idiv(char *op1, char *op2){
 		return INTERNAL_ERROR;
 	if (add_code(code, "PUSHS GF@&res1"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	return OK;
@@ -4856,7 +4864,7 @@ int gen_concat(char *op1, char *op2){
 	if (add_code(code, "CONCAT GF@&res1 \0"))
 		return INTERNAL_ERROR;
 	// op1
-	if (is_variable_defined(root, local_table, param_list, op1)){ // premenna 
+	if (is_constant(root, local_table, param_list, op1)){ // premenna 
 		if (is_global_variable(root, op1)){ // globalna
 			if (add_code(code, "GF@\0"))
 				return INTERNAL_ERROR;
@@ -4873,7 +4881,7 @@ int gen_concat(char *op1, char *op2){
 	// op2
 	if (add_code(code, " "))
 		return INTERNAL_ERROR;
-	if (is_variable_defined(root, local_table, param_list, op2)){ // premenna 
+	if (is_constant(root, local_table, param_list, op2)){ // premenna 
 		if (is_global_variable(root, op2)){ // globalna
 			if (add_code(code, "GF@\0"))
 				return INTERNAL_ERROR;
@@ -4887,7 +4895,7 @@ int gen_concat(char *op1, char *op2){
 		if (add_code(code, op2))
 			return INTERNAL_ERROR;
 	}
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -4895,7 +4903,7 @@ int gen_concat(char *op1, char *op2){
 		return INTERNAL_ERROR;
 	if (add_code(code, "PUSHS GF@&res1"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(code))
+	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
 	return OK;
