@@ -9,12 +9,7 @@
  */
 
 
-//TODO SEM-A - funkcie musia mat definiciu premennej v hlavnom programe vždy dopredu definovanu
-//TODO SEM-A - v tele funkcie nemusí byť hned definovaná..
 //TODO SEM-A - kontrolovanie parametrov funkcie či v parametry nieje názov globalnej funkcie..
-//TODO SEM-A or SYNTAX - kontrola pri volaní funkcie ci tam sú zátvorky alebo to nechať tak ako to je..
-//TODO EXPR - spýtat sa maggie na základe predošleho todo ako to robí prípadne opraviť
-//TODO SYM_TAB - možno vymazať funkcie ktré budú navyše..
 //TODO GEN - prida5 premennu aby sa negeneroval kod pri nejakých sytuáciach
 //TODO GEN - pridat generoť generovanie volania funkcie aj ked to nieje v a = 
 
