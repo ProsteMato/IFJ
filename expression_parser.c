@@ -364,7 +364,20 @@ int callExpression(Token *token)
       {
             rightBracket+=1;
       }
-      
+
+      if ( token->type == TK_INT || token->type == TK_FLOAT)
+      {
+            //Token *testToken;
+            int l = preload_token(token); 
+            if (l != OK)
+            {
+                  return l; 
+            }
+            if (token->type == TK_ID)
+            {
+                  return SYNTAX_ERROR;
+            }
+      }
       if (token->type == TK_EQUAL)
       {
             isRelational = true; 
@@ -418,7 +431,6 @@ int callExpression(Token *token)
       {
              listInsertAct(&eList,token->attribute, symbol, dType);
       }
-     
      
       if ( symbol == PT_ID || symbol == PT_INT || symbol == PT_FLOAT || symbol == PT_STRING || symbol == PT_NONE)
       {
