@@ -691,7 +691,7 @@ int gen_assign_expr_res(char *dest){
 		if (add_code(code, "GF@"))
 			return INTERNAL_ERROR;
 	} else {
-		if (add_code(code, "GF@"))
+		if (add_code(code, "LF@"))
 			return INTERNAL_ERROR;
 	}
 	if (add_code(code, dest))
