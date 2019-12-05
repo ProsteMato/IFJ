@@ -175,6 +175,7 @@ int st_list(Token *token) {
 		returnValue = stat(token);
 		if (returnValue == OK) {
 			GET_NEXT_TOKEN(token);
+			copy_id = NULL;
 			if (!in_function && !in_if_while) {
 				return st_list(token);
 			} else {
@@ -529,21 +530,26 @@ int arg_params(Token *token) {
 				return returnValue;
 			}
 	} else if (token->type == TK_BRACKET_R) {
-		if(!is_function_defined(root, saved_id)) {
-			if(!is_function_created(root, saved_id)) {
-				if(is_global_variable(root, saved_id)) {
-					return SEM_FUNCTION_ERROR;
+		if(in_function) {
+			if(!is_function_defined(root, saved_id)) {
+				if(!is_function_created(root, saved_id)) {
+					if(is_global_variable(root, saved_id)) {
+						return SEM_FUNCTION_ERROR;
+					}
+					returnValue = define_function(&root, saved_id);
+					if (returnValue != OK) {
+						return returnValue;
+					}
+					SetParamCount(root, saved_id, 0);
+					SetCalled(root, saved_id);
 				}
-				returnValue = define_function(&root, saved_id);
-				if (returnValue != OK) {
-					return returnValue;
-				}
-				SetParamCount(root, saved_id, 0);
-				SetCalled(root, saved_id);
+				return OK;
 			}
-			return OK;
-		} else {
+		}
+		if(is_function_created(root, saved_id)) {
 			return check_function_param_count(root, saved_id, 0);
+		} else {
+			return SEM_FUNCTION_ERROR;
 		}
 	} else {
 		return SYNTAX_ERROR;
@@ -575,24 +581,29 @@ int arg_next_params(Token *token) {
 			}
 		}
 	} else if (token->type == TK_BRACKET_R) {
-		if(!is_function_defined(root, saved_id) && !is_function_created(root, saved_id)) {
-			if(!is_function_created(root, saved_id)) {
-				if(is_global_variable(root, saved_id)) {
-					return SEM_FUNCTION_ERROR;
+		if(in_function) {
+			if(!is_function_defined(root, saved_id) && !is_function_created(root, saved_id)) {
+				if(!is_function_created(root, saved_id)) {
+					if(is_global_variable(root, saved_id)) {
+						return SEM_FUNCTION_ERROR;
+					}
+					returnValue = define_function(&root, saved_id);
+					if (returnValue != OK) {
+						return returnValue;
+					}
+					SetParamCount(root, saved_id, count);
+					SetCalled(root, saved_id);
 				}
-				returnValue = define_function(&root, saved_id);
-				if (returnValue != OK) {
-					return returnValue;
-				}
-				SetParamCount(root, saved_id, count);
-				SetCalled(root, saved_id);
+				count = 1;
+				return OK;
 			}
-			count = 1;
-			return OK;
-		} else {
+		}
+	 	if(is_function_created(root, saved_id)){
 			returnValue = check_function_param_count(root, saved_id, count);
 			count = 1;
 			return returnValue;
+		} else {
+			return SEM_FUNCTION_ERROR;
 		}
 	}
 	return SYNTAX_ERROR;
@@ -758,7 +769,7 @@ int def_id(Token *token) {
 */
 int eof_or_eol(Token *token) {
 	if (token->type == TK_EOL || token->type == TK_EOF) {
-		copy_id = NULL;
+		//copy_id = NULL;
 		return OK;
 	}
 	return SYNTAX_ERROR;
