@@ -9,10 +9,12 @@
  */
 
 
-//TODO SEM-A - kontrola pri definicii ID ci sa nerovná build-id function
-//TODO SEM-A - na začatku programu definovať všetky build-id funcie
-//TODO SEM-A - kontrolovať parametre build-id funkcii
-//TODO SEM-A - skontrolovať každú definíciu premennej
+//TODO SEM-A - funkcie musia mat definiciu premennej v hlavnom programe vždy dopredu definovanu
+//TODO SEM-A - v tele funkcie nemusí byť hned definovaná..
+//TODO SEM-A - kontrolovanie parametrov funkcie či v parametry nieje názov globalnej funkcie..
+//TODO SEM-A or SYNTAX - kontrola pri volaní funkcie ci tam sú zátvorky alebo to nechať tak ako to je..
+//TODO EXPR - spýtat sa maggie na základe predošleho todo ako to robí prípadne opraviť
+//TODO SYM_TAB - možno vymazať funkcie ktré budú navyše..
 
 #include "parser.h"
 #include "main.h"
@@ -606,7 +608,6 @@ int assign(Token *token) {
 		token->type == TK_STRING ||
 		(token->type == TK_KW && strcmp(token->attribute, "None") == 0)
 		){
-		GET_NEXT_TOKEN(token);
 		if((returnValue = callExpression(token)) == OK) {
 			if(!isRelational) {
 				GET_NEXT_TOKEN(token);
@@ -715,7 +716,7 @@ int assign(Token *token) {
 */
 int after_id(Token *token) {
 	if(token->type == TK_ASSIGN) {
-		PRELOAD_TOKEN(token);
+		GET_NEXT_TOKEN(token);
 		copy_id = saved_id;
 		return assign(token);
 	} else if (token->type == TK_EOL || token->type == TK_EOF || token->type == TK_BRACKET_L) {
