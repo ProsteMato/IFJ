@@ -9,7 +9,6 @@
  */
 
 
-//TODO SEM-A - kontrolovanie parametrov funkcie či v parametry nieje názov globalnej funkcie..
 //TODO GEN - prida5 premennu aby sa negeneroval kod pri nejakých sytuáciach
 //TODO GEN - pridat generoť generovanie volania funkcie aj ked to nieje v a = 
 
@@ -17,25 +16,22 @@
 #include "main.h"
 
 #define UNGET_TOKEN(token) \
-		int token_return_value = 0; \
 		if ((token_return_value = unget_token((token))) != OK) \
 			return token_return_value
 
 #define PRELOAD_TOKEN(token) \
-		int token_return_value = 0; \
 		if ((token_return_value = preload_token(token)) != OK) \
 			return token_return_value
 
 #define GET_NEXT_TOKEN(token) \
-		int token_return_value = 0; \
 		if ((token_return_value = get_next_token((token))) != OK) \
 			return token_return_value
 
 bool in_function = false;
 bool in_if_while = false;
 bool if_in_else = false;
+int token_return_value = OK;
 int depth = 0;
-Token savedToken;
 char *saved_id = NULL;
 char *copy_id = NULL;
 
@@ -464,6 +460,9 @@ int params(Token *token) {
 		}
 		return OK;
 	} else if (token->type == TK_ID) {
+		if(is_function_created(root, token->attribute)) {
+			return SEM_FUNCTION_ERROR; //chyba redefinacia funkcie v parametri
+		} 
 		int returnValue = ParamInsert(param_list, token->attribute);
 		GET_NEXT_TOKEN(token);
 		if (returnValue != OK) {
@@ -484,6 +483,9 @@ int params_next(Token *token) {
 	if (token->type == TK_COMMA) {
 		GET_NEXT_TOKEN(token);
 		if (token->type == TK_ID) {
+			if(is_function_created(root, token->attribute)) {
+				return SEM_FUNCTION_ERROR; //chyba redefinacia funkcie v parametri
+			}
 			int returnValue = ParamInsert(param_list, token->attribute);
 			if (returnValue != OK) {
 				return returnValue;
@@ -616,6 +618,7 @@ int assign(Token *token) {
 		token->type == TK_STRING ||
 		(token->type == TK_KW && strcmp(token->attribute, "None") == 0)
 		){
+		GET_NEXT_TOKEN(token);
 		if((returnValue = callExpression(token)) == OK) {
 			if(!isRelational) {
 				GET_NEXT_TOKEN(token);
@@ -647,6 +650,7 @@ int assign(Token *token) {
 		saved_id = token->attribute;
 		PRELOAD_TOKEN(token);
 		if (token->type == TK_BRACKET_L) {
+			GET_NEXT_TOKEN(token);
 			GET_NEXT_TOKEN(token);
 			returnValue = def_id(token);
 			if (returnValue != OK) {
@@ -724,7 +728,7 @@ int assign(Token *token) {
 */
 int after_id(Token *token) {
 	if(token->type == TK_ASSIGN) {
-		GET_NEXT_TOKEN(token);
+		PRELOAD_TOKEN(token);
 		copy_id = saved_id;
 		return assign(token);
 	} else if (token->type == TK_EOL || token->type == TK_EOF || token->type == TK_BRACKET_L) {
@@ -806,6 +810,7 @@ int value(Token *token) {
 		case TK_KW:
 			if (strcmp(token->attribute, "None") == 0) {
 				pq_queue(token, 0);
+				return OK;
 			}
 			return OTHER_ERROR;
 			break;
@@ -826,7 +831,7 @@ int value(Token *token) {
 				pq_queue(token, 0);
 				return OK;
 			}
-			return SEM_PARAMS_ERROR;
+			return SEM_FUNCTION_ERROR;
 			break;
 		default:
 			return OTHER_ERROR;

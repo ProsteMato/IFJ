@@ -333,7 +333,7 @@ int callExpression(Token *token)
   {
       if (token->type == TK_ID)
       {
-            if (!is_variable_defined(root, local_table, NULL, token->attribute))
+            if (!is_variable_defined(root, local_table, param_list, token->attribute))
             {
                   return SEM_FUNCTION_ERROR;
             }
