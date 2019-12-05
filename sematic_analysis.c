@@ -41,8 +41,6 @@ Data_type build_in_function_return_type(char *function_id) {
     if (strcmp(function_id, "inputi") == 0) return TYPE_INT;
     if (strcmp(function_id, "inputf") == 0) return TYPE_FLOAT;
     if (strcmp(function_id, "print") == 0) return TYPE_NONE;
-    // TODO odtialto nižšie sa kontroluje veľkosť vstupných parametrov a podľa toho sa určí navratová hodnota
-    // TODO toto dole asi bude treba zmazat neviem...
     if (strcmp(function_id, "len") == 0) return TYPE_INT;
     if (strcmp(function_id, "substr") == 0) return TYPE_STRING;
     if (strcmp(function_id, "ord") == 0) return TYPE_STRING;
