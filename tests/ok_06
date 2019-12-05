@@ -1,4 +1,4 @@
-a = ahoj_
-b = svete
+a = 'ahoj_'
+b = 'svete'
 vysl = a + b
 print('Vysledek: ', vysl, '\n')

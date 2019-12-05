@@ -1,4 +1,6 @@
 ahoj = 5
 svete = 5
-if ( ahoj == svete)
+if ( ahoj == svete) :
     print('Vytisknu petku: ', svete, '\n')
+else :
+    pass
