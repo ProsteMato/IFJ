@@ -22,6 +22,7 @@
 
 #define tableSize 19 
 bool isRelational;  //is operator relational? <, <=, >, >=, ==, != 
+bool generate;
 Data_type finalType;
 
 typedef enum {

@@ -8,7 +8,6 @@
  * 
  */
 
-//TODO GEN - pridat generoť generovanie volania funkcie aj ked to nieje v a = 
 
 #include "parser.h"
 #include "main.h"
@@ -35,6 +34,7 @@ char *copy_id = NULL;
 
 int prog(Token *token) {
 	pq_init();
+	generate = true;
 	/*
 	+----------------------+
   	|1: <prog> -> <st-list>|
@@ -390,7 +390,7 @@ int stat(Token *token) {
 			token->type == TK_DIV ||
 			token->type == TK_DIV_DIV
 			) {
-			//TODO GEN-CODE - netreba generovať treba len vyhodnotit a vrátit OK
+			generate = false;
 			if((returnValue = callExpression(token)) == OK) {
 				if(!isRelational) {
 					GET_NEXT_TOKEN(token);
@@ -423,7 +423,7 @@ int stat(Token *token) {
 		token->type == TK_INT ||
 		(token->type == TK_KW && strcmp(token->attribute, "None") == 0)
 		) {
-		//TODO GEN-CODE - netreba generovať treba len vyhodnotit a vrátit OK
+		generate = false;
 		if((returnValue = callExpression(token)) == OK) {
 			if(!isRelational) {
 				GET_NEXT_TOKEN(token);

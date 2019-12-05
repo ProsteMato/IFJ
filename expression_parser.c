@@ -596,7 +596,18 @@ int callExpression(Token *token)
  {
         return err_unget;
  }
- gen_expr();
+ if (generate) { // musia byt obe true aby sa generovalo
+      int returnValue = OK;
+      if((returnValue = gen_expr()) != OK){ //kontrola ci nahodou nevratil chybu
+            return returnValue;
+      }
+ } else {
+      generate = true; //aby sa nabudúce generovalo
+      int returnValue = OK;
+      if((returnValue = gen_clear()) != OK){ //aby na stacku neostala vyhodnotená hodnota z expr
+            return returnValue;
+      }
+ }
  listDispose(&eList);
  //disposeStack(&stack);
  return OK;
