@@ -23,6 +23,8 @@
 #define FLOAT2STR_SIZE 23 // nas rozsah floatu prebehnutym %a formatom
 
 int while_counter;
+Stack while_stack;
+Stack if_stack;
 int if_counter;
 TKQueue pq;
 
@@ -130,7 +132,7 @@ Code* create_code();
 int add_code(Code *code, char *inst);
 
 //----------------------------------------
-//         PARAM QUEUE FUNSTIONS         -
+//         PARAM QUEUE FUNCTIONS         -
 //----------------------------------------
 
 /**
@@ -313,6 +315,14 @@ int gen_else();
  *             occurrence
  */
 int gen_if_end();
+
+/**
+ * @brief      Generates the code to check to type and values of expression used in if
+ *
+ * @return     OK if successfull, INTERNAL_ERROR in case of internal error
+ *             occurrence
+ */
+int gen_if_exprval_check();
 
 //----------------------------------------
 //           MATH OPERATIONS             -
