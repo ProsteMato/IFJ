@@ -114,6 +114,8 @@ void CL_destroy(Code_line *line){
 int init_generator(){
 	while_counter = 0;
 	if_counter = 0;
+	s_init(&while_stack);
+	s_init(&if_stack);
 	CL_init(&code_list);
 
 	CL_init(&builtin_list);
@@ -224,13 +226,40 @@ char* transform_for_write(char *str){
 // precedenceRules
 // operandList
 int gen_if(){
+	char *tmp = int_to_str(if_counter);
+	if (tmp == NULL)
+		return INTERNAL_ERROR;
+
+	static int if_used = 0;
+	if (!if_used){
+		if (gen_if_exprval_check())
+			return INTERNAL_ERROR;
+		if_used = 1;
+	}
+
 	Code *code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
-	if (add_code(code, "JUMPIFNEQ %false%\0"))
+	if (add_code(code, "CALL %exprval_check%\0"))
 		return INTERNAL_ERROR;
-	char *tmp = int_to_str(if_counter);
-	if (tmp == NULL)
+	if (CL_add_line(&code_list, code))
+		return INTERNAL_ERROR;
+
+	// samotny if
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "LABEL %if%\0"))
+		return INTERNAL_ERROR;
+	if (add_code(code, tmp))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&code_list, code))
+		return INTERNAL_ERROR;
+
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "JUMPIFNEQ %false%\0"))
 		return INTERNAL_ERROR;
 	if (add_code(code, tmp))
 		return INTERNAL_ERROR;
@@ -238,7 +267,13 @@ int gen_if(){
 		return INTERNAL_ERROR;
 	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
+
+
 	free(tmp);
+
+	s_push(&if_stack, if_counter);
+	if_counter++;
+
 	return OK;
 }
 
@@ -248,7 +283,9 @@ int gen_else(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "JUMP %if_end%\0"))
 		return INTERNAL_ERROR;
-	char *tmp = int_to_str(if_counter);
+
+	int if_c = s_top(&if_stack);
+	char *tmp = int_to_str(if_c);
 	if (tmp == NULL)
 		return INTERNAL_ERROR;
 	if (add_code(code, tmp))
@@ -260,9 +297,6 @@ int gen_else(){
 	if (!code)
 		return INTERNAL_ERROR;
 	if (add_code(code, "LABEL %false%\0"))
-		return INTERNAL_ERROR;
-	tmp = int_to_str(if_counter);
-	if (tmp == NULL)
 		return INTERNAL_ERROR;
 	if (add_code(code, tmp))
 		return INTERNAL_ERROR;
@@ -277,7 +311,9 @@ int gen_if_end(){
 	Code *code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
-	char *tmp = int_to_str(if_counter);
+
+	int if_c = s_pop(&if_stack);
+	char *tmp = int_to_str(if_c);
 	if (tmp == NULL)
 		return INTERNAL_ERROR;
 	if (add_code(code, "LABEL %if_end%\0"))
@@ -286,7 +322,7 @@ int gen_if_end(){
 		return INTERNAL_ERROR;
 	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
-	if_counter++;
+
 	free(tmp);
 	return OK;
 }
@@ -703,6 +739,9 @@ int gen_while_begin(){
 	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
+	s_push(&while_stack, while_counter);
+	while_counter++;
+
 	return OK;
 }
 
@@ -710,7 +749,9 @@ int gen_while_end(){
 	Code *code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
-	char *unq_while_n = int_to_str(while_counter);
+
+	int tmp = s_pop(&while_stack);
+	char *unq_while_n = int_to_str(tmp); // zo stacku
 	if (unq_while_n == NULL)
 		return INTERNAL_ERROR;
 
@@ -732,7 +773,6 @@ int gen_while_end(){
 	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
-	while_counter++;
 	return OK;
 }
 
@@ -1114,6 +1154,14 @@ int gen_header(){
 	if (!header)
 		return INTERNAL_ERROR;
 	if (add_code(header, "DEFVAR GF@&expr&val"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&code_list, header))
+		return INTERNAL_ERROR;
+
+	header = create_code();
+	if (!header)
+		return INTERNAL_ERROR;
+	if (add_code(header, "DEFVAR GF@&expr&val&type\0"))
 		return INTERNAL_ERROR;
 	if (CL_add_line(&code_list, header))
 		return INTERNAL_ERROR;
@@ -1941,6 +1989,14 @@ int gen_stack_plus(){
 			Code *code = create_code();
 			if (!code)
 				return INTERNAL_ERROR;
+			if (add_code(code, "#  STACK_PLUS\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(&builtin_list, code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
 			if (add_code(code, "JUMP $expr_plus_end$\0"))
 				return INTERNAL_ERROR;
 			if (CL_add_line(&builtin_list, code))
@@ -2241,6 +2297,14 @@ int gen_stack_minus(){
 			Code *code = create_code();
 			if (!code)
 				return INTERNAL_ERROR;
+			if (add_code(code, "#  STACK_MINUS\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(&builtin_list, code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
 			if (add_code(code, "JUMP $expr_minus_end$\0"))
 				return INTERNAL_ERROR;
 			if (CL_add_line(&builtin_list, code))
@@ -2498,6 +2562,14 @@ int gen_stack_mult(){
 			Code *code = create_code();
 			if (!code)
 				return INTERNAL_ERROR;
+			if (add_code(code, "#  STACK_MULT\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(&builtin_list, code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
 			if (add_code(code, "JUMP $expr_mult_end$\0"))
 				return INTERNAL_ERROR;
 			if (CL_add_line(&builtin_list, code))
@@ -2753,6 +2825,14 @@ int gen_stack_mult(){
 
 int gen_stack_div(){
 			Code *code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "# STACK_DIV\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(&builtin_list, code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
 			if (!code)
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMP $expr_div_end$\0"))
@@ -3056,6 +3136,14 @@ int gen_stack_idiv(){
 			Code *code = create_code();
 			if (!code)
 				return INTERNAL_ERROR;
+			if (add_code(code, "# STACK_IDIV\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(&builtin_list, code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
 			if (add_code(code, "JUMP $expr_idiv_end$\0"))
 				return INTERNAL_ERROR;
 			if (CL_add_line(&builtin_list, code))
@@ -3258,6 +3346,14 @@ int gen_stack_idiv(){
 
 int gen_stack_equal(){
 			Code *code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "#  STACK_EQUAL\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(&builtin_list, code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
 			if (!code)
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMP $expr_equal_end$\0"))
@@ -3515,6 +3611,14 @@ int gen_stack_equal(){
 
 int gen_stack_notequal(){
 			Code *code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "# STACK_NOTEQUAL\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(&builtin_list, code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
 			if (!code)
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMP $expr_notequal_end$\0"))
@@ -3782,6 +3886,14 @@ int gen_stack_less(){
 			Code *code = create_code();
 			if (!code)
 				return INTERNAL_ERROR;
+			if (add_code(code, "#  STACK_LESS\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(&builtin_list, code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
 			if (add_code(code, "JUMP $expr_less_end$\0"))
 				return INTERNAL_ERROR;
 			if (CL_add_line(&builtin_list, code))
@@ -4020,6 +4132,14 @@ int gen_stack_less(){
 
 int gen_stack_lesseq(){
 			Code *code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "# STACK_LESSEQ\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(&builtin_list, code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
 			if (!code)
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMP $expr_lesseq_end$\0"))
@@ -4294,6 +4414,14 @@ int gen_stack_greater(){
 			Code *code = create_code();
 			if (!code)
 				return INTERNAL_ERROR;
+			if (add_code(code, "#  STACK_GREATER\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(&builtin_list, code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
 			if (add_code(code, "JUMP $expr_greater_end$\0"))
 				return INTERNAL_ERROR;
 			if (CL_add_line(&builtin_list, code))
@@ -4532,6 +4660,14 @@ int gen_stack_greater(){
 
 int gen_stack_greatereq(){
 			Code *code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "#  STACK_GREATEREQ\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(&builtin_list, code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
 			if (!code)
 				return INTERNAL_ERROR;
 			if (add_code(code, "JUMP $expr_greatereq_end$\0"))
@@ -5110,6 +5246,245 @@ int gen_concat(char *op1, char *op2){
 	if (add_code(code, "PUSHS GF@&res1"))
 		return INTERNAL_ERROR;
 	if (CL_add_line(&code_list, code))
+		return INTERNAL_ERROR;
+
+	return OK;
+}
+
+int gen_if_exprval_check(){
+	Code *code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "#  IF_EXPRVAL_CHECK\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "JUMP %exprval_check%end\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "LABEL %exprval_check%\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "POPS GF@&expr&val\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "TYPE GF@&expr&val&type GF@&expr&val\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
+	// vysledok expr je bool
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "JUMPIFNEQ %exprval_check%not_bool% GF@&expr&val&type string@bool\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "RETURN\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
+	// vysledok expr neni bool
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "LABEL %exprval_check%not_bool%\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
+	// jump na None
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "JUMPIFEQ %exprval_check%false GF@&expr&val&type string@nil\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
+	// jump na int
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "JUMPIFEQ %exprval_check%int GF@&expr&val&type string@int\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
+	// jump na float
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "JUMPIFEQ %exprval_check%float GF@&expr&val&type string@float\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
+	// jump na string
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "JUMPIFEQ %exprval_check%string GF@&expr&val&type string@string\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
+	// int
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "LABEL %exprval_check%int\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "JUMPIFEQ %exprval_check%false GF@&expr&val int@0\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "MOVE GF@&expr&val bool@true\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "RETURN\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
+	// float
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "LABEL %exprval_check%float\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "JUMPIFEQ %exprval_check%false GF@&expr&val float@0x0p+0\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "MOVE GF@&expr&val bool@true\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "RETURN\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
+	// string
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "LABEL %exprval_check%string\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "JUMPIFEQ %exprval_check%false GF@&expr&val string@\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "MOVE GF@&expr&val bool@true\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "RETURN\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
+	// false do exprval
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "LABEL %exprval_check%false\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "MOVE GF@&expr&val bool@false\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "RETURN\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
+
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "LABEL %exprval_check%end\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
 		return INTERNAL_ERROR;
 
 	return OK;
