@@ -46,7 +46,7 @@ typedef struct{
 } Code_list;
 
 Code_list code_list;
-
+Code_list builtin_list;
 
 //----------------------------------------
 //     INTERNAL TRANSFORM FUNCTIONS      -
@@ -98,7 +98,7 @@ void CL_destroy(Code_line *line);
  * @return     OK if successfull, INTERNAL_ERROR in case of internal error
  *             occurrence
  */
-int CL_add_line(Code *line);
+int CL_add_line(Code_list *code_list, Code *line);
 /**
  * @brief      Initializes the generator.
  *
