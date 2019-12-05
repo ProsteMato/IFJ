@@ -365,7 +365,13 @@ char *UndefinedFunctionControl(SymTabNodePtr RootPtr){
 			}	
 		}
 		returnValue = UndefinedFunctionControl(RootPtr->LPtr);
+		if(returnValue != NULL) {
+			return returnValue;
+		}
 		returnValue = UndefinedFunctionControl(RootPtr->RPtr);
+		if(returnValue != NULL) {
+			return returnValue;
+		}
 	}
 	return returnValue;
 }

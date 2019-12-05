@@ -26,6 +26,7 @@ int while_counter;
 Stack while_stack;
 Stack if_stack;
 int if_counter;
+int param_c;
 TKQueue pq;
 
 
@@ -239,7 +240,7 @@ int gen_clear();
  * @return     OK if successfull, INTERNAL_ERROR in case of internal error
  *             occurrence
  */
-int gen_inputs(char *dest);
+int gen_inputs();
 /**
  * @brief      Generates built-in function inputi
  *
@@ -248,7 +249,7 @@ int gen_inputs(char *dest);
  * @return     OK if successfull, INTERNAL_ERROR in case of internal error
  *             occurrence
  */
-int gen_inputi(char *dest);
+int gen_inputi();
 /**
  * @brief      Generates built-in function intputf
  *
@@ -257,17 +258,7 @@ int gen_inputi(char *dest);
  * @return     OK if successfull, INTERNAL_ERROR in case of internal error
  *             occurrence
  */
-int gen_inputf(char *dest);
-/**
- * @brief      Generates built-in function print
- *
- * @param      symb  The pointer to the string with name of var or const string
- *                   to be pritent
- *
- * @return     OK if successfull, INTERNAL_ERROR in case of internal error
- *             occurrence
- */
-int gen_print(char *symb);
+int gen_inputf();
 /**
  * @brief      Generates built-in function len
  *
