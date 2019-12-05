@@ -266,6 +266,8 @@ Data_type getFinalType(pRules rule, exprStack* sym1, exprStack* sym2, exprStack*
             case PR_EEQE: 
             case PR_ENOTEQE: 
                   return TYPE_BOOL;
+            case PR_BIB:
+                  return sym2->dType;
             default: 
                   return TYPE_UNDEFINED;
       }
@@ -368,7 +370,7 @@ int callExpression(Token *token)
       if ( token->type == TK_INT || token->type == TK_FLOAT)
       {
             //Token *testToken;
-            int l = preload_token(token); 
+            int l = get_next_token(token); 
             if (l != OK)
             {
                   return l; 
@@ -376,6 +378,11 @@ int callExpression(Token *token)
             if (token->type == TK_ID)
             {
                   return SYNTAX_ERROR;
+            }
+            int e = unget_token(token); 
+            if (e != OK)
+            {
+                  return l; 
             }
       }
        if (token->type ==TK_ASSIGN)
@@ -613,7 +620,7 @@ int callExpression(Token *token)
  {
         return err_unget;
  }
- if (generate) { // musia byt obe true aby sa generovalo
+ if (generate)  { // musia byt obe true aby sa generovalo
       int returnValue = OK;
       if((returnValue = gen_expr()) != OK){ //kontrola ci nahodou nevratil chybu
             return returnValue;
