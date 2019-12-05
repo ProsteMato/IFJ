@@ -398,7 +398,14 @@ int scan(Token *token){
 						if (!append_char(&str, &str_i, &cap, '\0')){
 							return internal_error_exit(&s, str);
 						}
-						token->type = TK_KW;
+						if (keyword == KW_PRINT || keyword == KW_CHR ||
+							keyword == KW_ORD || keyword == KW_INPUTI ||
+							keyword == KW_INPUTF ||	keyword == KW_INPUTS ||
+							keyword == KW_LEN ||keyword == KW_SUBSTR){
+							token->type = TK_ID;
+						} else {
+							token->type = TK_KW;
+						}
 						token->attribute = str;
 						ungetc(c, stdin);
 						return OK;
