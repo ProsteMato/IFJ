@@ -1,0 +1,7 @@
+def id(a):
+    pass
+
+def f():
+    pass
+
+id(f)
