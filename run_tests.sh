@@ -49,7 +49,7 @@ do
     ((TOTAL_CNT++))
     ((TOTAL_LEX++))
     #dos2unix $f
-    ${APP} <$f
+    ${APP} <$f >/dev/null
     RETURN_CODE=$?
     echo $f
     if [ $RETURN_CODE -eq 1 ]  
@@ -57,7 +57,7 @@ do
         print_ok "Lex err returned."
     else 
         echo $RETURN_CODE
-        print_err "Should be lex error."
+        print_err "Should be syntax error."
         ((ERROR_CNT++))
         ((ERR_LEX++))
     fi
@@ -67,8 +67,8 @@ for f in ./tests/syn_err*
 do 
     ((TOTAL_CNT++))
     ((TOTAL_SYN++))
-    dos2unix $f
-    ${APP} <$f
+    #dos2unix $f
+    ${APP} <$f >/dev/null
     RETURN_CODE=$?
     echo $f
     if [ $RETURN_CODE -eq 2 ]  
@@ -87,7 +87,7 @@ do
     ((TOTAL_CNT++))
     ((TOTAL_SEMTHREE++))
     #dos2unix $f
-    ${APP} <$f
+    ${APP} <$f >/dev/null
     RETURN_CODE=$?
     echo $f
     if [ $RETURN_CODE -eq 3 ]  
@@ -106,7 +106,7 @@ do
     ((TOTAL_CNT++))
     ((TOTAL_SEMFOUR++))
     #dos2unix $f
-    ${APP} <$f
+    ${APP} <$f >/dev/null
     RETURN_CODE=$?
     echo $f
     if [ $RETURN_CODE -eq 4 ]  
@@ -125,7 +125,7 @@ do
     ((TOTAL_CNT++))
     ((TOTAL_SEMFIVE++))
     #dos2unix $f
-    ${APP} <$f
+    ${APP} <$f >/dev/null
     RETURN_CODE=$?
     echo $f
     if [ $RETURN_CODE -eq 5 ]  
@@ -144,7 +144,7 @@ do
     ((TOTAL_CNT++))
     ((TOTAL_SEMSIX++))
     #dos2unix $f
-    ${APP} <$f
+    ${APP} <$f >/dev/null
     RETURN_CODE=$?
     echo $f
     if [ $RETURN_CODE -eq 6 ]  
@@ -163,7 +163,7 @@ do
     ((TOTAL_CNT++))
     ((TOTAL_ZERO++))
     #dos2unix $f
-    ${APP} <$f
+    ${APP} <$f >/dev/null
     RETURN_CODE=$?
     echo $f
     if [ $RETURN_CODE -eq 9 ]  
@@ -177,12 +177,12 @@ do
     fi
 done
 
-for f in ./tests/OK*
+for f in ./tests/ok*
 do 
     ((TOTAL_CNT++))
     ((TOTAL_OK++))
-    #dos2unix $f
-    ${APP} <$f
+    #dos2unix $f 
+    ${APP} <$f >/dev/null
     RETURN_CODE=$?
     echo $f
     if [ $RETURN_CODE -eq 0 ]  
@@ -196,12 +196,12 @@ do
     fi
 done
 
-echo "Test lex count: $TOTAL_LEX, Error lex count: $ERROR_LEX"
+echo "Test lex count: $TOTAL_LEX, Error lex count: $ERR_LEX"
 echo "Test syntax count: $TOTAL_SYN, Error syntax count: $ERR_SYN"
-echo "Test sem3 count: $TOTAL_SEMTHREE, Error sem3 count: $ERR_SEM3_"
-echo "Test sem4 count: $TOTAL_SEMFOUR, Error sem4 count: $ERR_SEM4_"
-echo "Test sem5 count: $TOTAL_SEMFIVE, Error sem5 count: $ERR_SEM5_"
-echo "Test sem6 count: $TOTAL_SEMSIX, Error sem6 count: $ERR_SEM6_"
-echo "Test zero count: $TOTAL_ZERO, Error zero count: $ERROR_ZERO"
-echo "Test OK count: $TOTAL_OK, Error OK count: $ERROR_OK"
+echo "Test sem3 count: $TOTAL_SEMTHREE, Error sem3 count: $ERR_SEMTHREE"
+echo "Test sem4 count: $TOTAL_SEMFOUR, Error sem4 count: $ERR_SEMFOUR"
+echo "Test sem5 count: $TOTAL_SEMFIVE, Error sem5 count: $ERR_SEMFIVE"
+echo "Test sem6 count: $TOTAL_SEMSIX, Error sem6 count: $ERR_SEMSIX"
+echo "Test zero count: $TOTAL_ZERO, Error zero count: $ERR_ZERO"
+echo "Test OK count: $TOTAL_OK, Error OK count: $ERR_OK"
 echo "Test count: $TOTAL_CNT, Error count: $ERROR_CNT"
