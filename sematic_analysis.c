@@ -133,7 +133,8 @@ Data_type get_type_from_token(SymTabNodePtr root, LocalTableNode local_table, To
 int is_function_created(SymTabNodePtr root, char *function_id) {
     GlobalTableData *global_data;
     if (GlobalSymTabSearch(root, function_id, &global_data)) {
-        return true;
+        if (global_data->funkce)
+            return true;
     }
     return false;
 }
@@ -156,7 +157,8 @@ int is_variable_defined(SymTabNodePtr root, LocalTableNode local_table, ParamLis
         return true;
     }
     if (GlobalSymTabSearch(root, variable_id, &global_data)){
-        return true;
+        if (!global_data->funkce)
+            return true;
     }
     return false;
 }
@@ -198,22 +200,25 @@ int define_function(SymTabNodePtr *root, char *function_id) {
 int is_function_defined(SymTabNodePtr root, char *function_id){
     GlobalTableData *global_data;
     if (GlobalSymTabSearch(root, function_id, &global_data)) {
-        if (global_data->define == true)
+        if (global_data->funkce == true && global_data->define == true)
             return true;
     }
     return false;
 }
 
-int define_local_variable(LocalTableNode *root, bool function_call, char *variable_id) {
+int define_local_variable(LocalTableNode *local_table, bool function_call, char *variable_id) {
     int returnValue = 0;
-    if (!is_variable_defined(NULL, *root, NULL, variable_id)) {
+    if (!is_variable_defined(root, *local_table, NULL, variable_id)) {
+        if(is_function_created(root, variable_id)) {
+            return SEM_FUNCTION_ERROR;
+        }
         if((returnValue = gen_defvar(variable_id)) != OK) {
             return returnValue;
         }
         LocalTableData *data = malloc (sizeof(GlobalTableData));
         data->define = false;
         data->type = TYPE_UNDEFINED;
-        int returnValue = LocalSymTabInsert(root, variable_id, data);
+        int returnValue = LocalSymTabInsert(local_table, variable_id, data);
         if(returnValue != OK) {
             return returnValue;
         }
@@ -230,6 +235,9 @@ int define_local_variable(LocalTableNode *root, bool function_call, char *variab
 int define_global_variable(SymTabNodePtr *root, bool function_call, char *variable_id) {
     int returnValue = 0;
     if (!is_variable_defined(*root, NULL, NULL, variable_id)) {
+        if(is_function_created(*root, variable_id)) {
+            return SEM_FUNCTION_ERROR;
+        }
         GlobalTableData *data = malloc (sizeof(GlobalTableData));
         data->funkce = false;
         data->define = false;

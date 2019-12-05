@@ -303,6 +303,19 @@ void SetDefine(SymTabNodePtr RootPtr, char * K){
 	return;
 }
 
+void SetCalled(SymTabNodePtr RootPtr, char * K){
+	GlobalTableData *data;
+	if (GlobalSymTabSearch (RootPtr, K, &data) == false) return;
+	else data->wasCalled = true;
+	return;
+}
+
+bool WasCalled(SymTabNodePtr RootPtr, char * K){
+	GlobalTableData *data;
+	if (GlobalSymTabSearch (RootPtr, K, &data) == false) return false;
+	else return data->wasCalled;
+}
+
 void LocalSetDefine(LocalTableNode RootPtr, char * K){
 	LocalTableData *data;
 	if (LocalSymTabSearch (RootPtr, K, &data) == false) return;
