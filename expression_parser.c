@@ -172,7 +172,7 @@ pRules findRule(int num, exprStack* sym1, exprStack* sym2, exprStack* sym3)
                               return PR_EMULTE;
                         // E -> E / E 
                         case (PT_DIV):
-                              return PR_EDIVDIVE;
+                              return PR_EDIVE;
                         // E -> E // E 
                         case (PT_DIV_DIV):
                               return PR_EDIVDIVE;
@@ -338,6 +338,7 @@ int callExpression(Token *token)
                   return SEM_FUNCTION_ERROR;
             }
       }
+      
       symbol= getIndex(token);
       if (symbol == -1 )
       {
