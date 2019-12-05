@@ -118,6 +118,17 @@ void print_final_code();
  */
 Code* create_code();
 
+/**
+ * @brief      Adds string to the code
+ *
+ * @param      code  Pointer to the code
+ * @param      inst  String with instruction
+ *
+ * @return     OK if successfull, INTERNAL_ERROR in case of internal error
+ *             occurrence
+ */
+int add_code(Code *code, char *inst);
+
 //----------------------------------------
 //         PARAM QUEUE FUNSTIONS         -
 //----------------------------------------
@@ -323,6 +334,14 @@ int gen_expr();
  *             occurrence
  */
 int gen_stack_plus();
+/**
+ * @brief      Generates function for substraction operation proccessing using
+ *             stack operations
+ *
+ * @return     OK if successfull, INTERNAL_ERROR in case of internal error
+ *             occurrence
+ */
+int gen_stack_minus();
 /**
  * @brief      Generates function for multiplacation operation proccessing using
  *             stack operations
