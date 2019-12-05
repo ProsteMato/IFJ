@@ -812,6 +812,20 @@ int gen_int2float(char *var){
 	return OK;
 }
 
+int gen_clear(){
+	Code *code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "CLEARS\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&code_list, code))
+		return INTERNAL_ERROR;
+
+	return OK;
+}
+
+// TODO inbuilt funckie do inbuilt listu
+// TODO None a ine typy
 int gen_print(char *symb){
 	Code *code = create_code();
 	if (!code)

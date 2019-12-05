@@ -219,6 +219,14 @@ int gen_assing_const_to_val(char *var, Token *token);
  */
 int gen_defvar(char *var);
 
+/**
+ * @brief      Generates CLEARS, clears the stack
+ *
+ * @return     OK if successfull, INTERNAL_ERROR in case of internal error
+ *             occurrence
+ */
+int gen_clear();
+
 //----------------------------------------
 //          BUILT-IN FUNCTIONS           -
 //----------------------------------------
