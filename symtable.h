@@ -105,16 +105,27 @@ void GlobalSymTabDelete (SymTabNodePtr *, char *);
 void GlobalSymTabDispose (SymTabNodePtr *);
 
 /** nastavi hodnutu define na true
-@param SymTabNodePtr - tabulka symbolu
-@char - klic symbolu u ktereho mam provest zmenu */
+* @param SymTabNodePtr - tabulka symbolu
+* @param char - klic symbolu u ktereho mam provest zmenu 
+*/
 void SetDefine(SymTabNodePtr, char *);
 
-//TODO dokumentacia
-//nastavuje premennu wascalled ci je funkcia definovana
+/**
+ * @brief Nastaví premennú volania funckie na true
+ * 
+ * @param RootPtr pointer na globálnu tabuľku symbolov
+ * @param K klúč ktorý bude hľadaný
+ */
 void SetCalled(SymTabNodePtr RootPtr, char * K);
 
-//TODO dokumentacia
-//vracia premennu wascalled ci bola funkcia definovana 
+/**
+ * @brief skontroluje že či je funkcia volaná
+ * 
+ * @param RootPtr pointer na globálnu tabuľku symbolov
+ * @param K klúč ktorý bude hľadaný
+ * @return true ak funkcia bola volaná
+ * @return false ak funkcia volaná nebola
+ */
 bool WasCalled(SymTabNodePtr RootPtr, char * K);
 
 /** nastavi typ globalni premmennej
