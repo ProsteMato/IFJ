@@ -49,7 +49,7 @@ do
     ((TOTAL_CNT++))
     ((TOTAL_LEX++))
     #dos2unix $f
-    ${APP} <$f >/dev/null
+    timeout 2s ${APP} <$f >/dev/null
     RETURN_CODE=$?
     echo $f
     if [ $RETURN_CODE -eq 1 ]  
@@ -68,7 +68,7 @@ do
     ((TOTAL_CNT++))
     ((TOTAL_SYN++))
     #dos2unix $f
-    ${APP} <$f >/dev/null
+    timeout 2s ${APP} <$f >/dev/null
     RETURN_CODE=$?
     echo $f
     if [ $RETURN_CODE -eq 2 ]  
@@ -87,7 +87,7 @@ do
     ((TOTAL_CNT++))
     ((TOTAL_SEMTHREE++))
     #dos2unix $f
-    ${APP} <$f >/dev/null
+    timeout 2s ${APP} <$f >/dev/null
     RETURN_CODE=$?
     echo $f
     if [ $RETURN_CODE -eq 3 ]  
@@ -106,7 +106,7 @@ do
     ((TOTAL_CNT++))
     ((TOTAL_SEMFOUR++))
     #dos2unix $f
-    ${APP} <$f >/dev/null
+    timeout 2s ${APP} <$f >/dev/null
     RETURN_CODE=$?
     echo $f
     if [ $RETURN_CODE -eq 4 ]  
@@ -125,7 +125,7 @@ do
     ((TOTAL_CNT++))
     ((TOTAL_SEMFIVE++))
     #dos2unix $f
-    ${APP} <$f >/dev/null
+    timeout 2s ${APP} <$f >/dev/null
     RETURN_CODE=$?
     echo $f
     if [ $RETURN_CODE -eq 5 ]  
@@ -144,7 +144,7 @@ do
     ((TOTAL_CNT++))
     ((TOTAL_SEMSIX++))
     #dos2unix $f
-    ${APP} <$f >/dev/null
+    timeout 2s ${APP} <$f >/dev/null
     RETURN_CODE=$?
     echo $f
     if [ $RETURN_CODE -eq 6 ]  
@@ -163,7 +163,7 @@ do
     ((TOTAL_CNT++))
     ((TOTAL_ZERO++))
     #dos2unix $f
-    ${APP} <$f >/dev/null
+    timeout 2s ${APP} <$f >/dev/null
     RETURN_CODE=$?
     echo $f
     if [ $RETURN_CODE -eq 9 ]  
@@ -182,7 +182,7 @@ do
     ((TOTAL_CNT++))
     ((TOTAL_OK++))
     #dos2unix $f 
-    ${APP} <$f >/dev/null
+    timeout 2s ${APP} <$f >/dev/null
     RETURN_CODE=$?
     echo $f
     if [ $RETURN_CODE -eq 0 ]  
