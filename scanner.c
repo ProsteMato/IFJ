@@ -563,6 +563,10 @@ int scan(Token *token){
 				if (c == '"'){
 					state = BLOCK_COMMENT3;
 					block_end++;
+				} else if (c == EOF){
+					free(str);
+					s_destroy(&s);
+					return LEX_ERROR;
 				} else {
 					if (!first_token){
 						if (!append_char(&str, &str_i, &cap, c)){
