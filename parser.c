@@ -382,6 +382,7 @@ int stat(Token *token) {
 	*/
 	} else if (token->type == TK_ID) {
 		saved_id = token->attribute;
+		UNGET_TOKEN(token);
 		PRELOAD_TOKEN(token);
 		if (
 			token->type == TK_MINUS ||
@@ -391,6 +392,7 @@ int stat(Token *token) {
 			token->type == TK_DIV_DIV
 			) {
 			generate = false;
+			GET_NEXT_TOKEN(token);
 			if((returnValue = callExpression(token)) == OK) {
 				if(!isRelational) {
 					GET_NEXT_TOKEN(token);
@@ -409,6 +411,7 @@ int stat(Token *token) {
 				token->type == TK_BRACKET_L ||
 				token->type == TK_ASSIGN
 			) {
+			GET_NEXT_TOKEN(token);
 			GET_NEXT_TOKEN(token);
 			return after_id(token);
 		}
