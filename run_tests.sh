@@ -10,18 +10,18 @@ TOTAL_CNT=0
 ERROR_CNT=0
 TOTAL_LEX=0
 TOTAL_SYN=0
-TOTAL_SEM3_=0
-TOTAL_SEM4_=0
-TOTAL_SEM5_=0
-TOTAL_SEM6_=0
+TOTAL_SEMTHREE=0
+TOTAL_SEMFOUR=0
+TOTAL_SEMFIVE=0
+TOTAL_SEMSIX=0
 TOTAL_ZERO=0
 TOTAL_OK=0
 ERR_LEX=0
 ERR_SYN=0
-ERR_SEM3_=0
-ERR_SEM4_=0
-ERR_SEM5_=0
-ERR_SEM6_=0
+ERR_SEMTHREE=0
+ERR_SEMFOUR=0
+ERR_SEMFIVE=0
+ERR_SEMSIX=0
 ERR_ZERO=0
 ERR_OK=0
 
@@ -48,7 +48,7 @@ for f in ./tests/lex_err*
 do 
     ((TOTAL_CNT++))
     ((TOTAL_LEX++))
-    dos2unix $f
+    #dos2unix $f
     ${APP} <$f
     RETURN_CODE=$?
     echo $f
@@ -85,8 +85,8 @@ done
 for f in ./tests/sem_err3_*
 do 
     ((TOTAL_CNT++))
-    ((TOTAL_SEM3_++))
-    dos2unix $f
+    ((TOTAL_SEMTHREE++))
+    #dos2unix $f
     ${APP} <$f
     RETURN_CODE=$?
     echo $f
@@ -97,15 +97,15 @@ do
         echo $RETURN_CODE
         print_err "Should be sem 3 error."
         ((ERROR_CNT++))
-        ((ERR_SEM3_++))
+        ((ERR_SEMTHREE++))
     fi
 done
 
 for f in ./tests/sem_err4_*
 do 
     ((TOTAL_CNT++))
-    ((TOTAL_SEM4_++))
-    dos2unix $f
+    ((TOTAL_SEMFOUR++))
+    #dos2unix $f
     ${APP} <$f
     RETURN_CODE=$?
     echo $f
@@ -116,15 +116,15 @@ do
         echo $RETURN_CODE
         print_err "Should be sem 4 error."
         ((ERROR_CNT++))
-        ((ERR_SEM4_++))
+        ((ERR_SEMFOUR++))
     fi
 done
 
 for f in ./tests/sem_err5_*
 do 
     ((TOTAL_CNT++))
-    ((TOTAL_SEM5_++))
-    dos2unix $f
+    ((TOTAL_SEMFIVE++))
+    #dos2unix $f
     ${APP} <$f
     RETURN_CODE=$?
     echo $f
@@ -135,15 +135,15 @@ do
         echo $RETURN_CODE
         print_err "Should be sem 5 error."
         ((ERROR_CNT++))
-        ((ERR_SEM5_++))
+        ((ERR_SEMFIVE++))
     fi
 done
 
 for f in ./tests/sem_err6_*
 do 
     ((TOTAL_CNT++))
-    ((TOTAL_SEM6_++))
-    dos2unix $f
+    ((TOTAL_SEMSIX++))
+    #dos2unix $f
     ${APP} <$f
     RETURN_CODE=$?
     echo $f
@@ -154,7 +154,7 @@ do
         echo $RETURN_CODE
         print_err "Should be sem 6 error."
         ((ERROR_CNT++))
-        ((ERR_SEM6_++))
+        ((ERR_SEMSIX++))
     fi
 done
 
@@ -162,7 +162,7 @@ for f in ./tests/zero*
 do 
     ((TOTAL_CNT++))
     ((TOTAL_ZERO++))
-    dos2unix $f
+    #dos2unix $f
     ${APP} <$f
     RETURN_CODE=$?
     echo $f
@@ -181,7 +181,7 @@ for f in ./tests/OK*
 do 
     ((TOTAL_CNT++))
     ((TOTAL_OK++))
-    dos2unix $f
+    #dos2unix $f
     ${APP} <$f
     RETURN_CODE=$?
     echo $f
@@ -197,11 +197,11 @@ do
 done
 
 echo "Test lex count: $TOTAL_LEX, Error lex count: $ERROR_LEX"
-echo "Test syntax count: $TOTAL_SYN, Error syntax count: $ERROR_SYN"
-echo "Test sem3 count: $TOTAL_SEM3_, Error sem3 count: $ERROR_SEM3_"
-echo "Test sem4 count: $TOTAL_SEM4_, Error sem4 count: $ERROR_SEM4_"
-echo "Test sem5 count: $TOTAL_SEM5_, Error sem5 count: $ERROR_SEM5_"
-echo "Test sem6 count: $TOTAL_SEM6_, Error sem6 count: $ERROR_SEM6_"
+echo "Test syntax count: $TOTAL_SYN, Error syntax count: $ERR_SYN"
+echo "Test sem3 count: $TOTAL_SEMTHREE, Error sem3 count: $ERR_SEM3_"
+echo "Test sem4 count: $TOTAL_SEMFOUR, Error sem4 count: $ERR_SEM4_"
+echo "Test sem5 count: $TOTAL_SEMFIVE, Error sem5 count: $ERR_SEM5_"
+echo "Test sem6 count: $TOTAL_SEMSIX, Error sem6 count: $ERR_SEM6_"
 echo "Test zero count: $TOTAL_ZERO, Error zero count: $ERROR_ZERO"
 echo "Test OK count: $TOTAL_OK, Error OK count: $ERROR_OK"
 echo "Test count: $TOTAL_CNT, Error count: $ERROR_CNT"
