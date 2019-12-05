@@ -1,4 +1,0 @@
-if 5.5 >= 4.9 : 
-    pass
-else :
-    pass

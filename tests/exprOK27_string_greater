@@ -1,4 +1,0 @@
-if 'abc' > 'cd' : 
-    pass
-else : 
-    pass

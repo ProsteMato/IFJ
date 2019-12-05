@@ -1,4 +1,0 @@
-if 'abc' < 4 : 
-    pass
-else :
-    pass
