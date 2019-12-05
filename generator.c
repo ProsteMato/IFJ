@@ -1077,56 +1077,6 @@ int gen_return(){ // tu sme skoncili
 		return INTERNAL_ERROR;
 	return OK;
 }
-/*
-	char *tmp;
-	Code *code = create_code();
-	if (!code)
-		return INTERNAL_ERROR;
-
-	if (add_code(code, "MOVE LF@%retval \0"))
-		return INTERNAL_ERROR;
-
-	if (token->type == TK_ID){
-		if (is_global_variable(root, token->attribute)){
-			if (add_code(code, "GF@%\0"))
-				return INTERNAL_ERROR;
-		} else {
-			if (add_code(code, "LF@\0"))
-				return INTERNAL_ERROR;
-		}
-		if (add_code(code, token->attribute))
-			return INTERNAL_ERROR;
-	} else if (token->type == TK_KW){
-		if (add_code(code, "nil@nil\0"))
-			return INTERNAL_ERROR;
-	} else if (token->type == TK_INT){
-		if (add_code(code, "int@\0"))
-			return INTERNAL_ERROR;
-		if (add_code(code, token->attribute))
-			return INTERNAL_ERROR;
-	} else if (token->type == TK_FLOAT){
-		if (add_code(code, "float@\0"))
-			return INTERNAL_ERROR;
-		tmp = float_to_str(token->attribute);
-		if (add_code(code, tmp))
-			return INTERNAL_ERROR;
-		free(tmp);
-	} else if (token->type == TK_STRING){
-		if (add_code(code, "string@\0"))
-			return INTERNAL_ERROR;
-		tmp = transform_for_write(token->attribute);
-		if (add_code(code, tmp))
-			return INTERNAL_ERROR;
-		free(tmp);
-	} else { // sem by sa nic ine nemalo dostat
-		return INTERNAL_ERROR;
-	}
-
-	if (CL_add_line(&code_list, code))
-		return INTERNAL_ERROR;
-	return OK;
-}
-*/
 
 int gen_f_return(char* var){
 	Code *code = create_code();
@@ -2291,6 +2241,14 @@ int gen_stack_minus(){
 			Code *code = create_code();
 			if (!code)
 				return INTERNAL_ERROR;
+			if (add_code(code, "JUMP $expr_minus_end$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(&builtin_list, code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
 			if (add_code(code, "LABERL $expr_minus$\0"))
 				return INTERNAL_ERROR;
 			if (CL_add_line(&builtin_list, code))
@@ -2525,11 +2483,27 @@ int gen_stack_minus(){
 			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "LABEL $expr_minus_end$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(&builtin_list, code))
+				return INTERNAL_ERROR;
+
 			return OK;
 }
 
 int gen_stack_mult(){
 			Code *code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMP $expr_mult_end$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(&builtin_list, code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
 			if (!code)
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $expr_mult$\0"))
@@ -2766,11 +2740,27 @@ int gen_stack_mult(){
 			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "LABEL $expr_mult_end$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(&builtin_list, code))
+				return INTERNAL_ERROR;
+
 			return OK;
 }
 
 int gen_stack_div(){
 			Code *code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMP $expr_div_end$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(&builtin_list, code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
 			if (!code)
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $expr_div$\0"))
@@ -3051,11 +3041,27 @@ int gen_stack_div(){
 			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "LABEL $expr_div_end$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(&builtin_list, code))
+				return INTERNAL_ERROR;
+
 			return OK;
 }
 
 int gen_stack_idiv(){
 			Code *code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMP $expr_idiv_end$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(&builtin_list, code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
 			if (!code)
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $expr_idiv$\0"))
@@ -3239,11 +3245,27 @@ int gen_stack_idiv(){
 			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "LABEL $expr_idiv_end$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(&builtin_list, code))
+				return INTERNAL_ERROR;
+
 			return OK;
 }
 
 int gen_stack_equal(){
 			Code *code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMP $expr_equal_end$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(&builtin_list, code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
 			if (!code)
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $expr_equal$\0"))
@@ -3480,11 +3502,27 @@ int gen_stack_equal(){
 			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "LABEL $expr_equal_end$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(&builtin_list, code))
+				return INTERNAL_ERROR;
+
 			return OK;
 }
 
 int gen_stack_notequal(){
 			Code *code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMP $expr_notequal_end$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(&builtin_list, code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
 			if (!code)
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $expr_notequal$\0"))
@@ -3729,11 +3767,27 @@ int gen_stack_notequal(){
 			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "LABEL $expr_noteqal_end$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(&builtin_list, code))
+				return INTERNAL_ERROR;
+
 			return OK;
 }
 
 int gen_stack_less(){
 			Code *code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMP $expr_less_end$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(&builtin_list, code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
 			if (!code)
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $expr_less$\0"))
@@ -3953,11 +4007,27 @@ int gen_stack_less(){
 			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "LABEL $expr_less_end$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(&builtin_list, code))
+				return INTERNAL_ERROR;
+
 			return OK;
 }
 
 int gen_stack_lesseq(){
-	Code *code = create_code();
+			Code *code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMP $expr_lesseq_end$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(&builtin_list, code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
 			if (!code)
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $expr_lesseq$\0"))
@@ -4209,11 +4279,27 @@ int gen_stack_lesseq(){
 			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "LABEL $expr_lesseq_end$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(&builtin_list, code))
+				return INTERNAL_ERROR;
+
 			return OK;
 }
 
 int gen_stack_greater(){
 			Code *code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMP $expr_greater_end$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(&builtin_list, code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
 			if (!code)
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $expr_greater$\0"))
@@ -4433,11 +4519,27 @@ int gen_stack_greater(){
 			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
 
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "LABEL $expr_greater_end$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(&builtin_list, code))
+				return INTERNAL_ERROR;
+
 			return OK;
 }
 
 int gen_stack_greatereq(){
 			Code *code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "JUMP $expr_greatereq_end$\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(&builtin_list, code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
 			if (!code)
 				return INTERNAL_ERROR;
 			if (add_code(code, "LABEL $expr_greatereq$\0"))
@@ -4685,6 +4787,14 @@ int gen_stack_greatereq(){
 			if (!code)
 				return INTERNAL_ERROR;
 			if (add_code(code, "RETURN\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(&builtin_list, code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "LABEL $expr_greatereq_end$\0"))
 				return INTERNAL_ERROR;
 			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
