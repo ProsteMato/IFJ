@@ -8,8 +8,6 @@
  * 
  */
 
-
-//TODO GEN - prida5 premennu aby sa negeneroval kod pri nejakých sytuáciach
 //TODO GEN - pridat generoť generovanie volania funkcie aj ked to nieje v a = 
 
 #include "parser.h"
@@ -540,7 +538,11 @@ int arg_params(Token *token) {
 			}
 		}
 		if(is_function_created(root, saved_id)) {
-			return check_function_param_count(root, saved_id, 0);
+			if(strcmp(saved_id, "print") != 0) {
+				return check_function_param_count(root, saved_id, 0);
+			} else {
+				return OK;
+			}
 		} else {
 			return SEM_FUNCTION_ERROR;
 		}
@@ -592,9 +594,14 @@ int arg_next_params(Token *token) {
 			}
 		}
 	 	if(is_function_created(root, saved_id)){
-			returnValue = check_function_param_count(root, saved_id, count);
-			count = 1;
-			return returnValue;
+			if(strcmp(saved_id, "print") != 0) {
+				returnValue = check_function_param_count(root, saved_id, count);
+				count = 1;
+				return returnValue;
+			} else {
+				count = 1;
+				return OK;
+			}
 		} else {
 			return SEM_FUNCTION_ERROR;
 		}
@@ -740,7 +747,6 @@ int def_id(Token *token) {
 	if (token->type == TK_BRACKET_L) {
 		GET_NEXT_TOKEN(token);
 		if ((returnValue = arg_params(token)) == OK) {
-			//TODO GEN vygenerovat call na funkciu a pripravit parametre
 			if((returnValue = gen_f_prep_params()) != OK) {
 				return returnValue;
 			}
