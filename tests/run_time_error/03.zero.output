@@ -20,6 +20,8 @@ MOVE TF@%2 GF@vysl
 DEFVAR TF@%3
 MOVE TF@%3 string@\010
 PUSHFRAME
+DEFVAR LF@%retval
+MOVE LF@%retval nil@nil
 TYPE GF@&res1 LF@%1
 JUMPIFNEQ $write$1 GF@&res1 string@nil
 WRITE string@None

@@ -26,6 +26,8 @@ MOVE TF@%3 GF@b
 DEFVAR TF@%4
 MOVE TF@%4 string@\010
 PUSHFRAME
+DEFVAR LF@%retval
+MOVE LF@%retval nil@nil
 TYPE GF@&res1 LF@%1
 JUMPIFNEQ $write$1 GF@&res1 string@nil
 WRITE string@None
@@ -71,6 +73,8 @@ MOVE TF@%3 GF@a
 DEFVAR TF@%4
 MOVE TF@%4 string@\010
 PUSHFRAME
+DEFVAR LF@%retval
+MOVE LF@%retval nil@nil
 TYPE GF@&res1 LF@%1
 JUMPIFNEQ $write$1 GF@&res1 string@nil
 WRITE string@None
