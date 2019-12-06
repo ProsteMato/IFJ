@@ -665,12 +665,6 @@ int assign(Token *token) {
 			if (returnValue != OK) {
 				return returnValue;
 			}
-			if((returnValue = gen_f_prep_params()) != OK) {
-				return returnValue;
-			}
-			if((returnValue = gen_f_call(saved_id)) != OK) {
-				return returnValue;
-			}
 			if(in_function){
 				returnValue = define_local_variable(&local_table, true, copy_id);
 				if (returnValue != OK){
