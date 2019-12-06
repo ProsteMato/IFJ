@@ -11,7 +11,7 @@ clean:
 	rm *.o cifj19
 
 test: 
-	./run_tests.sh
+	bash ./run_tests.sh
 
 # --------------------------#
 #         Object files      #

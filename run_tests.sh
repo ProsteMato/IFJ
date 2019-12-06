@@ -44,7 +44,7 @@ function print_err() {
 }
 
 
-for f in ./tests/*.lex_err
+for f in ./tests/lex_err/*.lex_err
 do 
     ((TOTAL_CNT++))
     ((TOTAL_LEX++))
@@ -63,7 +63,7 @@ do
     fi
 done
 
-for f in ./tests/*.syn_err
+for f in ./tests/syn_err/*.syn_err
 do 
     ((TOTAL_CNT++))
     ((TOTAL_SYN++))
@@ -82,7 +82,7 @@ do
     fi
 done
 
-for f in ./tests/*.sem_err3
+for f in ./tests/sem_err/*.sem_err3
 do 
     ((TOTAL_CNT++))
     ((TOTAL_SEMTHREE++))
@@ -101,7 +101,7 @@ do
     fi
 done
 
-for f in ./tests/*.sem_err4
+for f in ./tests/sem_err/*.sem_err4
 do 
     ((TOTAL_CNT++))
     ((TOTAL_SEMFOUR++))
@@ -120,7 +120,7 @@ do
     fi
 done
 
-for f in ./tests/*.sem_err5
+for f in ./tests/sem_err/*.sem_err5
 do 
     ((TOTAL_CNT++))
     ((TOTAL_SEMFIVE++))
@@ -139,7 +139,7 @@ do
     fi
 done
 
-for f in ./tests/*.sem_err6
+for f in ./tests/sem_err/*.sem_err6
 do 
     ((TOTAL_CNT++))
     ((TOTAL_SEMSIX++))
@@ -158,7 +158,7 @@ do
     fi
 done
 
-for f in ./tests/*.zero
+for f in ./tests/run_time_error/*.zero
 do 
     ((TOTAL_CNT++))
     ((TOTAL_ZERO++))
@@ -178,7 +178,7 @@ do
     fi
 done
 
-for f in ./tests/*.ok
+for f in ./tests/gen/*.ok
 do 
     ((TOTAL_CNT++))
     ((TOTAL_OK++))

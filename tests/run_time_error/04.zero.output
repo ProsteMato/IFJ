@@ -1,20 +1,18 @@
-op
-op
 .IFJcode19
 DEFVAR GF@&expr&val
 DEFVAR GF@&expr&val&type
 DEFVAR GF@&res1
 CREATEFRAME
-PUSHS string@ahoj_
+PUSHS int@5
 DEFVAR GF@a
 POPS GF@a
-PUSHS string@svete
+PUSHS int@0
 DEFVAR GF@b
 POPS GF@b
 PUSHS GF@a
 PUSHS GF@b
 CREATEFRAME
-CALL $expr_plus$
+CALL $expr_div$
 DEFVAR GF@vysl
 POPS GF@vysl
 CREATEFRAME
@@ -51,9 +49,9 @@ LABEL $write$end$3
 WRITE string@\010
 POPFRAME
 #   BUILT-IN FUNCTIONS
-#  STACK_PLUS
-JUMP $expr_plus_end$
-LABEL $expr_plus$
+# STACK_DIV
+JUMP $expr_div_end$
+LABEL $expr_div$
 PUSHFRAME
 DEFVAR LF@$op1$
 DEFVAR LF@$op2$
@@ -63,28 +61,29 @@ POPS LF@$op1$
 POPS LF@$op2$
 TYPE LF@$type1$ LF@$op1$
 TYPE LF@$type2$ LF@$op2$
-JUMPIFNEQ $plus_not_same_type$ LF@$type1$ LF@$type2$
-JUMPIFEQ $plus_concat$ LF@$type1$ string@string
-JUMP $plus_add$
-LABEL $plus_concat$
-CONCAT LF@$op1$ LF@$op1$ LF@$op2$
-JUMP $plus_end$
-LABEL $plus_two_floats$
-LABEL $plus_not_same_type$
-JUMPIFEQ $plus_fail$ LF@$type1$ string@string
-JUMPIFEQ $plus_fail$ LF@$type2$ string@string
-JUMPIFEQ $plus_int2float_op1$ LF@$type1$ string@int
-INT2FLOAT LF@$op2$ LF@$op2$
-JUMP $plus_add$
-LABEL $plus_int2float_op1$
+JUMPIFEQ $div_fail$ LF@$type1$ string@string
+JUMPIFEQ $div_fail$ LF@$type2$ string@string
+JUMPIFNEQ $div_not_same$ LF@$type1$ LF@$type2$
+JUMPIFEQ $div_div$ LF@$type1$ string@float
 INT2FLOAT LF@$op1$ LF@$op1$
-JUMP $plus_add$
-LABEL $plus_fail$
+INT2FLOAT LF@$op2$ LF@$op2$
+LABEL $div_div$
+JUMPIFEQ $div_zero$ LF@$op1$ float@0x0p+0
+DIV LF@$op1$ LF@$op2$ LF@$op1$
+JUMP $div_end$
+LABEL $div_zero$
+EXIT int@9
+LABEL $div_fail$
 EXIT int@4
-LABEL $plus_add$
-ADD LF@$op1$ LF@$op1$ LF@$op2$
-LABEL $plus_end$
+LABEL $div_not_same$
+JUMPIFNEQ $div_int2float_op2$ LF@$type2$ string@float
+INT2FLOAT LF@$op1$ LF@$op1$
+JUMP $div_div$
+LABEL $div_int2float_op2$
+INT2FLOAT LF@$op2$ LF@$op2$
+JUMP $div_div$
+LABEL $div_end$
 PUSHS LF@$op1$
 POPFRAME
 RETURN
-LABEL $expr_plus_end$
+LABEL $expr_div_end$

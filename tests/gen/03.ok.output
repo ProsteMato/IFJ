@@ -1,22 +1,12 @@
-int
-
-
-int
-
-
-op
-op
 .IFJcode19
 DEFVAR GF@&expr&val
 DEFVAR GF@&expr&val&type
 DEFVAR GF@&res1
 CREATEFRAME
-PUSHS int@
-
+PUSHS int@5
 DEFVAR GF@ahoj
 POPS GF@ahoj
-PUSHS int@
-
+PUSHS int@5
 DEFVAR GF@svete
 POPS GF@svete
 PUSHS GF@ahoj
@@ -61,39 +51,6 @@ WRITE string@\010
 POPFRAME
 JUMP %if_end%0
 LABEL %false%0
-CREATEFRAME
-DEFVAR TF@%1
-MOVE TF@%1 string@Vytisknu\032sedmicku:
-DEFVAR TF@%2
-MOVE TF@%2 GF@svete
-DEFVAR TF@%3
-MOVE TF@%3 string@\010
-PUSHFRAME
-TYPE GF@&res1 LF@%1
-JUMPIFNEQ $write$1 GF@&res1 string@nil
-WRITE string@None
-JUMP $write$end$1
-LABEL $write$1
-WRITE LF@%1
-LABEL $write$end$1
-WRITE string@\032
-TYPE GF@&res1 LF@%2
-JUMPIFNEQ $write$2 GF@&res1 string@nil
-WRITE string@None
-JUMP $write$end$2
-LABEL $write$2
-WRITE LF@%2
-LABEL $write$end$2
-WRITE string@\032
-TYPE GF@&res1 LF@%3
-JUMPIFNEQ $write$3 GF@&res1 string@nil
-WRITE string@None
-JUMP $write$end$3
-LABEL $write$3
-WRITE LF@%3
-LABEL $write$end$3
-WRITE string@\010
-POPFRAME
 LABEL %if_end%0
 #   BUILT-IN FUNCTIONS
 #  STACK_EQUAL

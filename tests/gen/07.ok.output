@@ -1,22 +1,12 @@
-int
-
-
-int
-
-
-op
-op
 .IFJcode19
 DEFVAR GF@&expr&val
 DEFVAR GF@&expr&val&type
 DEFVAR GF@&res1
 CREATEFRAME
-PUSHS int@
-
+PUSHS int@3
 DEFVAR GF@a
 POPS GF@a
-PUSHS int@
-
+PUSHS int@4
 DEFVAR GF@b
 POPS GF@b
 PUSHS GF@a
