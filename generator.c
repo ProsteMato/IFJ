@@ -1329,86 +1329,189 @@ int gen_header(){
 	return OK;
 }
 
-int gen_inputs(char *dest){
-	if (dest == NULL)
-		return INTERNAL_ERROR;
-	Code *code = create_code();
+int gen_inputs(){
+	Code *code;
+
+	code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
-	if (add_code(code, "READ \0"))
-		return INTERNAL_ERROR;
-	
-	int glob = is_global_variable(root, dest);
-	if (glob){
-		if (add_code(code, "GF@"))
-			return INTERNAL_ERROR;
-	} else {
-		if (add_code(code, "LF@"))
-			return INTERNAL_ERROR;
-	}
-	if (add_code(code, dest))
-		return INTERNAL_ERROR;
-
-	if (add_code(code, " string\0"))
+	if (add_code(code, "JUMP $inputs$end\0"))
 		return INTERNAL_ERROR;
 	if (CL_add_line(&builtin_list, code))
 		return INTERNAL_ERROR;
+
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "PUSHFRAME\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "DEFVAR LF@%retval\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "READ LF@%retval string\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "POPFRAME\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "RETURN\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "LABEL $inputs$end\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
 	return OK;
 }
 
-int gen_inputi(char *dest){
-	if (dest == NULL)
-		return INTERNAL_ERROR;
-	Code *code = create_code();
+int gen_inputi(){
+	Code *code;
+
+	code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
-	if (add_code(code, "READ \0"))
-		return INTERNAL_ERROR;
-
-	int glob = is_global_variable(root, dest);
-	if (glob){
-		if (add_code(code, "GF@"))
-			return INTERNAL_ERROR;
-	} else {
-		if (add_code(code, "LF@"))
-			return INTERNAL_ERROR;
-	}
-
-	if (add_code(code, dest))
-		return INTERNAL_ERROR;
-
-	if (add_code(code, " int\0"))
+	if (add_code(code, "JUMP $inputi$end\0"))
 		return INTERNAL_ERROR;
 	if (CL_add_line(&builtin_list, code))
 		return INTERNAL_ERROR;
+
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "PUSHFRAME\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "DEFVAR LF@%retval\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "READ LF@%retval int\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "POPFRAME\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "RETURN\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "LABEL $inputi$end\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
 	return OK;
 }
 
-int gen_inputf(char *dest){
-	if (dest == NULL)
-		return INTERNAL_ERROR;
-	Code *code = create_code();
+int gen_inputf(){
+	Code *code;
+
+	code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
-	if (add_code(code, "READ \0"))
-		return INTERNAL_ERROR;
-
-	int glob = is_global_variable(root, dest);
-	if (glob){
-		if (add_code(code, "GF@"))
-			return INTERNAL_ERROR;
-	} else {
-		if (add_code(code, "LF@"))
-			return INTERNAL_ERROR;
-	}
-
-	if (add_code(code, dest))
-		return INTERNAL_ERROR;
-
-	if (add_code(code, " float\0"))
+	if (add_code(code, "JUMP $inputf$end\0"))
 		return INTERNAL_ERROR;
 	if (CL_add_line(&builtin_list, code))
 		return INTERNAL_ERROR;
+
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "PUSHFRAME\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "DEFVAR LF@%retval\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "READ LF@%retval float\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "POPFRAME\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "RETURN\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "LABEL $inputf$end\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
 	return OK;
 }
 

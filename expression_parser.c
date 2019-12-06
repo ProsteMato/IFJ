@@ -330,17 +330,28 @@ int callExpression(Token *token)
   {     
       return e;
   } */
+  bool numberinID = false;
   // Load tokens into list, count brackets, control division by 0
    while ( token->type != TK_EOL && token->type != TK_EOF && token->type != TK_COLON)
   {
-      if (token->type == TK_ID)
+       // printf("%s\n", token->attribute);
+      
+      if ( token->type == TK_ID && numberinID)
+      {
+            return SYNTAX_ERROR;
+      }
+      if ( token->type == TK_INT || token->type == TK_FLOAT)
+      {
+            numberinID = true;
+      }
+      else numberinID = false ;
+     if (token->type == TK_ID)
       {
             if (!is_variable_defined(root, local_table, param_list, token->attribute))
             {
                   return SEM_FUNCTION_ERROR;
             }
-      }
-      
+      } 
       symbol= getIndex(token);
       if (symbol == -1 )
       {
@@ -367,24 +378,6 @@ int callExpression(Token *token)
             rightBracket+=1;
       }
 
-      if ( token->type == TK_INT || token->type == TK_FLOAT)
-      {
-            //Token *testToken;
-            int l = get_next_token(token); 
-            if (l != OK)
-            {
-                  return l; 
-            }
-            if (token->type == TK_ID)
-            {
-                  return SYNTAX_ERROR;
-            }
-            int e = unget_token(token); 
-            if (e != OK)
-            {
-                  return l; 
-            }
-      }
        if (token->type ==TK_ASSIGN)
        {
              return SYNTAX_ERROR;
@@ -442,7 +435,6 @@ int callExpression(Token *token)
       {
              listInsertAct(&eList,token->attribute, symbol, dType);
       }
-     
       if ( symbol == PT_ID || symbol == PT_INT || symbol == PT_FLOAT || symbol == PT_STRING || symbol == PT_NONE)
       {
              if ( operandList.first == NULL)
