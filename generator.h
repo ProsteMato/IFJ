@@ -23,10 +23,11 @@
 #define FLOAT2STR_SIZE 23 // nas rozsah floatu prebehnutym %a formatom
 
 int while_counter;
-Stack while_stack;
-Stack if_stack;
+int print_counter;
 int if_counter;
 int param_c;
+Stack while_stack;
+Stack if_stack;
 TKQueue pq;
 
 
