@@ -833,6 +833,22 @@ int gen_f_call(char *id){
 		if (CL_add_line(&code_list, code))
 			return INTERNAL_ERROR;
 
+		code = create_code();
+		if (!code)
+			return INTERNAL_ERROR;
+		if (add_code(code, "DEFVAR LF@%retval\0"))
+			return INTERNAL_ERROR;
+		if (CL_add_line(&code_list, code))
+			return INTERNAL_ERROR;
+
+		code = create_code();
+		if (!code)
+			return INTERNAL_ERROR;
+		if (add_code(code, "MOVE LF@%retval nil@nil\0"))
+			return INTERNAL_ERROR;
+		if (CL_add_line(&code_list, code))
+			return INTERNAL_ERROR;
+
 		for (int i = 1; i <= param_c; i++){
 			tmp = int_to_str(i);
 			if (tmp == NULL){
