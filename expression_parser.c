@@ -335,21 +335,23 @@ int callExpression(Token *token)
    while ( token->type != TK_EOL && token->type != TK_EOF && token->type != TK_COLON)
   {
        // printf("%s\n", token->attribute);
-      if (token->type == TK_ID)
+      
+      if ( token->type == TK_ID && numberinID)
       {
-            if (!is_variable_defined(root, local_table, param_list, token->attribute))
-            {
-                  return SEM_FUNCTION_ERROR;
-            }
+            return SYNTAX_ERROR;
       }
       if ( token->type == TK_INT || token->type == TK_FLOAT)
       {
             numberinID = true;
       }
-      if ( token->type == TK_ID && numberinID)
+      else numberinID = false ;
+     if (token->type == TK_ID)
       {
-            return SYNTAX_ERROR;
-      }
+            if (!is_variable_defined(root, local_table, param_list, token->attribute))
+            {
+                  return SEM_FUNCTION_ERROR;
+            }
+      } 
       symbol= getIndex(token);
       if (symbol == -1 )
       {
