@@ -23,28 +23,28 @@ PUSHFRAME
 DEFVAR LF@%retval
 MOVE LF@%retval nil@nil
 TYPE GF@&res1 LF@%1
-JUMPIFNEQ $write$1 GF@&res1 string@nil
+JUMPIFNEQ $write$0$1 GF@&res1 string@nil
 WRITE string@None
-JUMP $write$end$1
-LABEL $write$1
+JUMP $write$end$0$1
+LABEL $write$0$1
 WRITE LF@%1
-LABEL $write$end$1
+LABEL $write$end$0$1
 WRITE string@\032
 TYPE GF@&res1 LF@%2
-JUMPIFNEQ $write$2 GF@&res1 string@nil
+JUMPIFNEQ $write$0$2 GF@&res1 string@nil
 WRITE string@None
-JUMP $write$end$2
-LABEL $write$2
+JUMP $write$end$0$2
+LABEL $write$0$2
 WRITE LF@%2
-LABEL $write$end$2
+LABEL $write$end$0$2
 WRITE string@\032
 TYPE GF@&res1 LF@%3
-JUMPIFNEQ $write$3 GF@&res1 string@nil
+JUMPIFNEQ $write$0$3 GF@&res1 string@nil
 WRITE string@None
-JUMP $write$end$3
-LABEL $write$3
+JUMP $write$end$0$3
+LABEL $write$0$3
 WRITE LF@%3
-LABEL $write$end$3
+LABEL $write$end$0$3
 WRITE string@\010
 POPFRAME
 #   BUILT-IN FUNCTIONS
