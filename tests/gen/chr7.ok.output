@@ -1,0 +1,74 @@
+.IFJcode19
+DEFVAR GF@&expr&val
+DEFVAR GF@&expr&val&type
+DEFVAR GF@&res1
+CREATEFRAME
+PUSHS int@1
+PUSHS int@2
+CREATEFRAME
+CALL $expr_minus$
+DEFVAR GF@p
+POPS GF@p
+CREATEFRAME
+DEFVAR TF@%1
+MOVE TF@%1 GF@p
+CALL $chr
+DEFVAR GF@a
+MOVE GF@a TF@%retval
+#   BUILT-IN FUNCTIONS
+#  STACK_MINUS
+JUMP $expr_minus_end$
+LABEL $expr_minus$
+PUSHFRAME
+DEFVAR LF@$op1$
+DEFVAR LF@$op2$
+DEFVAR LF@$type1$
+DEFVAR LF@$type2$
+POPS LF@$op1$
+POPS LF@$op2$
+TYPE LF@$type1$ LF@$op1$
+TYPE LF@$type2$ LF@$op2$
+JUMPIFEQ $minus_exit_4$ LF@$type1$ string@nil
+JUMPIFEQ $minus_exit_4$ LF@$type2$ string@nil
+JUMPIFEQ $minus_exit_4$ LF@$type1$ string@bool
+JUMPIFEQ $minus_exit_4$ LF@$type2$ string@bool
+JUMPIFNEQ $minus_diff_types$ LF@$type1$ LF@$type2$
+JUMPIFEQ $minus_exit_4$ LF@$type1$ string@string
+JUMP $minus_sub$
+LABEL $minus_diff_type$
+JUMPIFEQ $minus_exit_4$ LF@$type1$ string@string
+JUMPIFEQ $minus_exit_4$ LF@$type2$ string@string
+JUMPIFEQ $minus_int2float_op1$ LF@$type1$ string@int
+INT2FLOAT LF@$op2$ LF@$op2$
+JUMP $minus_sub$
+LABEL $minus_int2float_op1$
+INT2FLOAT LF@$op1$ LF@$op1$
+JUMP $minus_sub$
+LABEL $minus_exit_4$
+EXIT int@4
+LABEL $minus_sub$
+SUB LF@$op1$ LF@$op2$ LF@$op1$
+PUSHS LF@$op1$
+POPFRAME
+RETURN
+LABEL $expr_minus_end$
+#  CHR
+JUMP $chr$end
+LABEL $chr
+PUSHFRAME
+DEFVAR LF@%retval
+DEFVAR LF@%type
+TYPE LF@%type LF@%1
+JUMPIFNEQ $chr$return$4 LF@%type string@int
+LT LF@%retval LF@%1 int@0
+JUMPIFEQ $chr$return$6 LF@%retval bool@true
+GT LF@%retval LF@%1 int@255
+JUMPIFEQ $chr$return$58 LF@%retval bool@true
+INT2CHAR LF@%retval LF@%1
+POPFRAME
+RETURN
+LABEL $chr$return$4
+EXIT int@4
+LABEL $chr$return$58
+EXIT int@6
+LABEL $chr$end
