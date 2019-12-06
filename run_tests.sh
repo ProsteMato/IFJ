@@ -163,7 +163,8 @@ do
     ((TOTAL_CNT++))
     ((TOTAL_ZERO++))
     #dos2unix $f
-    timeout 2s ${APP} <$f >/dev/null
+    timeout 2s ${APP} <$f > $f.output
+    /pub/courses/ifj/ic19int/linux/ic19int $f.output
     RETURN_CODE=$?
     echo $f
     if [ $RETURN_CODE -eq 9 ]  
@@ -190,7 +191,7 @@ do
         print_ok "Ended with correct error code now lets see interpreter"
         /pub/courses/ifj/ic19int/linux/ic19int < $f.output > $f.output_interpret
         output=$(diff $f.output_interpret $f.expected_output -q)
-        if [$output -eq ""]
+        if [ "$output" = "" ]
         then
             print_ok "Interpreted correctly"
         else
