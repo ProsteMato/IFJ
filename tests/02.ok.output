@@ -1,0 +1,120 @@
+int
+-
+int
+)
+int
+
+
+.IFJcode19
+DEFVAR GF@&expr&val
+DEFVAR GF@&expr&val&type
+DEFVAR GF@&res1
+CREATEFRAME
+PUSHS int@-
+PUSHS int@)
+CREATEFRAME
+CALL $expr_minus$
+PUSHS int@
+
+CREATEFRAME
+CALL $expr_mult$
+DEFVAR GF@vysl
+POPS GF@vysl
+CREATEFRAME
+DEFVAR TF@%1
+MOVE TF@%1 string@Vysledek:
+DEFVAR TF@%2
+MOVE TF@%2 GF@vysl
+DEFVAR TF@%3
+MOVE TF@%3 string@\010
+PUSHFRAME
+TYPE GF@&res1 LF@%1
+JUMPIFNEQ $write$1 GF@&res1 string@nil
+WRITE string@None
+JUMP $write$end$1
+LABEL $write$1
+WRITE LF@%1
+LABEL $write$end$1
+WRITE string@\032
+TYPE GF@&res1 LF@%2
+JUMPIFNEQ $write$2 GF@&res1 string@nil
+WRITE string@None
+JUMP $write$end$2
+LABEL $write$2
+WRITE LF@%2
+LABEL $write$end$2
+WRITE string@\032
+TYPE GF@&res1 LF@%3
+JUMPIFNEQ $write$3 GF@&res1 string@nil
+WRITE string@None
+JUMP $write$end$3
+LABEL $write$3
+WRITE LF@%3
+LABEL $write$end$3
+WRITE string@\010
+POPFRAME
+#   BUILT-IN FUNCTIONS
+#  STACK_MINUS
+JUMP $expr_minus_end$
+LABERL $expr_minus$
+PUSHFRAME
+DEFVAR LF@$op1$
+DEFVAR LF@$op2$
+DEFVAR LF@$type1$
+DEFVAR LF@$type2$
+POPS LF@$op1$
+POPS LF@$op2$
+TYPE LF@$type1$ LF@$op1$
+TYPE LF@$type2$ LF@$op2$
+JUMPIFNEQ $minus_diff_types$ LF@$type1$ LF@$type2$
+JUMPIFEQ $minus_exit_4$ LF@$type1$ string@string
+JUMP $minus_sub$
+LABEL $minus_diff_type$
+JUMPIFEQ $minus_exit_4$ LF@$type1$ string@string
+JUMPIFEQ $minus_exit_4$ LF@$type2$ string@string
+JUMPIFEQ $minus_int2float_op1$ LF@$type1$ string@int
+INT2FLOAT LF@$op2$ LF@$op2$
+JUMP $minus_sub$
+LABEL $minus_int2float_op1$
+INT2FLOAT LF@$op1$ LF@$op1$
+JUMP $minus_sub$
+LABEL $minus_exit_4$
+EXIT int@4
+LABEL $minus_sub$
+SUB LF@$op1$ LF@$op2$ LF@$op1$
+PUSHS LF@$op1$
+POPFRAME
+RETURN
+LABEL $expr_minus_end$
+#  STACK_MULT
+JUMP $expr_mult_end$
+LABEL $expr_mult$
+PUSHFRAME
+DEFVAR LF@$op1$
+DEFVAR LF@$op2$
+DEFVAR LF@$type1$
+DEFVAR LF@$type2$
+POPS LF@$op1$
+POPS LF@$op2$
+TYPE LF@$type1$ LF@$op1$
+TYPE LF@$type2$ LF@$op2$
+JUMPIFNEQ $times_diff_types$ LF@$type1$ LF@$type2$
+JUMPIFEQ $times_exit_4$ LF@$type1$ string@string
+JUMP $times_mult$
+LABEL $times_diff_type$
+JUMPIFEQ $times_exit_4$ LF@$type1$ string@string
+JUMPIFEQ $times_exit_4$ LF@$type2$ string@string
+JUMPIFEQ $times_int2float_op1$ LF@$type1$ string@int
+INT2FLOAT LF@$op2$ LF@$op2$
+JUMP $times_mult$
+LABEL $times_int2float_op1$
+INT2FLOAT LF@$op1$ LF@$op1$
+JUMP $times_mult$
+LABEL $times_exit_4$
+EXIT int@4
+LABEL $times_mult$
+MUL LF@$op1$ LF@$op2$ LF@$op1$
+PUSHS LF@$op1$
+POPFRAME
+RETURN
+LABEL $expr_mult_end$

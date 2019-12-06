@@ -1,6 +1,0 @@
-a = 3
-b = 4
-if (a < b) :
-    print(a, ' je mensi nez ', b, '\n')
-else :
-    print(b, ' je mensi nez ', a, '\n')

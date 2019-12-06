@@ -1,6 +1,0 @@
-a = 0
-while a < 3:
-    b = a
-    a = a + 1
-    print('Uvnitr while po: ', b, '\n')
-print('Konec opakovani \n')

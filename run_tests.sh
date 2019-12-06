@@ -44,7 +44,7 @@ function print_err() {
 }
 
 
-for f in ./tests/lex_err*
+for f in ./tests/*.lex_err
 do 
     ((TOTAL_CNT++))
     ((TOTAL_LEX++))
@@ -63,7 +63,7 @@ do
     fi
 done
 
-for f in ./tests/syn_err*
+for f in ./tests/*.syn_err
 do 
     ((TOTAL_CNT++))
     ((TOTAL_SYN++))
@@ -82,7 +82,7 @@ do
     fi
 done
 
-for f in ./tests/sem_err3_*
+for f in ./tests/*.sem_err3
 do 
     ((TOTAL_CNT++))
     ((TOTAL_SEMTHREE++))
@@ -101,7 +101,7 @@ do
     fi
 done
 
-for f in ./tests/sem_err4_*
+for f in ./tests/*.sem_err4
 do 
     ((TOTAL_CNT++))
     ((TOTAL_SEMFOUR++))
@@ -120,7 +120,7 @@ do
     fi
 done
 
-for f in ./tests/sem_err5_*
+for f in ./tests/*.sem_err5
 do 
     ((TOTAL_CNT++))
     ((TOTAL_SEMFIVE++))
@@ -139,7 +139,7 @@ do
     fi
 done
 
-for f in ./tests/sem_err6_*
+for f in ./tests/*.sem_err6
 do 
     ((TOTAL_CNT++))
     ((TOTAL_SEMSIX++))
@@ -158,7 +158,7 @@ do
     fi
 done
 
-for f in ./tests/zero*
+for f in ./tests/*.zero
 do 
     ((TOTAL_CNT++))
     ((TOTAL_ZERO++))
@@ -177,17 +177,27 @@ do
     fi
 done
 
-for f in ./tests/ok*
+for f in ./tests/*.ok
 do 
     ((TOTAL_CNT++))
     ((TOTAL_OK++))
-    #dos2unix $f 
-    timeout 2s ${APP} <$f >/dev/null
+    #dos2unix $f
+    timeout 2s ${APP} < $f > $f.output
     RETURN_CODE=$?
     echo $f
-    if [ $RETURN_CODE -eq 0 ]  
-    then 
-        print_ok "No err returned."
+    if [ $RETURN_CODE -eq 0 ]
+    then
+        print_ok "Ended with correct error code now lets see interpreter"
+        /pub/courses/ifj/ic19int/linux/ic19int < $f.output > $f.output_interpret
+        output=$(diff $f.output_interpret $f.expected_output -q)
+        if [$output -eq ""]
+        then
+            print_ok "Interpreted correctly"
+        else
+            print_err "Bad Interpretation pleas check $f.output_interpret and $f.expected_output file"
+            ((ERROR_CNT++))
+            ((ERR_OK++))
+        fi
     else 
         echo $RETURN_CODE
         print_err "Should be without error."
