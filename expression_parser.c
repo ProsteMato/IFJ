@@ -376,24 +376,6 @@ int callExpression(Token *token)
             rightBracket+=1;
       }
 
-      if ( token->type == TK_INT || token->type == TK_FLOAT)
-      {
-            //Token *testToken;
-            int l = get_next_token(token); 
-            if (l != OK)
-            {
-                  return l; 
-            }
-            if (token->type == TK_ID)
-            {
-                  return SYNTAX_ERROR;
-            }
-            int e = unget_token(token); 
-            if (e != OK)
-            {
-                  return l; 
-            }
-      }
        if (token->type ==TK_ASSIGN)
        {
              return SYNTAX_ERROR;
@@ -451,7 +433,6 @@ int callExpression(Token *token)
       {
              listInsertAct(&eList,token->attribute, symbol, dType);
       }
-     
       if ( symbol == PT_ID || symbol == PT_INT || symbol == PT_FLOAT || symbol == PT_STRING || symbol == PT_NONE)
       {
              if ( operandList.first == NULL)
