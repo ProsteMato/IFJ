@@ -5958,14 +5958,6 @@ int gen_if_exprval_check(){
 	code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
-	if (add_code(code, "DEFVAR GF@&expr&val\0"))
-		return INTERNAL_ERROR;
-	if (CL_add_line(&builtin_list, code))
-		return INTERNAL_ERROR;
-
-	code = create_code();
-	if (!code)
-		return INTERNAL_ERROR;
 	if (add_code(code, "POPS GF@&expr&val\0"))
 		return INTERNAL_ERROR;
 	if (CL_add_line(&builtin_list, code))
