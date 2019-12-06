@@ -367,8 +367,6 @@ int gen_expr(){
 
 			// typ operandu
 			if (operand->symbol == PT_INT){
-				printf("int\n");
-				printf("%s\n", operand->attribute);
 				if (add_code(code, "int@\0")) // TODO zle attributy
 					return INTERNAL_ERROR;
 				if (add_code(code, operand->attribute))
@@ -392,7 +390,6 @@ int gen_expr(){
 					return INTERNAL_ERROR;
 				free(tmp);
 			} else if (operand->symbol == PT_ID){
-				printf("op\n");
 				if(is_global_variable(root, operand->attribute)){
 					if (add_code(code, "GF@\0"))
 						return INTERNAL_ERROR;
@@ -822,7 +819,6 @@ int gen_clear(){
 	return OK;
 }
 
-// TODO cisla pri viacerych parametroch print
 int gen_f_call(char *id){
 	Code *code;
 	char *tmp;
@@ -2268,7 +2264,7 @@ int gen_stack_plus(){
 			code = create_code();
 			if (!code)
 				return INTERNAL_ERROR;
-			if (add_code(code, "CONCAT LF@$op1$ LF@$op1$ LF@$op2$\0"))
+			if (add_code(code, "CONCAT LF@$op1$ LF@$op2$ LF@$op1$\0"))
 				return INTERNAL_ERROR;
 			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;

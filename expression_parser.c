@@ -485,6 +485,7 @@ int callExpression(Token *token)
   pTable indexStack;
   pTable indexInput; 
   pRules rule;  
+  bool generateExpr = false;
   int i=0;
   for (int j=0;  j < 100; j++)
   {
@@ -607,6 +608,10 @@ int callExpression(Token *token)
                               sPush(&stack, PT_E, finalType);
                         }
                   }
+                  if (finalType != TYPE_UNDEFINED)
+                  {
+                        generateExpr = true; 
+                  }
                   precedenceRules[i]=rule;
                   i++;
                   break;
@@ -620,7 +625,7 @@ int callExpression(Token *token)
  {
         return err_unget;
  }
- if (generate)  { // musia byt obe true aby sa generovalo
+ if (generate && generateExpr)  { // musia byt obe true aby sa generovalo
       int returnValue = OK;
       if((returnValue = gen_expr()) != OK){ //kontrola ci nahodou nevratil chybu
             return returnValue;

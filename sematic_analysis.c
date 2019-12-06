@@ -64,7 +64,7 @@ int arithmetic_operation_check(Data_type first_type, int operation, Data_type se
         case PR_EDIVE:
         case PR_EMULTE:
         case PR_EMINUSE:
-            if((first_type == TYPE_INT || first_type == TYPE_FLOAT) && (first_type == TYPE_INT || first_type == TYPE_FLOAT)) {
+            if((first_type == TYPE_INT || first_type == TYPE_FLOAT) && (second_type == TYPE_INT || second_type == TYPE_FLOAT)) {
                 return OK;
             }
     }
