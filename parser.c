@@ -237,6 +237,9 @@ int stat(Token *token) {
 				if((returnValue = gen_f_start(saved_id)) != OK){
 					return returnValue;
 				}
+				if(is_global_variable(root, saved_id)) {
+					return SEM_FUNCTION_ERROR;
+				}
 				if((is_function_created(root, saved_id) && is_function_defined(root, saved_id)) ||
 				(!is_function_created(root, saved_id) && !is_function_defined(root, saved_id))){
 					returnValue = define_function(&root, saved_id);
