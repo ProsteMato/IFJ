@@ -1,0 +1,29 @@
+a = 0
+if a > 4:
+  if a > 5:
+    if a > 10:
+      if a > 20:
+        if a > 30:
+          if a > 120:
+            pass
+          else:
+            pass
+        else:
+          pass
+      else:
+        pass
+    else:
+      pass
+  else:
+    pass
+else:
+  if a > 2:
+    pass
+  else:
+    if a > 3:
+      pass
+    else:
+      if a > 4:
+        pass
+      else:
+        print(a)

@@ -1,0 +1,11 @@
+a = 5
+if a > 6:
+  if a < 10:
+    pass
+  else:
+    pass
+else:
+  if a > 2:
+    print('a')
+  else:
+    pass

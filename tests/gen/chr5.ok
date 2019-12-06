@@ -1,0 +1,2 @@
+a = chr('string')
+print(a)

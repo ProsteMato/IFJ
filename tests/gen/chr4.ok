@@ -1,0 +1,3 @@
+f = inputf()
+a = chr(f)
+print(a)
