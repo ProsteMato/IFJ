@@ -330,9 +330,11 @@ int callExpression(Token *token)
   {     
       return e;
   } */
+  bool numberinID = false;
   // Load tokens into list, count brackets, control division by 0
    while ( token->type != TK_EOL && token->type != TK_EOF && token->type != TK_COLON)
   {
+       // printf("%s\n", token->attribute);
       if (token->type == TK_ID)
       {
             if (!is_variable_defined(root, local_table, param_list, token->attribute))
@@ -340,7 +342,14 @@ int callExpression(Token *token)
                   return SEM_FUNCTION_ERROR;
             }
       }
-      
+      if ( token->type == TK_INT || token->type == TK_FLOAT)
+      {
+            numberinID = true;
+      }
+      if ( token->type == TK_ID && numberinID)
+      {
+            return SYNTAX_ERROR;
+      }
       symbol= getIndex(token);
       if (symbol == -1 )
       {
