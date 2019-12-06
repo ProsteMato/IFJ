@@ -189,7 +189,7 @@ do
     if [ $RETURN_CODE -eq 0 ]
     then
         print_ok "Ended with correct error code now lets see interpreter"
-        /pub/courses/ifj/ic19int/linux/ic19int $f.output > $f.output_interpret
+        /pub/courses/ifj/ic19int/linux/ic19int <./tests/gen/input $f.output > $f.output_interpret
         output=$(diff -q $f.output_interpret $f.expected_output)
         if [ "$output" = "" ]
         then
