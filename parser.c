@@ -397,6 +397,7 @@ int stat(Token *token) {
 			generate = false;
 			GET_NEXT_TOKEN(token);
 			if((returnValue = callExpression(token)) == OK) {
+				generate = true;
 				if(!isRelational) {
 					GET_NEXT_TOKEN(token);
 					if (token->type == TK_EOL || token->type == TK_EOF) {
@@ -431,6 +432,7 @@ int stat(Token *token) {
 		) {
 		generate = false;
 		if((returnValue = callExpression(token)) == OK) {
+			generate = true;
 			if(!isRelational) {
 				GET_NEXT_TOKEN(token);
 				if (token->type == TK_EOL || token->type == TK_EOF) {

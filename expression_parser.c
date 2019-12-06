@@ -477,7 +477,7 @@ int callExpression(Token *token)
   pTable indexStack;
   pTable indexInput; 
   pRules rule;  
-  bool generateExpr = false;
+  bool generateExpr = true;
   int i=0;
   for (int j=0;  j < 100; j++)
   {
@@ -583,6 +583,11 @@ int callExpression(Token *token)
                         rule  = findRule (num, sym1, sym2, sym3);
                         int sematics = checkSematics(rule, sym1, sym2, sym3);
                         finalType = getFinalType(rule, sym1, sym2, sym3);
+                        if (finalType != TYPE_UNDEFINED)
+                        {     
+                              generateExpr = false;
+                               
+                        }
                         if (sematics != OK)
                         {
                               return sematics;
@@ -600,10 +605,6 @@ int callExpression(Token *token)
                               sPush(&stack, PT_E, finalType);
                         }
                   }
-                  if (finalType != TYPE_UNDEFINED)
-                  {
-                        generateExpr = true; 
-                  }
                   precedenceRules[i]=rule;
                   i++;
                   break;
@@ -617,7 +618,7 @@ int callExpression(Token *token)
  {
         return err_unget;
  }
- if (generate && generateExpr)  { // musia byt obe true aby sa generovalo
+ if (generate || generateExpr)  { // musia byt obe true aby sa generovalo
       int returnValue = OK;
       if((returnValue = gen_expr()) != OK){ //kontrola ci nahodou nevratil chybu
             return returnValue;
