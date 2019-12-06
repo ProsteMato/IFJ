@@ -1,0 +1,151 @@
+int
+
+
+op
+int
+:
+op
+op
+int
+
+
+.IFJcode19
+DEFVAR GF@&expr&val
+DEFVAR GF@&expr&val&type
+DEFVAR GF@&res1
+CREATEFRAME
+PUSHS int@
+
+DEFVAR GF@a
+POPS GF@a
+LABEL $while$0
+PUSHS GF@a
+PUSHS int@:
+CREATEFRAME
+CALL $expr_less$
+JUMPIFEQ $while_end$0 GF@&expr&val bool@false
+PUSHS GF@a
+DEFVAR GF@b
+POPS GF@b
+PUSHS GF@a
+PUSHS int@
+
+CREATEFRAME
+CALL $expr_plus$
+POPS GF@a
+CREATEFRAME
+DEFVAR TF@%1
+MOVE TF@%1 string@Uvnitr\032while\032po:
+DEFVAR TF@%2
+MOVE TF@%2 GF@b
+DEFVAR TF@%3
+MOVE TF@%3 string@\010
+PUSHFRAME
+TYPE GF@&res1 LF@%1
+JUMPIFNEQ $write$1 GF@&res1 string@nil
+WRITE string@None
+JUMP $write$end$1
+LABEL $write$1
+WRITE LF@%1
+LABEL $write$end$1
+WRITE string@\032
+TYPE GF@&res1 LF@%2
+JUMPIFNEQ $write$2 GF@&res1 string@nil
+WRITE string@None
+JUMP $write$end$2
+LABEL $write$2
+WRITE LF@%2
+LABEL $write$end$2
+WRITE string@\032
+TYPE GF@&res1 LF@%3
+JUMPIFNEQ $write$3 GF@&res1 string@nil
+WRITE string@None
+JUMP $write$end$3
+LABEL $write$3
+WRITE LF@%3
+LABEL $write$end$3
+WRITE string@\010
+POPFRAME
+JUMP $while$0
+LABEL $while_end$0
+CREATEFRAME
+DEFVAR TF@%1
+MOVE TF@%1 string@Konec\032opakovani\010
+PUSHFRAME
+TYPE GF@&res1 LF@%1
+JUMPIFNEQ $write$1 GF@&res1 string@nil
+WRITE string@None
+JUMP $write$end$1
+LABEL $write$1
+WRITE LF@%1
+LABEL $write$end$1
+WRITE string@\010
+POPFRAME
+#   BUILT-IN FUNCTIONS
+#  STACK_LESS
+JUMP $expr_less_end$
+LABEL $expr_less$
+PUSHFRAME
+DEFVAR LF@$op1$
+DEFVAR LF@$op2$
+DEFVAR LF@$type1$
+DEFVAR LF@$type2$
+POPS LF@$op1$
+POPS LF@$op2$
+TYPE LF@$type1$ LF@$op1$
+TYPE LF@$type2$ LF@$op2$
+JUMPIFEQ $less_less$ LF@$type1$ LF@$type2$
+JUMPIFEQ $less_fail$ LF@$type1$ string@string
+JUMPIFEQ $less_fail$ LF@$type2$ string@string
+JUMPIFEQ $less_int2float_op2$ LF@$type2$ string@int
+INT2FLOAT LF@$op1$ LF@$op1$
+LABEL $less_less$
+LT LF@$op1$ LF@$op2$ LF@$op1$
+JUMP $less_end$
+LABEL $less_fail$
+EXIT int@4
+LABEL $less_int2float_op2$
+INT2FLOAT LF@$op2$ LF@$op2$
+JUMP $less_less$
+LABEL $less_end$
+PUSHS LF@$op1$
+POPFRAME
+RETURN
+LABEL $expr_less_end$
+#  STACK_PLUS
+JUMP $expr_plus_end$
+LABEL $expr_plus$
+PUSHFRAME
+DEFVAR LF@$op1$
+DEFVAR LF@$op2$
+DEFVAR LF@$type1$
+DEFVAR LF@$type2$
+POPS LF@$op1$
+POPS LF@$op2$
+TYPE LF@$type1$ LF@$op1$
+TYPE LF@$type2$ LF@$op2$
+JUMPIFNEQ $plus_not_same_type$ LF@$type1$ LF@$type2$
+JUMPIFEQ $plus_concat$ LF@$type1$ string@string
+JUMP $plus_add$
+LABEL $plus_concat$
+CONCAT LF@$op1$ LF@$op1$ LF@$op2$
+JUMP $plus_end$
+LABEL $plus_two_floats$
+LABEL $plus_not_same_type$
+JUMPIFEQ $plus_fail$ LF@$type1$ string@string
+JUMPIFEQ $plus_fail$ LF@$type2$ string@string
+JUMPIFEQ $plus_int2float_op1$ LF@$type1$ string@int
+INT2FLOAT LF@$op2$ LF@$op2$
+JUMP $plus_add$
+LABEL $plus_int2float_op1$
+INT2FLOAT LF@$op1$ LF@$op1$
+JUMP $plus_add$
+LABEL $plus_fail$
+EXIT int@4
+LABEL $plus_add$
+ADD LF@$op1$ LF@$op1$ LF@$op2$
+LABEL $plus_end$
+PUSHS LF@$op1$
+POPFRAME
+RETURN
+LABEL $expr_plus_end$

@@ -1,0 +1,6 @@
+ahoj = 5
+svete = 7
+if ( ahoj == svete) :
+    print('Vytisknu petku:', svete, '\n')
+else :
+    print('Vytisknu sedmicku:', svete, '\n')
