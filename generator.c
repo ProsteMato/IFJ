@@ -367,7 +367,9 @@ int gen_expr(){
 
 			// typ operandu
 			if (operand->symbol == PT_INT){
-				if (add_code(code, "int@\0"))
+				printf("int\n");
+				printf("%s\n", operand->attribute);
+				if (add_code(code, "int@\0")) // TODO zle attributy
 					return INTERNAL_ERROR;
 				if (add_code(code, operand->attribute))
 					return INTERNAL_ERROR;
@@ -390,6 +392,7 @@ int gen_expr(){
 					return INTERNAL_ERROR;
 				free(tmp);
 			} else if (operand->symbol == PT_ID){
+				printf("op\n");
 				if(is_global_variable(root, operand->attribute)){
 					if (add_code(code, "GF@\0"))
 						return INTERNAL_ERROR;
@@ -916,8 +919,6 @@ int gen_f_call(char *id){
 					return INTERNAL_ERROR;
 				if (add_code(code, "WRITE string@\\032"))
 					return INTERNAL_ERROR;
-				if (add_code(code, tmp))
-					return INTERNAL_ERROR;
 				if (CL_add_line(&code_list, code))
 					return INTERNAL_ERROR;
 			}
@@ -1113,10 +1114,10 @@ int gen_f_prep_params(){ // parametre cez TKQueue, pridavane v spravnom poradi, 
 		
 		if (token->type == TK_ID){ // parameter je premenna
 			if (is_global_variable(root,token->attribute)){ // globalna premenna
-				if (add_code(code, "GF@%\0"))
+				if (add_code(code, "GF@\0"))
 					return INTERNAL_ERROR;
 			} else { // lokalna premenna
-				if (add_code(code, "LF@%\0"))
+				if (add_code(code, "LF@\0"))
 					return INTERNAL_ERROR;
 			}
 			if (add_code(code, token->attribute))
@@ -3397,7 +3398,7 @@ int gen_stack_idiv(){
 			code = create_code();
 			if (!code)
 				return INTERNAL_ERROR;
-			if (add_code(code, "JUMPIFNEQ $idiv_zero$ LF@$op1$ int@0\0"))
+			if (add_code(code, "JUMPIFEQ $idiv_zero$ LF@$op1$ int@0\0"))
 				return INTERNAL_ERROR;
 			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
