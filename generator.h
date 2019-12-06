@@ -235,7 +235,6 @@ int gen_clear();
 /**
  * @brief      Generates built-in function inputs
  *
- * @param      dest  Pointer to the string with name of destination variable
  *
  * @return     OK if successfull, INTERNAL_ERROR in case of internal error
  *             occurrence
@@ -244,7 +243,6 @@ int gen_inputs();
 /**
  * @brief      Generates built-in function inputi
  *
- * @param      dest  Pointer to the string with name of destination variable
  *
  * @return     OK if successfull, INTERNAL_ERROR in case of internal error
  *             occurrence
@@ -252,8 +250,6 @@ int gen_inputs();
 int gen_inputi();
 /**
  * @brief      Generates built-in function intputf
- *
- * @param      dest  Pointer to the string with name of destination variable
  *
  * @return     OK if successfull, INTERNAL_ERROR in case of internal error
  *             occurrence
