@@ -3405,7 +3405,7 @@ int gen_stack_mult(){
 			code = create_code();
 			if (!code)
 				return INTERNAL_ERROR;
-			if (add_code(code, "JUMPIFNEQ $times_diff_types$ LF@$type1$ LF@$type2$\0"))
+			if (add_code(code, "JUMPIFNEQ $times_diff_type$ LF@$type1$ LF@$type2$\0"))
 				return INTERNAL_ERROR;
 			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
