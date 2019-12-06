@@ -695,6 +695,7 @@ int gen_assign_expr_res(char *dest){
 	return OK;
 }
 
+// TODO zvlast list, na konci while pozriet ci obashuje definicie a hodit ich pred while
 int gen_while_label(){  // doplnit o unique labely
 	Code *code = create_code();
 	if (!code)
@@ -1600,7 +1601,7 @@ int gen_len(){
 	code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
-	if (add_code(code, "STRLEN LF@$retval LF@%1\0"))
+	if (add_code(code, "STRLEN LF@%retval LF@%1\0"))
 		return INTERNAL_ERROR;
 	if (CL_add_line(&builtin_list, code))
 		return INTERNAL_ERROR;
@@ -2038,7 +2039,7 @@ int gen_chr(){
 	code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
-	if (add_code(code, "JUMPIFEQ $chr$return$58 LF@%retval bool@true\0"))
+	if (add_code(code, "JUMPIFEQ $chr$return$6 LF@%retval bool@true\0"))
 		return INTERNAL_ERROR;
 	if (CL_add_line(&builtin_list, code))
 		return INTERNAL_ERROR;
@@ -2110,7 +2111,7 @@ int gen_chr(){
 	code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
-	if (add_code(code, "EXIT int@58\0"))
+	if (add_code(code, "EXIT int@6\0"))
 		return INTERNAL_ERROR;
 	if (CL_add_line(&builtin_list, code))
 		return INTERNAL_ERROR;
@@ -2995,7 +2996,7 @@ int gen_stack_minus(){
 			code = create_code();
 			if (!code)
 				return INTERNAL_ERROR;
-			if (add_code(code, "LABERL $expr_minus$\0"))
+			if (add_code(code, "LABEL $expr_minus$\0"))
 				return INTERNAL_ERROR;
 			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
