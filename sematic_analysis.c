@@ -103,10 +103,9 @@ Data_type arithmetic_operation_return_type(Data_type first_type, int relation, D
         return TYPE_FLOAT;
     if (first_type == TYPE_INT && second_type == TYPE_FLOAT)
         return TYPE_FLOAT;
-    if (first_type == TYPE_INT && second_type == TYPE_INT)
-    {
+    if (first_type == TYPE_INT && second_type == TYPE_INT) {
         if (relation == PR_EDIVE)
-        return TYPE_FLOAT;
+            return TYPE_FLOAT;
     } else 
         return TYPE_INT;
     return TYPE_UNDEFINED;
