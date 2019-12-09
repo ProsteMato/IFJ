@@ -94,7 +94,7 @@ int comparison_check(Data_type first_type, int relation, Data_type second_type) 
     return SEM_TYPE_ERROR;
 }
 
-Data_type arithmetic_operation_return_type(Data_type first_type, Data_type second_type) {
+Data_type arithmetic_operation_return_type(Data_type first_type, int relation, Data_type second_type) {
     if (first_type == TYPE_FLOAT && second_type == TYPE_FLOAT)
         return TYPE_FLOAT;
     if (first_type == TYPE_STRING && second_type == TYPE_STRING)
@@ -104,6 +104,10 @@ Data_type arithmetic_operation_return_type(Data_type first_type, Data_type secon
     if (first_type == TYPE_INT && second_type == TYPE_FLOAT)
         return TYPE_FLOAT;
     if (first_type == TYPE_INT && second_type == TYPE_INT)
+    {
+        if (relation == PR_EDIVE)
+        return TYPE_FLOAT;
+    } else 
         return TYPE_INT;
     return TYPE_UNDEFINED;
 }

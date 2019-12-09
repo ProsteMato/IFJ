@@ -258,7 +258,7 @@ Data_type getFinalType(pRules rule, exprStack* sym1, exprStack* sym2, exprStack*
             case PR_EMULTE:
             case PR_EDIVDIVE:
             case PR_EDIVE: 
-                  return arithmetic_operation_return_type(sym1->dType,sym3->dType);
+                  return arithmetic_operation_return_type(sym1->dType,rule,sym3->dType);
             case PR_ELESSE:
             case PR_ELESSEQE:
             case PR_EGREATE:

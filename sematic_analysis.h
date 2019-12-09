@@ -79,7 +79,7 @@ int comparison_check(Data_type first_type, int relation, Data_type second_type);
  * @param secod_type Second operand type
  * @return data type
  */
-Data_type arithmetic_operation_return_type(Data_type first_type, Data_type secod_type);
+Data_type arithmetic_operation_return_type(Data_type first_type,int relation, Data_type secod_type);
 
 /**
  * @brief Function will give type from token
