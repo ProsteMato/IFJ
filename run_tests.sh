@@ -195,7 +195,7 @@ do
         then
             print_ok "Interpreted correctly"
         else
-            print_err "Bad Interpretation pleas check $f.output_interpret and $f.expected_output file"
+            print_err "Bad Interpretation please check $f.output_interpret and $f.expected_output file"
             ((ERROR_CNT++))
             ((ERR_OK++))
         fi
