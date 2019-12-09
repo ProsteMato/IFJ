@@ -195,7 +195,7 @@ int scan(Token *token){
 					token->type = TK_EOF;
 					s_destroy(&s);
 					return OK;					
-				} else if (isdigit(c) && c != '0'){
+				} else if (isdigit(c)){
 					if (!append_char(&str, &str_i, &cap, c)){
 						return internal_error_exit(&s, str);
 					}
@@ -422,6 +422,13 @@ int scan(Token *token){
 				break;
 			case (NUM):
 				if (isdigit(c)){
+					// prva cifra bola nula -> ak nie nieco este za nou tak je to prebytocna zaciatocna nula -> lex error
+					if (str[0] == '0'){
+						ungetc(c,stdin);
+						free(str);
+						s_destroy(&s);
+						return LEX_ERROR;	
+					}
 					if (!append_char(&str, &str_i, &cap, c)){
 						return internal_error_exit(&s, str);
 					}
@@ -606,18 +613,6 @@ int scan(Token *token){
 						// dokumentacny retazec - koment
 						if (first_token){
 							state = START;
-							//str_i = 0;
-							// zahodenie ulozeneho komentu
-							/**
-							free(str);
-							str = malloc(sizeof(char) * DEFAULT_STR_LEN);
-							if (str == NULL){
-								// chyba alokacie pamate
-								s_destroy(&s);
-								return INTERNAL_ERROR;
-							}
-							**/
-						// dokumentacny retazec - string
 						} else {
 							for (int i = 0; i < block_end -3; i++){
 								if (!append_char(&str, &str_i, &cap, '"')){
