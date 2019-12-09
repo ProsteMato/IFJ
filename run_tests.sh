@@ -57,7 +57,7 @@ do
         print_ok "Lex err returned."
     else 
         echo $RETURN_CODE
-        print_err "Should be syntax error."
+        print_err "Should be lex error."
         ((ERROR_CNT++))
         ((ERR_LEX++))
     fi
