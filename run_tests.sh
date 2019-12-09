@@ -28,33 +28,34 @@ ERR_OK=0
 function print_ok() {
   TEXT=$1
   if [ "$USE_COLOR" -eq 1 ] ; then
-    echo -e "[${GREEN}OK${NC}] $TEXT"
+    printf "[${GREEN}OK${NC}] $TEXT \n"
   else
-    echo -e "[OK] $TEXT"
+    printf  "[OK] $TEXT \n"
   fi
 }
 
 function print_err() {
   TEXT=$1
   if [ "$USE_COLOR" -eq 1 ] ; then
-    echo -e "[${RED}FAILED${NC}] $TEXT"
+    printf "[${RED}FAILED${NC}] $TEXT \n"
   else
-    echo -e "[FAILED] $TEXT"
+    printf "[FAILED] $TEXT \n"
   fi
 }
 
 
 for f in ./tests/lex_err/*.lex_err
 do 
+     echo "-------------------------------------------"
     ((TOTAL_CNT++))
     ((TOTAL_LEX++))
     timeout 2s ${APP} <$f >/dev/null
     RETURN_CODE=$?
     if [ $RETURN_CODE -eq 1 ]  
     then 
-        print_ok "Test File: $f - Lex err returned."
+        print_ok "Test File: $f"
     else 
-        print_err "Test File: $f - Should be lex error. Return Code: $RETURN_CODE"
+        print_err "Test File: $f \nError: Should be lex error. Return Code: $RETURN_CODE"
         ((ERROR_CNT++))
         ((ERR_LEX++))
     fi
@@ -62,15 +63,16 @@ done
 
 for f in ./tests/syn_err/*.syn_err
 do 
+     echo "-------------------------------------------"
     ((TOTAL_CNT++))
     ((TOTAL_SYN++))
-    timeout 2s ${APP} <$f >/dev/null
+    timeout 2s ${APP} <$f >/dev/null 2>/dev/null 
     RETURN_CODE=$?
     if [ $RETURN_CODE -eq 2 ]  
     then 
-        print_ok "Test File: $f - Syntax err returned."
+        print_ok "Test File: $f"
     else 
-        print_err "Test File: $f - Should be syntax error. Return Code: $RETURN_CODE"
+        print_err "Test File: $f \nError: Should be syntax error. Return Code: $RETURN_CODE"
         ((ERROR_CNT++))
         ((ERR_SYN++))
     fi
@@ -78,15 +80,16 @@ done
 
 for f in ./tests/sem_err/*.sem_err3
 do 
+     echo "-------------------------------------------"
     ((TOTAL_CNT++))
     ((TOTAL_SEMTHREE++))
     timeout 2s ${APP} <$f >/dev/null
     RETURN_CODE=$?
     if [ $RETURN_CODE -eq 3 ]  
     then 
-        print_ok "Test File: $f - Sematic 3 err returned."
+        print_ok "Test File: $f"
     else
-        print_err "Test File: $f - Should be sem 3 error. Return Code: $RETURN_CODE"
+        print_err "Test File: $f \nError: Should be sem 3 error. Return Code: $RETURN_CODE"
         ((ERROR_CNT++))
         ((ERR_SEMTHREE++))
     fi
@@ -94,15 +97,16 @@ done
 
 for f in ./tests/sem_err/*.sem_err4
 do 
+     echo "-------------------------------------------"
     ((TOTAL_CNT++))
     ((TOTAL_SEMFOUR++))
     timeout 2s ${APP} <$f >/dev/null
     RETURN_CODE=$?
     if [ $RETURN_CODE -eq 4 ]  
     then 
-        print_ok "Test File: $f - Sematic 4 err returned."
+        print_ok "Test File: $f"
     else
-        print_err "Test File: $f - Should be sem 4 error. Return Code: $RETURN_CODE"
+        print_err "Test File: $f \nError: Should be sem 4 error. Return Code: $RETURN_CODE"
         ((ERROR_CNT++))
         ((ERR_SEMFOUR++))
     fi
@@ -110,15 +114,16 @@ done
 
 for f in ./tests/sem_err/*.sem_err5
 do 
+     echo "-------------------------------------------"
     ((TOTAL_CNT++))
     ((TOTAL_SEMFIVE++))
     timeout 2s ${APP} <$f >/dev/null
     RETURN_CODE=$?
     if [ $RETURN_CODE -eq 5 ]  
     then 
-        print_ok "Test File: $f - Sematic 5 err returned."
+        print_ok "Test File: $f"
     else
-        print_err "Test File: $f - Should be sem 5 error. Return Code: $RETURN_CODE"
+        print_err "Test File: $f \nError: Should be sem 5 error. Return Code: $RETURN_CODE"
         ((ERROR_CNT++))
         ((ERR_SEMFIVE++))
     fi
@@ -126,32 +131,34 @@ done
 
 for f in ./tests/sem_err/*.sem_err6
 do 
+     echo "-------------------------------------------"
     ((TOTAL_CNT++))
     ((TOTAL_SEMSIX++))
     timeout 2s ${APP} <$f >/dev/null
     RETURN_CODE=$?
     if [ $RETURN_CODE -eq 6 ]  
     then 
-        print_ok "Test File: $f - Sematic 6 err returned."
+        print_ok "Test File: $f"
     else 
-        print_err "Test File: $f - Should be sem 6 error. Return Code: $RETURN_CODE"
+        print_err "Test File: $f \nError: Should be sem 6 error. Return Code: $RETURN_CODE"
         ((ERROR_CNT++))
         ((ERR_SEMSIX++))
-    fi
+   fi
 done
 
 for f in ./tests/run_time_error/*.zero
 do 
-    ((TOTAL_CNT++))
+     echo "-------------------------------------------"
+   ((TOTAL_CNT++))
     ((TOTAL_ZERO++))
     timeout 2s ${APP} <$f > $f.output
     /pub/courses/ifj/ic19int/linux/ic19int $f.output
     RETURN_CODE=$?
     if [ $RETURN_CODE -eq 9 ]  
     then 
-        print_ok "Test File: $f - div with zero  err returned."
+        print_ok "Test File: $f"
     else 
-        print_err "Test File: $f - Should be div with zero error. Return Code: $RETURN_CODE"
+        print_err "Test File: $f \nError: Should be div with zero error. Return Code: $RETURN_CODE"
         ((ERROR_CNT++))
         ((ERR_ZERO++))
     fi
@@ -159,26 +166,27 @@ done
 
 for f in ./tests/gen/*.ok
 do 
+    echo "-------------------------------------------"
     ((TOTAL_CNT++))
     ((TOTAL_OK++))
     timeout 2s ${APP} < $f > $f.output
     RETURN_CODE=$?
     if [ $RETURN_CODE -eq 0 ]
     then
-        print_ok "Test File: $f - Ended with correct error code"
+        print_ok "Test File: $f Error code: ok"
         /pub/courses/ifj/ic19int/linux/ic19int <$f.in $f.output > $f.output_interpret
-        output=$(diff -q $f.output_interpret $f.expected_output)
+        output=$(diff $f.output_interpret $f.expected_output 2>&1)
         if [ "$output" = "" ]
         then
             print_ok "Interpreted correctly"
         else
-            print_err "Test File: $f - Bad Interpretation"
-            echo "Diff: \n $output"
+            print_err "Test File: $f \nError: Bad Interpretation"
+            printf "OUTPUT FROM DIFF: \n $output \n"
             ((ERROR_CNT++))
             ((ERR_OK++))
         fi
     else 
-        print_err "Should be without error. Return Code: $RETURN_CODE"
+        print_err "Test File: $f \nError: Should be without error. Return Code: $RETURN_CODE"
         ((ERROR_CNT++))
         ((ERR_OK++))
     fi
