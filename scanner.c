@@ -702,80 +702,27 @@ int scan(Token *token){
 				}
 				break;
 			case (STRING_HEX0):
-				if ((c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F') || isalpha(c)){
+				if ((c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F') || isdigit(c)){
 					hex[0] = c;
 					state = STRING_HEX1;
-				} else if (c == '\\'){
-					if (!append_char(&str, &str_i, &cap, '\\')){
-						return internal_error_exit(&s, str);
-					}
-					if (!append_char(&str, &str_i, &cap, 'x')){
-						return internal_error_exit(&s, str);
-					}
-					state = STRING_ESCSEQ;
-				} else if (c == '\''){
-					if (!append_char(&str, &str_i, &cap, '\\')){
-						return internal_error_exit(&s, str);
-					}
-					if (!append_char(&str, &str_i, &cap, 'x')){
-						return internal_error_exit(&s, str);
-					}
-					state = STRING_FIN;
 				} else {
-					if (!append_char(&str, &str_i, &cap, '\\')){
-						return internal_error_exit(&s, str);
-					}
-					if (!append_char(&str, &str_i, &cap, 'x')){
-						return internal_error_exit(&s, str);
-					}
-					if (!append_char(&str, &str_i, &cap, c)){
-						return internal_error_exit(&s, str);
-					}
-					state = STRING;
+					free(str);
+					s_destroy(&s);
+					return LEX_ERROR;
 				}
 				break;
 			case (STRING_HEX1):
-				if(c == '\''){
-					if (!append_char(&str, &str_i, &cap, '\\')){
-						return internal_error_exit(&s, str);
-					}
-					if (!append_char(&str, &str_i, &cap, 'x')){
-						return internal_error_exit(&s, str);
-					}
+				if ((c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F') || isdigit(c)){
+					hex[1] = c;
+					c = (int)strtol(hex, NULL, 16); 
 					if (!append_char(&str, &str_i, &cap, c)){
 						return internal_error_exit(&s, str);
-					}
-					state = STRING_FIN;
-				} else if (c == '\\'){
-					if (!append_char(&str, &str_i, &cap, '\\')){
-						return internal_error_exit(&s, str);
-					}
-					if (!append_char(&str, &str_i, &cap, 'x')){
-						return internal_error_exit(&s, str);
-					}
-					if (!append_char(&str, &str_i, &cap, c)){
-						return internal_error_exit(&s, str);
-					}
-					state = STRING_ESCSEQ;
-				} else {
-					if ((c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F') || isalpha(c)){
-						hex[1] = c;
-						c = (int)strtol(hex, NULL, 16); 
-						if (!append_char(&str, &str_i, &cap, c)){
-							return internal_error_exit(&s, str);
-						}
-					} else {
-						if (!append_char(&str, &str_i, &cap, '\\')){
-							return internal_error_exit(&s, str);
-						}
-						if (!append_char(&str, &str_i, &cap, 'x')){
-							return internal_error_exit(&s, str);
-						}
-						if (!append_char(&str, &str_i, &cap, c)){
-							return internal_error_exit(&s, str);
-						}
 					}
 					state = STRING;
+				} else {
+					free(str);
+					s_destroy(&s);
+					return LEX_ERROR;
 				}
 				break;
 			case (STRING_FIN):
