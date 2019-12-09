@@ -195,7 +195,7 @@ int scan(Token *token){
 					token->type = TK_EOF;
 					s_destroy(&s);
 					return OK;					
-				} else if (isdigit(c)){
+				} else if (isdigit(c) && c != '0'){
 					if (!append_char(&str, &str_i, &cap, c)){
 						return internal_error_exit(&s, str);
 					}
