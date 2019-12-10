@@ -1119,6 +1119,9 @@ int gen_f_prep_params(){ // parametre cez TKQueue, pridavane v spravnom poradi, 
 			if (add_code(code, tmp))
 				return INTERNAL_ERROR;
 			free(tmp);
+		} else if (token->type == TK_KW){ // konst None
+			if (add_code(code, "nil@nil"))
+				return INTERNAL_ERROR;
 		} else {
 			return INTERNAL_ERROR;
 		}
