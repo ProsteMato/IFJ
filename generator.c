@@ -166,7 +166,7 @@ int init_generator(){
 	return OK;
 }
 
-void get_variable_scope_prefix(Code *code, char *variable_id) {
+int get_variable_scope_prefix(Code *code, char *variable_id) {
 	if (is_variable_defined(NULL, local_table, NULL, variable_id)) {	
 		if (add_code(code, "LF@\0"))
 			return INTERNAL_ERROR;
@@ -187,6 +187,7 @@ void get_variable_scope_prefix(Code *code, char *variable_id) {
 		if (add_code(code, variable_id))
 			return INTERNAL_ERROR;
 	}
+	return OK;
 }
 
 void print_final_code(){

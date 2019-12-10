@@ -266,7 +266,7 @@ bool ParamIndex (ParamList *L, char * id, int *index){
 	ParamFirst(L);
 	while (L->act != NULL && strcmp(L->act->id, id) != 0){
 		ParamSucc(L);
-		index = *index + 1;
+		*index = *index + 1;
 		if (L->act == NULL) 
 			return false; //došlo se na konec seznamu
 	} 

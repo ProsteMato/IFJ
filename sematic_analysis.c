@@ -213,7 +213,7 @@ int is_function_defined(SymTabNodePtr root, char *function_id){
 }
 
 int is_parameter(ParamList *list, char *param) {
-    if(ParamSearch(param_list, params)) {
+    if(ParamSearch(param_list, param)) {
         return true;
     }
     return false;
