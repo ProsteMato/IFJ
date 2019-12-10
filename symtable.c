@@ -259,7 +259,7 @@ bool ParamSearch (ParamList *L, char * id){
 }
 
 bool ParamIndex (ParamList *L, char * id, int *index){
-	index = 1;
+	*index = 1;
 	if (L == NULL) {
 		return false;
 	}
