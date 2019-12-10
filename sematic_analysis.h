@@ -170,6 +170,15 @@ int define_function(SymTabNodePtr *root, char *function_id);
 int define_local_variable(LocalTableNode *root, bool function_call, char *variable_id);
 
 /**
+ * @brief Function will find if the param is parameter or not.
+ * 
+ * @param list pointer to param list of actual function
+ * @param param char that is maybe parameter or global variable or local variable
+ * @return int 
+ */ 
+int is_parameter(ParamList *list, char *param);
+
+/**
  * @brief This function will create global variable in global sym table
  * 
  * @param root poiner to a gloal sym table

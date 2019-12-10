@@ -166,6 +166,29 @@ int init_generator(){
 	return OK;
 }
 
+void get_variable_scope_prefix(Code *code, char *variable_id) {
+	if (is_variable_defined(NULL, local_table, NULL, variable_id)) {	
+		if (add_code(code, "LF@\0"))
+			return INTERNAL_ERROR;
+		if (add_code(code, variable_id))
+			return INTERNAL_ERROR;
+	} else if (is_variable_defined(NULL, NULL, param_list, variable_id)) {
+		int index = 0;
+		if(ParamIndex(param_list, variable_id, &index)) {
+			char *str_index = int_to_str(index);
+			if (add_code(code, "TF@%\0"))
+				return INTERNAL_ERROR;
+			if (add_code(code, str_index))
+				return INTERNAL_ERROR;
+		}
+	} else if (is_variable_defined(root, NULL, NULL, variable_id)) {
+		if (add_code(code, "GF@\0"))
+			return INTERNAL_ERROR;
+		if (add_code(code, variable_id))
+			return INTERNAL_ERROR;
+	}
+}
+
 void print_final_code(){
 	Code_line *tmp = code_list.first;
 	Code_line *tmp2;

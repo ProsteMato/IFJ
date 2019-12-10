@@ -212,6 +212,13 @@ int is_function_defined(SymTabNodePtr root, char *function_id){
     return false;
 }
 
+int is_parameter(ParamList *list, char *param) {
+    if(ParamSearch(param_list, params)) {
+        return true;
+    }
+    return false;
+}
+
 int define_local_variable(LocalTableNode *local_table, bool function_call, char *variable_id) {
     int returnValue = 0;
     if (!is_variable_defined(root, *local_table, NULL, variable_id)) {

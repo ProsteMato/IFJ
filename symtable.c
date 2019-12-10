@@ -249,8 +249,31 @@ bool ParamSearch (ParamList *L, char * id){
 	ParamFirst(L);
 	while (L->act != NULL && strcmp(L->act->id, id) != 0){
 		ParamSucc(L);
-		if (L->act == NULL) return false; //došlo se na konec seznamu
-	} return true;
+		if (L->act == NULL) 
+			return false; //došlo se na konec seznamu
+	}
+	if (L->act == NULL) {
+		return false;
+	}
+	return true;
+}
+
+bool ParamIndex (ParamList *L, char * id, int *index){
+	index = 0;
+	if (L == NULL) {
+		return false;
+	}
+	ParamFirst(L);
+	while (L->act != NULL && strcmp(L->act->id, id) != 0){
+		ParamSucc(L);
+		index = *index + 1;
+		if (L->act == NULL) 
+			return false; //došlo se na konec seznamu
+	} 
+	if (L->act == NULL) {
+		return false;
+	}
+	return true;
 }
 
 void DLDisposeList (ParamList *L) {

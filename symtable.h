@@ -233,6 +233,8 @@ char *ParamGetActive(ParamList *);
 @return pokud je nalezeno vraci TRUE */
 bool ParamSearch (ParamList *, char *);
 
+bool ParamIndex (ParamList *L, char * id, int *index);
+
 /**TODO:
 funkce ktera projde celou globalni tabulku a zkontroluje vsechny funkce, 
 pokud najde nedefinovanou fci, vrati ukazatel prvni nedef. fce, jinak NULL */

@@ -1,0 +1,15 @@
+a = 5
+
+def f(a):
+    a = a - 1
+    if (a == 0):
+        print(a)
+        return
+    else :
+        f(a)
+        print(a)
+        return
+f(a)
+
+def d():
+    g
