@@ -225,14 +225,14 @@ int define_local_variable(LocalTableNode *local_table, bool function_call, char 
         if(is_function_created(root, variable_id)) {
             return SEM_FUNCTION_ERROR;
         }
-        if((returnValue = gen_defvar(variable_id)) != OK) {
-            return returnValue;
-        }
         LocalTableData *data = malloc (sizeof(GlobalTableData));
         data->define = false;
         data->type = TYPE_UNDEFINED;
         int returnValue = LocalSymTabInsert(local_table, variable_id, data);
         if(returnValue != OK) {
+            return returnValue;
+        }
+        if((returnValue = gen_defvar(variable_id)) != OK) {
             return returnValue;
         }
     }
