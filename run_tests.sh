@@ -212,6 +212,47 @@ do
     fi
 done
 
+for f in ./tests/run_time_err3/*.runtime_err3
+do 
+     echo "-------------------------------------------"
+   ((TOTAL_CNT++))
+    ((TOTAL_ZERO++))
+    timeout 2s ${APP} <$f > $f.output
+    if [ -f "/pub/courses/ifj/ic19int/linux/ic19int" ]
+    then
+        if [ -f "$f.in" ]
+        then
+            /pub/courses/ifj/ic19int/linux/ic19int <$f.in $f.output
+        else
+            /pub/courses/ifj/ic19int/linux/ic19int $f.output
+        fi
+    else
+        if [ -f "$f.in" ]
+        then
+            ./tests/ic19int <$f.in $f.output
+        else
+            ./tests/ic19int $f.output
+        fi
+    fi
+    RETURN_CODE=$?
+    if [ $RETURN_CODE -eq 3 ]  
+    then 
+        print_ok "Test File: $f"
+        output=$(diff $f.output_interpret $f.expected_output 2>&1)
+        if [ "$output" = "" ]
+        then
+            print_ok "Interpreted correctly"
+        else
+            print_err "Test File: $f \nError: Bad Interpretation"
+            printf "OUTPUT FROM DIFF: \n $output \n"
+        fi
+    else 
+        print_err "Test File: $f \nError: Should be runtime err 3 Return Code: $RETURN_CODE"
+        ((ERROR_CNT++))
+        ((ERR_ZERO++))
+    fi
+done
+
 for f in ./tests/gen/*.ok
 do 
     echo "-------------------------------------------"
