@@ -43,6 +43,9 @@
 *.pdb
 
 bin/
+cifj19
+*.output
+*.output_interpret
 
 # Kernel Module Compile Results
 *.mod*

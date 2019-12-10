@@ -152,13 +152,41 @@ do
    ((TOTAL_CNT++))
     ((TOTAL_ZERO++))
     timeout 2s ${APP} <$f > $f.output
-    /pub/courses/ifj/ic19int/linux/ic19int $f.output
+    if [ -f "$f.in" ]
+    then
+        /pub/courses/ifj/ic19int/linux/ic19int <$f.in $f.output
+    else
+        /pub/courses/ifj/ic19int/linux/ic19int $f.output
+    fi
     RETURN_CODE=$?
     if [ $RETURN_CODE -eq 9 ]  
     then 
         print_ok "Test File: $f"
     else 
         print_err "Test File: $f \nError: Should be div with zero error. Return Code: $RETURN_CODE"
+        ((ERROR_CNT++))
+        ((ERR_ZERO++))
+    fi
+done
+
+for f in ./tests/run_time_err4/*.run_time_err4
+do 
+     echo "-------------------------------------------"
+   ((TOTAL_CNT++))
+    ((TOTAL_ZERO++))
+    timeout 2s ${APP} <$f > $f.output
+    if [ -f "$f.in" ]
+    then
+        /pub/courses/ifj/ic19int/linux/ic19int <$f.in $f.output
+    else
+        /pub/courses/ifj/ic19int/linux/ic19int $f.output
+    fi
+    RETURN_CODE=$?
+    if [ $RETURN_CODE -eq 4 ]  
+    then 
+        print_ok "Test File: $f"
+    else 
+        print_err "Test File: $f \nError: Should be runtime err 4 Return Code: $RETURN_CODE"
         ((ERROR_CNT++))
         ((ERR_ZERO++))
     fi
@@ -174,7 +202,12 @@ do
     if [ $RETURN_CODE -eq 0 ]
     then
         print_ok "Test File: $f Error code: ok"
-        /pub/courses/ifj/ic19int/linux/ic19int <$f.in $f.output > $f.output_interpret
+        if [ -f "$f.in" ]
+        then
+            /pub/courses/ifj/ic19int/linux/ic19int <$f.in $f.output >$f.output_interpret
+        else
+            /pub/courses/ifj/ic19int/linux/ic19int $f.output >$f.output_interpret
+        fi
         output=$(diff $f.output_interpret $f.expected_output 2>&1)
         if [ "$output" = "" ]
         then
