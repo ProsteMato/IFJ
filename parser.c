@@ -29,6 +29,7 @@ bool in_if_while = false;
 bool if_in_else = false;
 int token_return_value = OK;
 int depth = 0;
+char *function_id = NULL;
 char *saved_id = NULL;
 char *copy_id = NULL;
 
@@ -96,9 +97,10 @@ int st_list(Token *token) {
 		if (strcmp(token->attribute, "def") == 0 && !in_function && !in_if_while) {
 			returnValue = stat(token);
 			if (returnValue == OK) {
-				if((returnValue = gen_f_end(saved_id)) != OK) {
+				if((returnValue = gen_f_end(function_id)) != OK) {
 					return returnValue;
 				}
+				function_id = NULL;
 				saved_id = NULL;
 				GET_NEXT_TOKEN(token);
 				return st_list(token);
@@ -234,6 +236,7 @@ int stat(Token *token) {
 			GET_NEXT_TOKEN(token);
 			if (token->type == TK_ID) {
 				saved_id = token->attribute;
+				function_id = token->attribute;
 				if((returnValue = gen_f_start(saved_id)) != OK){
 					return returnValue;
 				}
