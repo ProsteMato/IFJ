@@ -209,12 +209,14 @@ int next_st_list(Token *token) {
 		if (in_if_while || in_function) {
 			depth--;
 			if (in_function && in_if_while && depth == 1) {
+				in_while = false;
 				in_if_while = false;
 			} else if (in_function && !in_if_while && depth == 0) {
 				param_list = NULL;
 				local_table = NULL;
 				in_function = false;
 			} else if (!in_function && in_if_while && depth == 0) {
+				in_while = false;
 				in_if_while = false;
 			}
 			return OK;
