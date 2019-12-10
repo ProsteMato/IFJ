@@ -152,11 +152,21 @@ do
    ((TOTAL_CNT++))
     ((TOTAL_ZERO++))
     timeout 2s ${APP} <$f > $f.output
-    if [ -f "$f.in" ]
+    if [ -f "/pub/courses/ifj/ic19int/linux/ic19int" ]
     then
-        /pub/courses/ifj/ic19int/linux/ic19int <$f.in $f.output
+        if [ -f "$f.in" ]
+        then
+            /pub/courses/ifj/ic19int/linux/ic19int <$f.in $f.output
+        else
+            /pub/courses/ifj/ic19int/linux/ic19int $f.output
+        fi
     else
-        /pub/courses/ifj/ic19int/linux/ic19int $f.output
+        if [ -f "$f.in" ]
+        then
+            ./tests/ic19int <$f.in $f.output
+        else
+            ./tests/ic19int $f.output
+        fi
     fi
     RETURN_CODE=$?
     if [ $RETURN_CODE -eq 9 ]  
@@ -175,11 +185,21 @@ do
    ((TOTAL_CNT++))
     ((TOTAL_ZERO++))
     timeout 2s ${APP} <$f > $f.output
-    if [ -f "$f.in" ]
+    if [ -f "/pub/courses/ifj/ic19int/linux/ic19int" ]
     then
-        /pub/courses/ifj/ic19int/linux/ic19int <$f.in $f.output
+        if [ -f "$f.in" ]
+        then
+            /pub/courses/ifj/ic19int/linux/ic19int <$f.in $f.output
+        else
+            /pub/courses/ifj/ic19int/linux/ic19int $f.output
+        fi
     else
-        /pub/courses/ifj/ic19int/linux/ic19int $f.output
+        if [ -f "$f.in" ]
+        then
+            ./tests/ic19int <$f.in $f.output
+        else
+            ./tests/ic19int $f.output
+        fi
     fi
     RETURN_CODE=$?
     if [ $RETURN_CODE -eq 4 ]  
@@ -202,11 +222,21 @@ do
     if [ $RETURN_CODE -eq 0 ]
     then
         print_ok "Test File: $f Error code: ok"
-        if [ -f "$f.in" ]
+        if [ -f "/pub/courses/ifj/ic19int/linux/ic19int" ]
         then
-            /pub/courses/ifj/ic19int/linux/ic19int <$f.in $f.output >$f.output_interpret
+            if [ -f "$f.in" ]
+            then
+                /pub/courses/ifj/ic19int/linux/ic19int <$f.in $f.output >$f.output_interpret
+            else
+                /pub/courses/ifj/ic19int/linux/ic19int $f.output >$f.output_interpret
+            fi
         else
-            /pub/courses/ifj/ic19int/linux/ic19int $f.output >$f.output_interpret
+            if [ -f "$f.in" ]
+            then
+                ./tests/ic19int <$f.in $f.output >$f.output_interpret
+            else
+                ./tests/ic19int $f.output >$f.output_interpret
+            fi
         fi
         output=$(diff $f.output_interpret $f.expected_output 2>&1)
         if [ "$output" = "" ]
