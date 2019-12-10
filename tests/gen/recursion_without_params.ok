@@ -10,6 +10,3 @@ def f(a):
         print(a)
         return
 f(a)
-
-def d():
-    g
