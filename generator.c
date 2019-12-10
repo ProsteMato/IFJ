@@ -71,7 +71,7 @@ void CL_init(Code_list *code_list){
 	code_list->last = NULL;
 }
 
-int CL_add_line(Code_list *code_list, Code *line){
+int CL_add_in_between(Code *line){ // ide to pred label
 	if (line == NULL){
 		return INTERNAL_ERROR;
 	}
@@ -85,6 +85,28 @@ int CL_add_line(Code_list *code_list, Code *line){
 	}
 	new->code = line;
 	new->next = NULL;
+	new->in_between = NULL;
+	
+	in_between_list->in_between = new;
+	in_between_list = new;
+	return OK;
+}
+
+
+int CL_add_line(Code_list *code_list, Code *line){
+	if (line != NULL){
+		if (!append_char(&(line->inst), &(line->len), &(line->cap), '\0')){
+			return INTERNAL_ERROR;
+		}
+	}
+	Code_line *new = (Code_line*) malloc (sizeof(Code_line));
+	if (new == NULL){
+		// chyba alokacie pamate
+		return INTERNAL_ERROR;
+	}
+	new->code = line;
+	new->next = NULL;
+	new->in_between = NULL;
 	if (code_list->first == NULL && code_list->last == NULL){
 		// ziaden prvok v liste
 		code_list->first = new;
@@ -105,6 +127,16 @@ void CL_destroy(Code_line *line){
 	if (tmp->code != NULL){
 		free(tmp->code);
 	}
+	if (tmp->in_between != NULL){
+		Code_line *tmp2 = tmp->in_between;
+		Code_line *delete;
+		while (tmp2 != NULL){
+			free(tmp2->code);
+			delete = tmp2;
+			tmp2 = tmp2->in_between;
+			free(delete);
+		}
+	}
 	tmp = tmp->next;
 	free(line);
 	CL_destroy(tmp);
@@ -114,6 +146,7 @@ int init_generator(){
 	while_counter = 0;
 	if_counter = 0;
 	print_counter = 0;
+	in_while = 0;
 	s_init(&while_stack);
 	s_init(&if_stack);
 	CL_init(&code_list);
@@ -135,7 +168,15 @@ int init_generator(){
 
 void print_final_code(){
 	Code_line *tmp = code_list.first;
+	Code_line *tmp2;
 	while (tmp != NULL){
+		if (tmp->in_between != NULL){
+			tmp2 = tmp->in_between;
+			while (tmp2 != NULL){
+				printf("%s\n", tmp2->code->inst);
+				tmp2 = tmp2->in_between;
+			}
+		}
 		printf("%s\n", tmp->code->inst);
 		tmp = tmp->next;
 	}
@@ -341,8 +382,14 @@ int gen_defvar(char *var){
 	}
 	if (add_code(code, var))
 		return INTERNAL_ERROR;
-	if (CL_add_line(&code_list, code))
-		return INTERNAL_ERROR;
+
+	if (in_while){
+		if (CL_add_in_between(code))
+			return INTERNAL_ERROR;
+	} else {
+		if (CL_add_line(&code_list, code))
+			return INTERNAL_ERROR;
+	}
 	return OK;
 }
 
@@ -696,11 +743,10 @@ int gen_assign_expr_res(char *dest){
 }
 
 // TODO zvlast list, na konci while pozriet ci obashuje definicie a hodit ich pred while
-int gen_while_label(){  // doplnit o unique labely
+int gen_while_label(){
 	Code *code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
-
 	if (add_code(code, "LABEL $while$\0"))
 		return INTERNAL_ERROR;
 	char *un_while_n = int_to_str(while_counter);
@@ -712,6 +758,10 @@ int gen_while_label(){  // doplnit o unique labely
 	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
+	if (!in_while){
+		in_while = 1;
+		in_between_list = code_list.last;
+	}
 	return OK;
 }
 
