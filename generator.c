@@ -397,16 +397,8 @@ int gen_defvar(char *var){
 		return INTERNAL_ERROR;
 	if (add_code(code, "DEFVAR \0"))
 		return INTERNAL_ERROR;
-	if (is_global_variable(root, var)){
-		if (add_code(code, "GF@\0"))
-			return INTERNAL_ERROR;
-	} else {
-		if (add_code(code, "LF@\0"))
-			return INTERNAL_ERROR;
-	}
-	if (add_code(code, var))
+	if (get_variable_scope_prefix(code, var))
 		return INTERNAL_ERROR;
-
 	if (in_while){
 		if (CL_add_in_between(code))
 			return INTERNAL_ERROR;
@@ -460,14 +452,7 @@ int gen_expr(){
 					return INTERNAL_ERROR;
 				free(tmp);
 			} else if (operand->symbol == PT_ID){
-				if(is_global_variable(root, operand->attribute)){
-					if (add_code(code, "GF@\0"))
-						return INTERNAL_ERROR;
-				} else {
-					if (add_code(code, "LF@\0"))
-						return INTERNAL_ERROR;
-				}
-				if (add_code(code, operand->attribute))
+				if (get_variable_scope_prefix(code, operand->attribute))
 					return INTERNAL_ERROR;
 			} else {
 				return INTERNAL_ERROR;
@@ -751,14 +736,7 @@ int gen_assign_expr_res(char *dest){
 		return INTERNAL_ERROR;
 	if (add_code(code, "POPS \0"))
 		return INTERNAL_ERROR;
-	if (is_global_variable(root, dest)){
-		if (add_code(code, "GF@"))
-			return INTERNAL_ERROR;
-	} else {
-		if (add_code(code, "LF@"))
-			return INTERNAL_ERROR;
-	}
-	if (add_code(code, dest))
+	if (get_variable_scope_prefix(code, dest))
 		return INTERNAL_ERROR;
 	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
@@ -857,24 +835,11 @@ int gen_int2float(char *var){
 		return INTERNAL_ERROR;
 	if (add_code(code, "INT2FLOAT \0"))
 		return INTERNAL_ERROR;
-	int glob = is_global_variable(root, var);
-	if (glob){
-		if (add_code(code, "GF@"))
-			return INTERNAL_ERROR;
-	} else {
-		if (add_code(code, "LF@"))
-			return INTERNAL_ERROR;
-	}
-	if (add_code(code, var))
+	if (get_variable_scope_prefix(code, var))
 		return INTERNAL_ERROR;
-	if (glob){
-		if (add_code(code, " GF@"))
+	if (add_code(code, " "))
 			return INTERNAL_ERROR;
-	} else {
-		if (add_code(code, " LF@"))
-			return INTERNAL_ERROR;
-	}
-	if (add_code(code, var))
+	if (get_variable_scope_prefix(code, var))
 		return INTERNAL_ERROR;
 	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
@@ -1169,14 +1134,7 @@ int gen_f_prep_params(){ // parametre cez TKQueue, pridavane v spravnom poradi, 
 		free(tmp);
 		
 		if (token->type == TK_ID){ // parameter je premenna
-			if (is_global_variable(root,token->attribute)){ // globalna premenna
-				if (add_code(code, "GF@\0"))
-					return INTERNAL_ERROR;
-			} else { // lokalna premenna
-				if (add_code(code, "LF@\0"))
-					return INTERNAL_ERROR;
-			}
-			if (add_code(code, token->attribute))
+			if (get_variable_scope_prefix(code, token->attribute))
 				return INTERNAL_ERROR;
 		} else if (token->type == TK_FLOAT){ // konst float
 			if (add_code(code, "float@"))
@@ -1332,14 +1290,7 @@ int gen_f_return(char* var){
 	if (add_code(code, "MOVE \0"))
 		return INTERNAL_ERROR;
 
-	if (is_global_variable(root, var)){
-		if (add_code(code, "GF@\0"))
-			return INTERNAL_ERROR;
-	} else {
-		if (add_code(code, "LF@\0"))
-			return INTERNAL_ERROR;
-	}
-	if (add_code(code, var))
+	if (get_variable_scope_prefix(code, var))
 		return INTERNAL_ERROR;
 	if (add_code(code, " TF@%retval\0"))
 		return INTERNAL_ERROR;
