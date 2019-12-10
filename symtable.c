@@ -247,7 +247,7 @@ bool ParamSearch (ParamList *L, char * id){
 		return false;
 	}
 	ParamFirst(L);
-	while (strcmp(L->act->id, id) != 0){
+	while (L->act != NULL && strcmp(L->act->id, id) != 0){
 		ParamSucc(L);
 		if (L->act == NULL) return false; //došlo se na konec seznamu
 	} return true;
