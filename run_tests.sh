@@ -164,6 +164,24 @@ do
     fi
 done
 
+for f in ./tests/run_time_err4/*.run_time_err4
+do 
+     echo "-------------------------------------------"
+   ((TOTAL_CNT++))
+    ((TOTAL_ZERO++))
+    timeout 2s ${APP} <$f > $f.output
+    /pub/courses/ifj/ic19int/linux/ic19int $f.output <$f.in
+    RETURN_CODE=$?
+    if [ $RETURN_CODE -eq 4 ]  
+    then 
+        print_ok "Test File: $f"
+    else 
+        print_err "Test File: $f \nError: Should be div with zero error. Return Code: $RETURN_CODE"
+        ((ERROR_CNT++))
+        ((ERR_ZERO++))
+    fi
+done
+
 for f in ./tests/gen/*.ok
 do 
     echo "-------------------------------------------"
