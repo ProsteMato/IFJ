@@ -25,6 +25,7 @@
 int while_counter;
 int print_counter;
 int if_counter;
+int in_while;
 int param_c;
 Stack while_stack;
 Stack if_stack;
@@ -41,6 +42,7 @@ typedef struct{
 typedef struct Code_line Code_line;
 struct Code_line{
 	Code *code;
+	Code_line *in_between;
 	Code_line *next;
 };
 
@@ -51,6 +53,7 @@ typedef struct{
 
 Code_list code_list;
 Code_list builtin_list;
+Code_line *in_between_list;
 
 //----------------------------------------
 //     INTERNAL TRANSFORM FUNCTIONS      -
