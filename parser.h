@@ -20,6 +20,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+
+extern in_if_while;
 /**
  * @brief      Representing rule <prog>
  * 	
