@@ -52,9 +52,9 @@ typedef struct{
 	Code_line *last;
 } Code_list;
 
-Code_list code_list;
-Code_list builtin_list;
-Code_line *in_between_list;
+extern Code_list code_list;
+extern Code_list builtin_list;
+extern Code_line *in_between_list;
 
 //----------------------------------------
 //     INTERNAL TRANSFORM FUNCTIONS      -

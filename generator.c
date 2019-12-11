@@ -9,6 +9,17 @@
 #include "generator.h"
 
 bool in_while;
+int while_counter;
+int print_counter;
+int if_counter;
+int param_c;
+Stack while_stack;
+Stack if_stack;
+TKQueue pq;
+Code_list code_list;
+Code_list builtin_list;
+Code_line *in_between_list;
+
 
 void pq_init(){
 	pq.first = NULL;

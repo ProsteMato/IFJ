@@ -8,6 +8,8 @@
 
 #include "scanner.h"
 
+TKQueue q;
+
 Keywords is_keyword(char* s, unsigned len){
 	if (strncmp (s, "def", len) == 0 && len == 3){
 		return KW_DEF;

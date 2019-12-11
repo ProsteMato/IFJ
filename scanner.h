@@ -81,7 +81,7 @@ typedef struct{
 /**
  * @brief      Global variable for token queue
  */
-TKQueue q;
+extern TKQueue q;
 
 /**
  * @enum States in finite deterministic automata
