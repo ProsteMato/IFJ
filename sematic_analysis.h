@@ -45,14 +45,6 @@ void set_build_in_function_param_count(SymTabNodePtr root, char *function_id);
 int check_function_param_count(SymTabNodePtr root, char *function_id, int param_count);
 
 /**
- * @brief This function returns data type of given build-id function id
- * 
- * @param function_id Name/ID of build-in function
- * @return Data_type
- */
-Data_type build_in_function_return_type(char *function_id);
-
-/**
  * @brief This function will check if two input types are compatible for arithmetic operation
  * 
  * @param first_type Type of first operand
@@ -135,20 +127,6 @@ int is_global_variable(SymTabNodePtr root, char *id);
  */
 int is_variable_defined(SymTabNodePtr root,  LocalTableNode local_table, ParamList *params, char *variable_id); // doplniť parametre
 
-
-/**
- * @brief This function will check if the variable is defined if variable is not defined in local table of function or params
- *        it will find global table and its local table and try find there.
- * 
- * @param root This is pointer to a global sym table 
- * @param local_table If we are in definition of function this is local table of this function otherwise NULL
- * @param params if is the function this will be pointer to a params of functiou otherwise NULL
- * @param variable_id Name/ID of variable
- * 
- * @return bool
- */
-int is_constant(SymTabNodePtr root,  LocalTableNode local_table, ParamList *params, char *variable_id); // doplniť parametre
-
 /**
  * @brief This function will define function in global sym table
  * 
@@ -188,14 +166,6 @@ int is_parameter(ParamList *list, char *param);
  */
 int define_global_variable(SymTabNodePtr *root, bool function_call, char *variable_id);
 
-/**
- * @brief This function will generate uniq id for expr_parser
- * 
- * @param root pointer to a global sym table
- * @param local_table if we are in function this is pointer to a local function otherwise pointer to a global sym table
- * @return uniq id
- */
-char * expr_parser_gen_uniq_id(SymTabNodePtr *root, LocalTableNode local_table);
 
 /**
  * @brief function will define and generate params when function is defined
@@ -206,16 +176,4 @@ char * expr_parser_gen_uniq_id(SymTabNodePtr *root, LocalTableNode local_table);
  * @return int error code
  */
 int define_param(LocalTableNode *local_table, char *variable_id, int index);
-
-/**
- * @brief This function will generate uniq id for expr_parser with prefix
- * 
- * @param root  Pointer to a global sym table.
- * @param local_table Pointer to a local table of the function.
- * @param function_id If we are in definition of function this is Name/ID of this function otherwise NULL
- * @param prefix Prefix for uniq id.
- * @return uniq id
- */
-char * expr_parser_gen_uniq_id_with_prefix(SymTabNodePtr root, LocalTableNode local_table, char* prefix);
-
 #endif

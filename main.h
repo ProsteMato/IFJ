@@ -23,9 +23,9 @@
 #include "parser.h"
 #include "scanner.h"
 
-SymTabNodePtr root;
-LocalTableNode local_table;
-ParamList *param_list;
+extern SymTabNodePtr root;
+extern LocalTableNode local_table;
+extern ParamList *param_list;
 
 
 #endif //_MAIN_H

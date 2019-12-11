@@ -23,13 +23,13 @@
 #define INT2STR_SIZE 12 // vsetky cisla velkosti int sa dokazu zmestit do 12 znakov
 #define FLOAT2STR_SIZE 23 // nas rozsah floatu prebehnutym %a formatom
 
-int while_counter;
-int print_counter;
-int if_counter;
-int param_c;
-Stack while_stack;
-Stack if_stack;
-TKQueue pq;
+extern int while_counter;
+extern int print_counter;
+extern int if_counter;
+extern int param_c;
+extern Stack while_stack;
+extern Stack if_stack;
+extern TKQueue pq;
 extern bool in_while;
 
 

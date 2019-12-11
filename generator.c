@@ -795,7 +795,6 @@ int gen_assign_expr_res(char *dest){
 	return OK;
 }
 
-// TODO zvlast list, na konci while pozriet ci obashuje definicie a hodit ich pred while
 int gen_while_label(){
 	Code *code = create_code();
 	if (!code)
