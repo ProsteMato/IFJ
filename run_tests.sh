@@ -129,22 +129,22 @@ do
     fi
 done
 
-for f in ./tests/sem_err/*.sem_err6
-do 
-     echo "-------------------------------------------"
-    ((TOTAL_CNT++))
-    ((TOTAL_SEMSIX++))
-    timeout 2s ${APP} <$f >/dev/null
-    RETURN_CODE=$?
-    if [ $RETURN_CODE -eq 6 ]  
-    then 
-        print_ok "Test File: $f"
-    else 
-        print_err "Test File: $f \nError: Should be sem 6 error. Return Code: $RETURN_CODE"
-        ((ERROR_CNT++))
-        ((ERR_SEMSIX++))
-   fi
-done
+#for f in ./tests/sem_err/*.sem_err6
+#do 
+#     echo "-------------------------------------------"
+#    ((TOTAL_CNT++))
+#    ((TOTAL_SEMSIX++))
+#    timeout 2s ${APP} <$f >/dev/null
+#    RETURN_CODE=$?
+#    if [ $RETURN_CODE -eq 6 ]  
+#    then 
+#        print_ok "Test File: $f"
+#    else 
+#        print_err "Test File: $f \nError: Should be sem 6 error. Return Code: $RETURN_CODE"
+#        ((ERROR_CNT++))
+#        ((ERR_SEMSIX++))
+#   fi
+#done
 
 for f in ./tests/run_time_error/*.zero
 do 
