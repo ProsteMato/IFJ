@@ -176,7 +176,7 @@ int get_variable_scope_prefix(Code *code, char *variable_id) {
 		int index = 0;
 		if(ParamIndex(param_list, variable_id, &index)) {
 			char *str_index = int_to_str(index);
-			if (add_code(code, "TF@%\0"))
+			if (add_code(code, "LF@%\0"))
 				return INTERNAL_ERROR;
 			if (add_code(code, str_index))
 				return INTERNAL_ERROR;
@@ -334,6 +334,11 @@ int gen_if(){
 		return INTERNAL_ERROR;
 	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
+
+	if (!in_while){
+		in_while = 1;
+		in_between_list = code_list.last;
+	}
 
 	free(tmp);
 	s_push(&if_stack, if_counter);
