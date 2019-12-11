@@ -235,6 +235,8 @@ bool ParamSearch (ParamList *, char *);
 
 bool ParamIndex (ParamList *L, char * id, int *index);
 
+bool WasVariableCalled(SymTabNodePtr RootPtr, char * K);
+
 /**TODO:
 funkce ktera projde celou globalni tabulku a zkontroluje vsechny funkce, 
 pokud najde nedefinovanou fci, vrati ukazatel prvni nedef. fce, jinak NULL */

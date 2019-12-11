@@ -343,7 +343,7 @@ bool WasCalled(SymTabNodePtr RootPtr, char * K){
 	return false;
 }
 
-bool WasVariableCalled(SymTabNodePtr RootPtr, char * K){
+bool WasVariableCalled(SymTabNodePtr RootPtr, char * K) {
 	GlobalTableData *data;
 	if (GlobalSymTabSearch (RootPtr, K, &data)) {
 		if (!data->funkce) {
@@ -351,6 +351,20 @@ bool WasVariableCalled(SymTabNodePtr RootPtr, char * K){
 		}
 	}
 	return false;
+}
+
+void setAllVariablesCalledToFalse(SymTabNodePtr *RootPtr) {
+	char *returnValue = NULL;
+	if (RootPtr != NULL) {
+		if (!(*RootPtr)->Data->funkce){ // symbol je funkce
+			if ((*RootPtr)->Data->wasCalled){ // funkce nebyla definovana
+				(*RootPtr)->Data->wasCalled = false;
+				return;
+			}	
+		}
+		UndefinedFunctionControl(&(*RootPtr)->LPtr);
+		UndefinedFunctionControl((*RootPtr)->RPtr);	
+	}
 }
 
 void LocalSetDefine(LocalTableNode RootPtr, char * K){
