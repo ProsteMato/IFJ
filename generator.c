@@ -1769,7 +1769,7 @@ int gen_ord(){
 	code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
-	if (add_code(code, "JUMPIFEQ $ord$return$4 LF@type strin@nil\0"))
+	if (add_code(code, "JUMPIFEQ $ord$return$4 LF@type string@nil\0"))
 		return INTERNAL_ERROR;
 	if (CL_add_line(&builtin_list, code))
 		return INTERNAL_ERROR;
@@ -1777,7 +1777,7 @@ int gen_ord(){
 	code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
-	if (add_code(code, "JUMPIFEQ $ord$return$4 LF@type strin@float\0"))
+	if (add_code(code, "JUMPIFEQ $ord$return$4 LF@type string@float\0"))
 		return INTERNAL_ERROR;
 	if (CL_add_line(&builtin_list, code))
 		return INTERNAL_ERROR;
@@ -1785,7 +1785,7 @@ int gen_ord(){
 	code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
-	if (add_code(code, "JUMPIFEQ $ord$return$4 LF@type strin@int\0"))
+	if (add_code(code, "JUMPIFEQ $ord$return$4 LF@type string@int\0"))
 		return INTERNAL_ERROR;
 	if (CL_add_line(&builtin_list, code))
 		return INTERNAL_ERROR;
@@ -1793,7 +1793,7 @@ int gen_ord(){
 	code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
-	if (add_code(code, "JUMPIFEQ $ord$return$4 LF@type strin@bool\0"))
+	if (add_code(code, "JUMPIFEQ $ord$return$4 LF@type string@bool\0"))
 		return INTERNAL_ERROR;
 	if (CL_add_line(&builtin_list, code))
 		return INTERNAL_ERROR;
@@ -1802,7 +1802,7 @@ int gen_ord(){
 	code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
-	if (add_code(code, "TYPE LF@type LF@%1\0"))
+	if (add_code(code, "TYPE LF@type LF@%2\0"))
 		return INTERNAL_ERROR;
 	if (CL_add_line(&builtin_list, code))
 		return INTERNAL_ERROR;
@@ -1810,7 +1810,7 @@ int gen_ord(){
 	code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
-	if (add_code(code, "JUMPIFEQ $ord$return$4 LF@type strin@nil\0"))
+	if (add_code(code, "JUMPIFEQ $ord$return$4 LF@type string@nil\0"))
 		return INTERNAL_ERROR;
 	if (CL_add_line(&builtin_list, code))
 		return INTERNAL_ERROR;
@@ -1818,7 +1818,7 @@ int gen_ord(){
 	code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
-	if (add_code(code, "JUMPIFEQ $ord$return$4 LF@type strin@float\0"))
+	if (add_code(code, "JUMPIFEQ $ord$return$4 LF@type string@float\0"))
 		return INTERNAL_ERROR;
 	if (CL_add_line(&builtin_list, code))
 		return INTERNAL_ERROR;
@@ -1826,7 +1826,7 @@ int gen_ord(){
 	code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
-	if (add_code(code, "JUMPIFEQ $ord$return$4 LF@type strin@string\0"))
+	if (add_code(code, "JUMPIFEQ $ord$return$4 LF@type string@string\0"))
 		return INTERNAL_ERROR;
 	if (CL_add_line(&builtin_list, code))
 		return INTERNAL_ERROR;
@@ -1834,7 +1834,7 @@ int gen_ord(){
 	code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
-	if (add_code(code, "JUMPIFEQ $ord$return$4 LF@type strin@bool\0"))
+	if (add_code(code, "JUMPIFEQ $ord$return$4 LF@type string@bool\0"))
 		return INTERNAL_ERROR;
 	if (CL_add_line(&builtin_list, code))
 		return INTERNAL_ERROR;
