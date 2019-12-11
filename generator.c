@@ -7,7 +7,8 @@
  */
 
 #include "generator.h"
-extern bool in_if_while;
+
+bool in_while;
 
 void pq_init(){
 	pq.first = NULL;
@@ -147,6 +148,7 @@ int init_generator(){
 	while_counter = 0;
 	if_counter = 0;
 	print_counter = 0;
+	in_while = 0;
 	s_init(&while_stack);
 	s_init(&if_stack);
 	CL_init(&code_list);
@@ -337,8 +339,8 @@ int gen_if(){
 	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
-	if (!in_if_while){
-		//in_if_while = 1;
+	if (!in_while){
+		in_while = 1;
 		in_between_list = code_list.last;
 	}
 
@@ -406,7 +408,7 @@ int gen_defvar(char *var){
 		return INTERNAL_ERROR;
 	if (get_variable_scope_prefix(code, var))
 		return INTERNAL_ERROR;
-	if (in_if_while){
+	if (in_while){
 		if (CL_add_in_between(code))
 			return INTERNAL_ERROR;
 	} else {
@@ -770,8 +772,8 @@ int gen_while_label(){
 	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
-	if (!in_if_while){
-		//in_if_while = 1;
+	if (!in_while){
+		in_while = 1;
 		in_between_list = code_list.last;
 	}
 	return OK;

@@ -26,11 +26,11 @@
 int while_counter;
 int print_counter;
 int if_counter;
-int in_while;
 int param_c;
 Stack while_stack;
 Stack if_stack;
 TKQueue pq;
+extern bool in_while;
 
 
 // linked list of code for printing at the end
