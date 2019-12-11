@@ -419,6 +419,7 @@ int gen_defvar(char *var){
 }
 
 int gen_expr(){
+	static int eq_used = 0;
 	int i = 0;
 	item operand = operandList.first;
 	Code *code;
@@ -691,7 +692,6 @@ int gen_expr(){
 				return INTERNAL_ERROR;
 
 		} else if (precedenceRules[i] == PR_EEQE){
-			static int eq_used = 0;
 			if (!eq_used){
 				if (gen_stack_equal()){
 					return INTERNAL_ERROR;
@@ -721,6 +721,12 @@ int gen_expr(){
 					return INTERNAL_ERROR;
 				}
 				noteq_used = 1;
+			}
+			if (!eq_used){
+				if (gen_stack_equal()){
+					return INTERNAL_ERROR;
+				}
+				eq_used = 1;
 			}
 			code = create_code();
 			if (!code)
@@ -872,6 +878,7 @@ int gen_clear(){
 }
 
 int gen_f_call(char *id){
+	static int len_used = 0;
 	Code *code;
 	char *tmp;
 	int keyword = is_keyword(id, strlen(id));
@@ -1060,7 +1067,6 @@ int gen_f_call(char *id){
 			inputs_used = 1;
 		}
 	} else if (keyword == KW_LEN){
-		static int len_used = 0;
 		if (!len_used){
 			if (gen_len())
 				return INTERNAL_ERROR;
@@ -1071,8 +1077,13 @@ int gen_f_call(char *id){
 		if (!substr_used){
 			if (gen_substr())
 				return INTERNAL_ERROR;
-			substr_used = 1;
 		}
+		if (!len_used){
+			if (gen_len())
+				return INTERNAL_ERROR;
+		}
+		substr_used = 1;
+		len_used = 1;
 	}
 	if (keyword != KW_PRINT){
 		code = create_code();
@@ -2283,14 +2294,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 
 	// kontroly dlzky substr a dlzky str
-	code = create_code();
-	if (!code)
-		return INTERNAL_ERROR;
-	if (add_code(code, "DEFVAR LF@len_str\0"))
-		return INTERNAL_ERROR;
-	if (CL_add_line(&builtin_list, code))
-		return INTERNAL_ERROR;
-
+	// ziskanie retval -> dlzky stringu s
 	code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
@@ -2323,11 +2327,18 @@ int gen_substr(){
 	if (CL_add_line(&builtin_list, code))
 		return INTERNAL_ERROR;
 
-	// ziskanie retval -> dlzky stringu s
 	code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
-	if (add_code(code, "MOVE LF@len_str LF@%retval\0"))
+	if (add_code(code, "DEFVAR LF@len_str\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&builtin_list, code))
+		return INTERNAL_ERROR;
+
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "MOVE LF@len_str TF@%retval\0"))
 		return INTERNAL_ERROR;
 	if (CL_add_line(&builtin_list, code))
 		return INTERNAL_ERROR;
@@ -2430,7 +2441,7 @@ int gen_substr(){
 	code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
-	if (add_code(code, "LT LF@ret_cond LF@%2 int@0\0"))
+	if (add_code(code, "LT LF@cond_val LF@%2 int@0\0"))
 		return INTERNAL_ERROR;
 	if (CL_add_line(&builtin_list, code))
 		return INTERNAL_ERROR;
@@ -2488,7 +2499,7 @@ int gen_substr(){
 	code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
-	if (add_code(code, "GT LF@max_cond LF@%3 LF@max_n\0"))
+	if (add_code(code, "GT LF@max_cond LF@%3 LF@max_len\0"))
 		return INTERNAL_ERROR;
 	if (CL_add_line(&builtin_list, code))
 		return INTERNAL_ERROR;
@@ -2630,7 +2641,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "RETURN\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(&code_list, code))
+	if (CL_add_line(&builtin_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -2638,7 +2649,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "LABEL $substr$return$4\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(&code_list, code))
+	if (CL_add_line(&builtin_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -2646,7 +2657,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "EXIT int@4\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(&code_list, code))
+	if (CL_add_line(&builtin_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -2654,7 +2665,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "LABEL $substr$return$none\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(&code_list, code))
+	if (CL_add_line(&builtin_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -2662,7 +2673,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "MOVE LF@ret_val nil@nil\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(&code_list, code))
+	if (CL_add_line(&builtin_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -2670,7 +2681,7 @@ int gen_substr(){
 		return INTERNAL_ERROR;
 	if (add_code(code, "JUMP $substr_end\0"))
 		return INTERNAL_ERROR;
-	if (CL_add_line(&code_list, code))
+	if (CL_add_line(&builtin_list, code))
 		return INTERNAL_ERROR;
 
 	code = create_code();
@@ -4516,6 +4527,14 @@ int gen_stack_notequal(){
 			if (!code)
 				return INTERNAL_ERROR;
 			if (add_code(code, "PUSHS GF@&res1\0"))
+				return INTERNAL_ERROR;
+			if (CL_add_line(&builtin_list, code))
+				return INTERNAL_ERROR;
+
+			code = create_code();
+			if (!code)
+				return INTERNAL_ERROR;
+			if (add_code(code, "RETURN\0"))
 				return INTERNAL_ERROR;
 			if (CL_add_line(&builtin_list, code))
 				return INTERNAL_ERROR;
