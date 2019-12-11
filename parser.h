@@ -21,7 +21,6 @@
 #include <stdio.h>
 
 
-extern bool in_if_while;
 /**
  * @brief      Representing rule <prog>
  * 	

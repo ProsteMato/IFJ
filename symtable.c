@@ -354,7 +354,6 @@ bool WasVariableCalled(SymTabNodePtr RootPtr, char * K) {
 }
 
 void setAllVariablesCalledToFalse(SymTabNodePtr *RootPtr) {
-	char *returnValue = NULL;
 	if (RootPtr != NULL) {
 		if (!(*RootPtr)->Data->funkce){ // symbol je funkce
 			if ((*RootPtr)->Data->wasCalled){ // funkce nebyla definovana
@@ -362,8 +361,8 @@ void setAllVariablesCalledToFalse(SymTabNodePtr *RootPtr) {
 				return;
 			}	
 		}
-		UndefinedFunctionControl(&(*RootPtr)->LPtr);
-		UndefinedFunctionControl((*RootPtr)->RPtr);	
+		setAllVariablesCalledToFalse(&(*RootPtr)->LPtr);
+		setAllVariablesCalledToFalse(&(*RootPtr)->RPtr);	
 	}
 }
 
