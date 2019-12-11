@@ -221,6 +221,9 @@ int is_parameter(ParamList *list, char *param) {
 
 int define_local_variable(LocalTableNode *local_table, bool function_call, char *variable_id) {
     int returnValue = 0;
+    if(WasVariableCalled(root, variable_id)) {
+        return SEM_FUNCTION_ERROR;
+    }
     if (!is_variable_defined(NULL, *local_table, NULL, variable_id)) {
         if(is_function_created(root, variable_id)) {
             return SEM_FUNCTION_ERROR;
