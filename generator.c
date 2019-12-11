@@ -1438,103 +1438,75 @@ int gen_header(){
 
 	return OK;
 }
-
+//
+//   BUILT-IN and STACK functions
+//
 int gen_inputs(){
 	Code *code = create_code();
-
 	if (gen_code(code, "#  INPUTS\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "JUMP $inputs$end\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "LABEL $inputs\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "PUSHFRAME\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "DEFVAR LF@%retval\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "READ LF@%retval string\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "POPFRAME\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "RETURN\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "LABEL $inputs$end\0") != OK)
 		return INTERNAL_ERROR;
-
 	return OK;
 }
 
 int gen_inputi(){
 	Code *code = create_code();;
-
 	if (gen_code(code, "#  INPUTI\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "JUMP $inputi$end\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "LABEL $inputi\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "PUSHFRAME\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "DEFVAR LF@%retval\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "READ LF@%retval int\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "POPFRAME\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "RETURN\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "LABEL $inputi$end\0") != OK)
 		return INTERNAL_ERROR;
-
 	return OK;
 }
 
 int gen_inputf(){
 	Code *code = create_code();;
-
 	if (gen_code(code, "#  INPUTF\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "JUMP $inputf$end\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "LABEL $inputf\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "PUSHFRAME\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "DEFVAR LF@%retval\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "READ LF@%retval float\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "POPFRAME\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "RETURN\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "LABEL $inputf$end\0") != OK)
 		return INTERNAL_ERROR;
-
 	return OK;
 }
 
@@ -1542,43 +1514,30 @@ int gen_len(){
 	Code *code = create_code();
 	if (gen_code(code, "#  LEN\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "JUMP $len$end\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "LABEL $len\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "PUSHFRAME\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "DEFVAR LF@%retval\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "TYPE LF@%retval LF@%1\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "JUMPIFNEQ $len$fail LF@%retval string@string\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "STRLEN LF@%retval LF@%1\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "POPFRAME\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "RETURN\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "LABEL $len$fail\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "EXIT int@4\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "LABEL $len$end\0") != OK)
 		return INTERNAL_ERROR;
-
 	return OK;
 }
 
@@ -1586,71 +1545,50 @@ int gen_ord(){
 	Code *code = create_code(); 
 	if (gen_code(code, "#  ORD\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "JUMP $ord$end\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "LABEL $ord\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "PUSHFRAME\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "DEFVAR LF@%retval\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "DEFVAR LF@type\0") != OK)
 		return INTERNAL_ERROR;
-
 	// kontrola typu prveho parametru s
 	if (gen_code(code, "TYPE LF@type LF@%1\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "JUMPIFEQ $ord$return$4 LF@type string@nil\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "JUMPIFEQ $ord$return$4 LF@type string@float\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "JUMPIFEQ $ord$return$4 LF@type string@int\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "JUMPIFEQ $ord$return$4 LF@type string@bool\0") != OK)
 		return INTERNAL_ERROR;
-
 	// kontrola typu druheho parametru i
 	if (gen_code(code, "TYPE LF@type LF@%2\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "JUMPIFEQ $ord$return$4 LF@type string@nil\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "JUMPIFEQ $ord$return$4 LF@type string@float\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "JUMPIFEQ $ord$return$4 LF@type string@string\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "JUMPIFEQ $ord$return$4 LF@type string@bool\0") != OK)
 		return INTERNAL_ERROR;
-
 	// kontrola i -> musi byt v rozmedzi retazca inak return None
 	// zikasnie dlzky retazca
 	if (gen_code(code, "DEFVAR LF@len\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "CREATEFRAME\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "DEFVAR TF@%1\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "MOVE TF@%1 LF@%1\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "CALL $len\0") != OK)
 		return INTERNAL_ERROR;
-
 	code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
@@ -1658,57 +1596,40 @@ int gen_ord(){
 		return INTERNAL_ERROR;
 	if (CL_add_line(&builtin_list, code))
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "DEFVAR LF@cond_val\0") != OK)
 		return INTERNAL_ERROR;
-
 	// len < 0
 	if (gen_code(code, "LT LF@cond_val LF@len int@1\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "JUMPIFEQ $ord_return_none LF@cond_val bool@true\0") != OK)
 		return INTERNAL_ERROR;
-
 	// i > len-1
 	if (gen_code(code, "SUB LF@len LF@len int@1\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "GT LF@cond_val LF@%2 LF@len\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "JUMPIFEQ $ord_return_none LF@cond_val bool@true\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "STRI2INT LF@%retval LF@%1 LF@%2\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "LABEL %ord_end\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "POPFRAME\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "RETURN\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "LABEL $ord_return_none\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "MOVE LF@%retval nil@nil\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "JUMP $ord_end\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "LABEL $ord$return$4\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "EXIT int@4\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "LABEL $ord$end\0") != OK)
 		return INTERNAL_ERROR;
-
 	return OK;
 }
 
@@ -1716,47 +1637,32 @@ int gen_chr(){
 	Code *code = create_code();	
 	if (gen_code(code, "#  CHR\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "JUMP $chr$end\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "LABEL $chr\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "PUSHFRAME\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "DEFVAR LF@%retval\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "DEFVAR LF@%type\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "TYPE LF@%type LF@%1\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "JUMPIFNEQ $chr$return$4 LF@%type string@int\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "INT2CHAR LF@%retval LF@%1\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "POPFRAME\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "RETURN\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "LABEL $chr$return$4\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "EXIT int@4\0") != OK)
 		return INTERNAL_ERROR;
-
-
 	if (gen_code(code, "LABEL $chr$end\0") != OK)
 		return INTERNAL_ERROR;
-
 	return OK;
 }
 
@@ -1764,1504 +1670,1044 @@ int gen_substr(){
 	Code *code = create_code();	
 	if (gen_code(code, "#  SUBSTR\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "JUMP $substr$end\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "LABEL $substr\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "PUSHFRAME\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "DEFVAR LF@%retval\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "MOVE LF@%retval string@\0") != OK)
 		return INTERNAL_ERROR;
 	// -----vytvoreny prazdny string v retval
-	
 	// typove kontroly
 	if (gen_code(code, "DEFVAR LF@%type\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "TYPE LF@%type LF@%1\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "JUMPIFNEQ $substr$return$4 LF@%type string@string\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "TYPE LF@%type LF@%2\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "JUMPIFNEQ $substr$return$4 LF@%type string@int\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "TYPE LF@%type LF@%3\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "JUMPIFNEQ $substr$return$4 LF@%type string@int\0") != OK)
 		return INTERNAL_ERROR;
-
 	// kontroly dlzky substr a dlzky str
 	// ziskanie retval -> dlzky stringu s
 	if (gen_code(code, "CREATEFRAME\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "DEFVAR TF@%1\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "MOVE TF@%1 LF@%1\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "CALL $len\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "DEFVAR LF@len_str\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "MOVE LF@len_str TF@%retval\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "DEFVAR LF@cond_val\0") != OK)
 		return INTERNAL_ERROR;
-
 	// len(s) < 0 -> prazdny substr
-
 	if (gen_code(code, "LT LF@cond_val LF@len_str int@1\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "JUMPIFEQ $substr_end LF@cond_val bool@true\0") != OK)
 		return INTERNAL_ERROR;
-
 	// dlzka subst - n < 0 -> None
 	if (gen_code(code, "LT LF@cond_val LF@%3 int@0\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "JUMPIFEQ $substr$return$none LF@cond_val bool@true\0") != OK)
 		return INTERNAL_ERROR;
-
 	// dlzka subst - n == 0 -> prazdny substr
 	if (gen_code(code, "EQ LF@cond_val LF@%3 int@0\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "JUMPIFEQ $substr_end LF@cond_val bool@true\0") != OK)
 		return INTERNAL_ERROR;
-
 	// index zac subsrt i > len(s) -> none
 	if (gen_code(code, "GT LF@cond_val LF@%2 LF@len_str\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "JUMPIFEQ $substr$return$none LF@cond_val bool@true\0") != OK)
 		return INTERNAL_ERROR;
-
 	// index zac subsrt i = len(s) -> none
 	if (gen_code(code, "EQ LF@cond_val LF@%2 LF@len_str\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "JUMPIFEQ $substr$return$none LF@cond_val bool@true\0") != OK)
 		return INTERNAL_ERROR;
-
 	// i < 0
 	if (gen_code(code, "LT LF@cond_val LF@%2 int@0\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "JUMPIFEQ $substr$return$none LF@cond_val bool@true\0") != OK)
 		return INTERNAL_ERROR;
 	// ------ kontroly vstupov hotove
-
 	// ak je n > len(s) -> n = len(s) - i -> id indexu po koniec stringu
 	if (gen_code(code, "DEFVAR LF@max_len\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "MOVE LF@max_len LF@len_str\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "SUB LF@max_len LF@max_len LF@%2\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "ADD LF@max_len LF@max_len int@1\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "DEFVAR LF@max_cond\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "GT LF@max_cond LF@%3 LF@max_len\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "JUMPIFNEQ %substr_concating LF@max_cond bool@true\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "MOVE LF@%3 LF@max_len\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "LABEL %substr_concating\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "DEFVAR LF@idx\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "MOVE LF@idx LF@%2\0") != OK)
 		return INTERNAL_ERROR;
-
 	// premenne pre cyklus
 	if (gen_code(code, "DEFVAR LF@loop_cond\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "DEFVAR LF@char\0") != OK)
 		return INTERNAL_ERROR;
-
 	// zaciatok cyklu pridavania pismen
 	if (gen_code(code, "LABEL $substr_loop\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "GETCHAR LF@char LF@%1 LF@idx\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "CONCAT LF@%retval LF@%retval LF@char\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "ADD LF@idx LF@idx int@1\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "SUB LF@%3 LF@%3 int@1\0") != OK)
 		return INTERNAL_ERROR;
-
 	// ak je n uz nula koniec cyklu
 	if (gen_code(code, "GT LF@loop_cond LF@%3 int@0\0") != OK)
 		return INTERNAL_ERROR;
-
 	// skok na zac cyklu
 	if (gen_code(code, "JUMPIFEQ $substr_loop LF@loop_cond bool@true\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "LABEL $substr_end\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "POPFRAME\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "RETURN\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "LABEL $substr$return$4\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "EXIT int@4\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "LABEL $substr$return$none\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "MOVE LF@ret_val nil@nil\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "JUMP $substr_end\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "LABEL $substr$end\0") != OK)
 		return INTERNAL_ERROR;
-
 	return OK;
 }
 
 int gen_stack_plus(){
-			Code *code = create_code();
-			if (gen_code(code, "#  STACK_PLUS\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMP $expr_plus_end$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $expr_plus$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "PUSHFRAME\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$type1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$type2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "POPS LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "POPS LF@$op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "TYPE LF@$type1$ LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "TYPE LF@$type2$ LF@$op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $plus_fail$ LF@$type1$ string@nil\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $plus_fail$ LF@$type2$ string@nil\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $plus_fail$ LF@$type1$ string@bool\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $plus_fail$ LF@$type2$ string@bool\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFNEQ $plus_not_same_type$ LF@$type1$ LF@$type2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $plus_concat$ LF@$type1$ string@string\0") != OK)
-				return INTERNAL_ERROR;
-
-			// tu uz mozu byt len dva inty/float -> jump na add
-			if (gen_code(code, "JUMP $plus_add$\0") != OK)
-				return INTERNAL_ERROR;
-
-			// concat
-			if (gen_code(code, "LABEL $plus_concat$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "CONCAT LF@$op1$ LF@$op2$ LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMP $plus_end$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $plus_two_floats$\0") != OK)
-				return INTERNAL_ERROR;
-
-			// rozdielne typy
-			if (gen_code(code, "LABEL $plus_not_same_type$\0") != OK)
-				return INTERNAL_ERROR;
-
-			// ak je ktorykolvek z nich neda sa vykonat operacia
-			if (gen_code(code, "JUMPIFEQ $plus_fail$ LF@$type1$ string@string\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $plus_fail$ LF@$type2$ string@string\0") != OK)
-				return INTERNAL_ERROR;
-
-			// jeden je float a druhy int, trepa zistit ktory je int a pretypovat ho na float
-
-			if (gen_code(code, "JUMPIFEQ $plus_int2float_op1$ LF@$type1$ string@int\0") != OK)
-				return INTERNAL_ERROR;
-
-			// druhy operator je int
-			if (gen_code(code, "INT2FLOAT LF@$op2$ LF@$op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMP $plus_add$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $plus_int2float_op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "INT2FLOAT LF@$op1$ LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMP $plus_add$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $plus_fail$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "EXIT int@4\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $plus_add$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "ADD LF@$op1$ LF@$op1$ LF@$op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $plus_end$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "PUSHS LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "POPFRAME\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "RETURN\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $expr_plus_end$\0") != OK)
-				return INTERNAL_ERROR;
-
-
-			return OK;
+	Code *code = create_code();
+	if (gen_code(code, "#  STACK_PLUS\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMP $expr_plus_end$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $expr_plus$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "PUSHFRAME\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$type1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$type2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "POPS LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "POPS LF@$op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "TYPE LF@$type1$ LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "TYPE LF@$type2$ LF@$op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $plus_fail$ LF@$type1$ string@nil\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $plus_fail$ LF@$type2$ string@nil\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $plus_fail$ LF@$type1$ string@bool\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $plus_fail$ LF@$type2$ string@bool\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFNEQ $plus_not_same_type$ LF@$type1$ LF@$type2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $plus_concat$ LF@$type1$ string@string\0") != OK)
+		return INTERNAL_ERROR;
+	// tu uz mozu byt len dva inty/float -> jump na add
+	if (gen_code(code, "JUMP $plus_add$\0") != OK)
+		return INTERNAL_ERROR;
+	// concat
+	if (gen_code(code, "LABEL $plus_concat$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "CONCAT LF@$op1$ LF@$op2$ LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMP $plus_end$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $plus_two_floats$\0") != OK)
+		return INTERNAL_ERROR;
+	// rozdielne typy
+	if (gen_code(code, "LABEL $plus_not_same_type$\0") != OK)
+		return INTERNAL_ERROR;
+	// ak je ktorykolvek z nich neda sa vykonat operacia
+	if (gen_code(code, "JUMPIFEQ $plus_fail$ LF@$type1$ string@string\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $plus_fail$ LF@$type2$ string@string\0") != OK)
+		return INTERNAL_ERROR;
+	// jeden je float a druhy int, trepa zistit ktory je int a pretypovat ho na float
+	if (gen_code(code, "JUMPIFEQ $plus_int2float_op1$ LF@$type1$ string@int\0") != OK)
+		return INTERNAL_ERROR;
+	// druhy operator je int
+	if (gen_code(code, "INT2FLOAT LF@$op2$ LF@$op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMP $plus_add$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $plus_int2float_op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "INT2FLOAT LF@$op1$ LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMP $plus_add$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $plus_fail$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "EXIT int@4\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $plus_add$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "ADD LF@$op1$ LF@$op1$ LF@$op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $plus_end$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "PUSHS LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "POPFRAME\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "RETURN\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $expr_plus_end$\0") != OK)
+		return INTERNAL_ERROR;
+	return OK;
 }
 
 int gen_stack_minus(){
-			Code *code = create_code();
-			if (gen_code(code, "#  STACK_MINUS\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMP $expr_minus_end$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $expr_minus$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "PUSHFRAME\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$type1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$type2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "POPS LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "POPS LF@$op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "TYPE LF@$type1$ LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "TYPE LF@$type2$ LF@$op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $minus_exit_4$ LF@$type1$ string@nil\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $minus_exit_4$ LF@$type2$ string@nil\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $minus_exit_4$ LF@$type1$ string@bool\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $minus_exit_4$ LF@$type2$ string@bool\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFNEQ $minus_diff_types$ LF@$type1$ LF@$type2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			// rovnake typy
-			if (gen_code(code, "JUMPIFEQ $minus_exit_4$ LF@$type1$ string@string\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMP $minus_sub$\0") != OK)
-				return INTERNAL_ERROR;
-
-			// rozdielne typy
-			if (gen_code(code, "LABEL $minus_diff_type$\0") != OK)
-				return INTERNAL_ERROR;
-
-			// ak je ktorykolvek z nich string neda sa vykonat operacia
-			if (gen_code(code, "JUMPIFEQ $minus_exit_4$ LF@$type1$ string@string\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $minus_exit_4$ LF@$type2$ string@string\0") != OK)
-				return INTERNAL_ERROR;
-
-			// jeden je float a druhy int, trepa zistit ktory je int a pretypovat ho na float
-			if (gen_code(code, "JUMPIFEQ $minus_int2float_op1$ LF@$type1$ string@int\0") != OK)
-				return INTERNAL_ERROR;
-
-			// druhy operator je int
-			if (gen_code(code, "INT2FLOAT LF@$op2$ LF@$op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMP $minus_sub$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $minus_int2float_op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "INT2FLOAT LF@$op1$ LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMP $minus_sub$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $minus_exit_4$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "EXIT int@4\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $minus_sub$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "SUB LF@$op1$ LF@$op2$ LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "PUSHS LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "POPFRAME\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "RETURN\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $expr_minus_end$\0") != OK)
-				return INTERNAL_ERROR;
-
-			return OK;
+	Code *code = create_code();
+	if (gen_code(code, "#  STACK_MINUS\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMP $expr_minus_end$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $expr_minus$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "PUSHFRAME\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$type1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$type2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "POPS LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "POPS LF@$op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "TYPE LF@$type1$ LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "TYPE LF@$type2$ LF@$op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $minus_exit_4$ LF@$type1$ string@nil\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $minus_exit_4$ LF@$type2$ string@nil\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $minus_exit_4$ LF@$type1$ string@bool\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $minus_exit_4$ LF@$type2$ string@bool\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFNEQ $minus_diff_types$ LF@$type1$ LF@$type2$\0") != OK)
+		return INTERNAL_ERROR;
+	// rovnake typy
+	if (gen_code(code, "JUMPIFEQ $minus_exit_4$ LF@$type1$ string@string\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMP $minus_sub$\0") != OK)
+		return INTERNAL_ERROR;
+	// rozdielne typy
+	if (gen_code(code, "LABEL $minus_diff_type$\0") != OK)
+		return INTERNAL_ERROR;
+	// ak je ktorykolvek z nich string neda sa vykonat operacia
+	if (gen_code(code, "JUMPIFEQ $minus_exit_4$ LF@$type1$ string@string\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $minus_exit_4$ LF@$type2$ string@string\0") != OK)
+		return INTERNAL_ERROR;
+	// jeden je float a druhy int, trepa zistit ktory je int a pretypovat ho na float
+	if (gen_code(code, "JUMPIFEQ $minus_int2float_op1$ LF@$type1$ string@int\0") != OK)
+		return INTERNAL_ERROR;
+	// druhy operator je int
+	if (gen_code(code, "INT2FLOAT LF@$op2$ LF@$op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMP $minus_sub$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $minus_int2float_op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "INT2FLOAT LF@$op1$ LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMP $minus_sub$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $minus_exit_4$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "EXIT int@4\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $minus_sub$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "SUB LF@$op1$ LF@$op2$ LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "PUSHS LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "POPFRAME\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "RETURN\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $expr_minus_end$\0") != OK)
+		return INTERNAL_ERROR;
+	return OK;
 }
 
 int gen_stack_mult(){
-			Code *code = create_code();
-			if (gen_code(code, "#  STACK_MULT\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMP $expr_mult_end$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $expr_mult$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "PUSHFRAME\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$type1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$type2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "POPS LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "POPS LF@$op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "TYPE LF@$type1$ LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "TYPE LF@$type2$ LF@$op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $times_exit_4$ LF@$type1$ string@nil\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $times_exit_4$ LF@$type2$ string@nil\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $times_exit_4$ LF@$type1$ string@bool\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $times_exit_4$ LF@$type2$ string@bool\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFNEQ $times_diff_type$ LF@$type1$ LF@$type2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			// rovnake typy
-			if (gen_code(code, "JUMPIFEQ $times_exit_4$ LF@$type1$ string@string\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMP $times_mult$\0") != OK)
-				return INTERNAL_ERROR;
-
-			// rozdielne typy
-			if (gen_code(code, "LABEL $times_diff_type$\0") != OK)
-				return INTERNAL_ERROR;
-
-			// ak je ktorykolvek z nich string neda sa vykonat operacia
-			if (gen_code(code, "JUMPIFEQ $times_exit_4$ LF@$type1$ string@string\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $times_exit_4$ LF@$type2$ string@string\0") != OK)
-				return INTERNAL_ERROR;
-
-			// jeden je float a druhy int, trepa zistit ktory je int a pretypovat ho na float
-			if (gen_code(code, "JUMPIFEQ $times_int2float_op1$ LF@$type1$ string@int\0") != OK)
-				return INTERNAL_ERROR;
-
-			// druhy operator je int
-			if (gen_code(code, "INT2FLOAT LF@$op2$ LF@$op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMP $times_mult$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $times_int2float_op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "INT2FLOAT LF@$op1$ LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMP $times_mult$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $times_exit_4$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "EXIT int@4\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $times_mult$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "MUL LF@$op1$ LF@$op2$ LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "PUSHS LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "POPFRAME\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "RETURN\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $expr_mult_end$\0") != OK)
-				return INTERNAL_ERROR;
-
-			return OK;
+	Code *code = create_code();
+	if (gen_code(code, "#  STACK_MULT\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMP $expr_mult_end$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $expr_mult$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "PUSHFRAME\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$type1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$type2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "POPS LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "POPS LF@$op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "TYPE LF@$type1$ LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "TYPE LF@$type2$ LF@$op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $times_exit_4$ LF@$type1$ string@nil\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $times_exit_4$ LF@$type2$ string@nil\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $times_exit_4$ LF@$type1$ string@bool\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $times_exit_4$ LF@$type2$ string@bool\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFNEQ $times_diff_type$ LF@$type1$ LF@$type2$\0") != OK)
+		return INTERNAL_ERROR;
+	// rovnake typy
+	if (gen_code(code, "JUMPIFEQ $times_exit_4$ LF@$type1$ string@string\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMP $times_mult$\0") != OK)
+		return INTERNAL_ERROR;
+	// rozdielne typy
+	if (gen_code(code, "LABEL $times_diff_type$\0") != OK)
+		return INTERNAL_ERROR;
+	// ak je ktorykolvek z nich string neda sa vykonat operacia
+	if (gen_code(code, "JUMPIFEQ $times_exit_4$ LF@$type1$ string@string\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $times_exit_4$ LF@$type2$ string@string\0") != OK)
+		return INTERNAL_ERROR;
+	// jeden je float a druhy int, trepa zistit ktory je int a pretypovat ho na float
+	if (gen_code(code, "JUMPIFEQ $times_int2float_op1$ LF@$type1$ string@int\0") != OK)
+		return INTERNAL_ERROR;
+	// druhy operator je int
+	if (gen_code(code, "INT2FLOAT LF@$op2$ LF@$op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMP $times_mult$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $times_int2float_op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "INT2FLOAT LF@$op1$ LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMP $times_mult$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $times_exit_4$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "EXIT int@4\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $times_mult$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "MUL LF@$op1$ LF@$op2$ LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "PUSHS LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "POPFRAME\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "RETURN\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $expr_mult_end$\0") != OK)
+		return INTERNAL_ERROR;
+	return OK;
 }
 
 int gen_stack_div(){
-			Code *code = create_code();
-			if (gen_code(code, "# STACK_DIV\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMP $expr_div_end$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $expr_div$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "PUSHFRAME\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$type1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$type2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "POPS LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "POPS LF@$op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "TYPE LF@$type1$ LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "TYPE LF@$type2$ LF@$op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $div_fail$ LF@$type1$ string@nil\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $div_fail$ LF@$type2$ string@nil\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $div_fail$ LF@$type1$ string@bool\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $div_fail$ LF@$type2$ string@bool\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $div_fail$ LF@$type1$ string@string\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $div_fail$ LF@$type2$ string@string\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFNEQ $div_not_same$ LF@$type1$ LF@$type2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $div_div$ LF@$type1$ string@float\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "INT2FLOAT LF@$op1$ LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "INT2FLOAT LF@$op2$ LF@$op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $div_div$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $div_zero$ LF@$op1$ float@0x0p+0\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DIV LF@$op1$ LF@$op2$ LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMP $div_end$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $div_zero$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "EXIT int@9\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $div_fail$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "EXIT int@4\0") != OK)
-				return INTERNAL_ERROR;
-
-			// druhy operator je int
-			if (gen_code(code, "LABEL $div_not_same$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFNEQ $div_int2float_op2$ LF@$type2$ string@float\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "INT2FLOAT LF@$op1$ LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMP $div_div$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $div_int2float_op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "INT2FLOAT LF@$op2$ LF@$op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMP $div_div$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $div_end$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "PUSHS LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "POPFRAME\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "RETURN\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $expr_div_end$\0") != OK)
-				return INTERNAL_ERROR;
-
-			return OK;
+	Code *code = create_code();
+	if (gen_code(code, "# STACK_DIV\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMP $expr_div_end$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $expr_div$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "PUSHFRAME\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$type1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$type2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "POPS LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "POPS LF@$op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "TYPE LF@$type1$ LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "TYPE LF@$type2$ LF@$op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $div_fail$ LF@$type1$ string@nil\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $div_fail$ LF@$type2$ string@nil\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $div_fail$ LF@$type1$ string@bool\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $div_fail$ LF@$type2$ string@bool\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $div_fail$ LF@$type1$ string@string\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $div_fail$ LF@$type2$ string@string\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFNEQ $div_not_same$ LF@$type1$ LF@$type2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $div_div$ LF@$type1$ string@float\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "INT2FLOAT LF@$op1$ LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "INT2FLOAT LF@$op2$ LF@$op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $div_div$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $div_zero$ LF@$op1$ float@0x0p+0\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DIV LF@$op1$ LF@$op2$ LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMP $div_end$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $div_zero$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "EXIT int@9\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $div_fail$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "EXIT int@4\0") != OK)
+		return INTERNAL_ERROR;
+	// druhy operator je int
+	if (gen_code(code, "LABEL $div_not_same$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFNEQ $div_int2float_op2$ LF@$type2$ string@float\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "INT2FLOAT LF@$op1$ LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMP $div_div$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $div_int2float_op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "INT2FLOAT LF@$op2$ LF@$op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMP $div_div$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $div_end$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "PUSHS LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "POPFRAME\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "RETURN\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $expr_div_end$\0") != OK)
+		return INTERNAL_ERROR;
+	return OK;
 }
 
 int gen_stack_idiv(){
-			Code *code = create_code();
-			if (gen_code(code, "# STACK_IDIV\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMP $expr_idiv_end$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $expr_idiv$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "PUSHFRAME\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$type1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$type2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "POPS LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "POPS LF@$op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "TYPE LF@$type1$ LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "TYPE LF@$type2$ LF@$op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			// musia byt rovnake typy
-			if (gen_code(code, "JUMPIFNEQ $idiv_fail$ LF@$type1$ LF@$type2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			// musia byt int
-			if (gen_code(code, "JUMPIFNEQ $idiv_fail$ LF@$type1$ string@int\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $idiv_zero$ LF@$op1$ int@0\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "IDIV LF@$op1$ LF@$op2$ LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-			if (gen_code(code, "JUMP $idiv_end$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $idiv_fail$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "EXIT int@4\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $idiv_zero$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "EXIT int@9\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $idiv_end$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "PUSHS LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "POPFRAME\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "RETURN\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $expr_idiv_end$\0") != OK)
-				return INTERNAL_ERROR;
-
-			return OK;
+	Code *code = create_code();
+	if (gen_code(code, "# STACK_IDIV\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMP $expr_idiv_end$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $expr_idiv$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "PUSHFRAME\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$type1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$type2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "POPS LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "POPS LF@$op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "TYPE LF@$type1$ LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "TYPE LF@$type2$ LF@$op2$\0") != OK)
+		return INTERNAL_ERROR;
+	// musia byt rovnake typy
+	if (gen_code(code, "JUMPIFNEQ $idiv_fail$ LF@$type1$ LF@$type2$\0") != OK)
+		return INTERNAL_ERROR;
+	// musia byt int
+	if (gen_code(code, "JUMPIFNEQ $idiv_fail$ LF@$type1$ string@int\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $idiv_zero$ LF@$op1$ int@0\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "IDIV LF@$op1$ LF@$op2$ LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMP $idiv_end$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $idiv_fail$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "EXIT int@4\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $idiv_zero$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "EXIT int@9\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $idiv_end$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "PUSHS LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "POPFRAME\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "RETURN\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $expr_idiv_end$\0") != OK)
+		return INTERNAL_ERROR;
+	return OK;
 }
 
 int gen_stack_equal(){
-			Code *code = create_code();
-			if (gen_code(code, "#  STACK_EQUAL\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMP $expr_equal_end$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $expr_equal$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "PUSHFRAME\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$type1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$type2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "POPS LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "POPS LF@$op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "TYPE LF@$type1$ LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "TYPE LF@$type2$ LF@$op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $equal_eq$ LF@$type1$ LF@$type2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			// rozdielne typy
-			// ake je jeden z nich nil tak sa operacia da stale vykonat
-			if (gen_code(code, "JUMPIFEQ $equal_false$ LF@$type1$ string@nil\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $equal_false$ LF@$type2$ string@nil\0") != OK)
-				return INTERNAL_ERROR;
-
-			// ak je jeden z nich string ta sele zle
-			if (gen_code(code, "JUMPIFEQ $equal_false$ LF@$type1$ string@string\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $equal_false$ LF@$type2$ string@string\0") != OK)
-				return INTERNAL_ERROR;
-
-
-			// ak je jeden z nich bool ta sele zle
-			if (gen_code(code, "JUMPIFEQ $equal_false$ LF@$type1$ string@bool\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $equal_false$ LF@$type2$ string@bool\0") != OK)
-				return INTERNAL_ERROR;
-
-			// druhy op je int a prvy float
-			if (gen_code(code, "JUMPIFEQ $equal_int2float_op2$ LF@$type2$ string@int\0") != OK)
-				return INTERNAL_ERROR;
-
-			// prvy op je int a druhy float
-			if (gen_code(code, "INT2FLOAT LF@$op1$ LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $equal_eq$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "EQ LF@$op1$ LF@$op2$ LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMP $equal_end$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $equal_false$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "MOVE LF@$op1$ bool@false\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMP $equal_end$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $equal_int2float_op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "INT2FLOAT LF@$op2$ LF@$op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMP $equal_eq$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $equal_end$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "PUSHS LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "POPFRAME\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "RETURN\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $expr_equal_end$\0") != OK)
-				return INTERNAL_ERROR;
-
-			return OK;
+	Code *code = create_code();
+	if (gen_code(code, "#  STACK_EQUAL\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMP $expr_equal_end$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $expr_equal$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "PUSHFRAME\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$type1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$type2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "POPS LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "POPS LF@$op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "TYPE LF@$type1$ LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "TYPE LF@$type2$ LF@$op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $equal_eq$ LF@$type1$ LF@$type2$\0") != OK)
+		return INTERNAL_ERROR;
+	// rozdielne typy
+	// ake je jeden z nich nil tak sa operacia da stale vykonat
+	if (gen_code(code, "JUMPIFEQ $equal_false$ LF@$type1$ string@nil\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $equal_false$ LF@$type2$ string@nil\0") != OK)
+		return INTERNAL_ERROR;
+	// ak je jeden z nich string ta sele zle
+	if (gen_code(code, "JUMPIFEQ $equal_false$ LF@$type1$ string@string\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $equal_false$ LF@$type2$ string@string\0") != OK)
+		return INTERNAL_ERROR;
+	// ak je jeden z nich bool ta sele zle
+	if (gen_code(code, "JUMPIFEQ $equal_false$ LF@$type1$ string@bool\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $equal_false$ LF@$type2$ string@bool\0") != OK)
+		return INTERNAL_ERROR;
+	// druhy op je int a prvy float
+	if (gen_code(code, "JUMPIFEQ $equal_int2float_op2$ LF@$type2$ string@int\0") != OK)
+		return INTERNAL_ERROR;
+	// prvy op je int a druhy float
+	if (gen_code(code, "INT2FLOAT LF@$op1$ LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $equal_eq$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "EQ LF@$op1$ LF@$op2$ LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMP $equal_end$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $equal_false$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "MOVE LF@$op1$ bool@false\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMP $equal_end$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $equal_int2float_op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "INT2FLOAT LF@$op2$ LF@$op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMP $equal_eq$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $equal_end$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "PUSHS LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "POPFRAME\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "RETURN\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $expr_equal_end$\0") != OK)
+		return INTERNAL_ERROR;
+	return OK;
 }
 
 int gen_stack_notequal(){
-			Code *code = create_code();
-			if (gen_code(code, "# STACK_NOTEQUAL\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMP $expr_notequal_end$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $expr_notequal$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "CALL $expr_equal$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "POPS GF@&res1\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "NOT GF@&res1 GF@&res1\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "PUSHS GF@&res1\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "RETURN\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $expr_notequal_end$\0") != OK)
-				return INTERNAL_ERROR;
-
-			return OK;
+	Code *code = create_code();
+	if (gen_code(code, "# STACK_NOTEQUAL\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMP $expr_notequal_end$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $expr_notequal$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "CALL $expr_equal$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "POPS GF@&res1\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "NOT GF@&res1 GF@&res1\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "PUSHS GF@&res1\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "RETURN\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $expr_notequal_end$\0") != OK)
+		return INTERNAL_ERROR;
+	return OK;
 }
 
 int gen_stack_less(){
-			Code *code = create_code();
-			if (gen_code(code, "#  STACK_LESS\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMP $expr_less_end$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $expr_less$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "PUSHFRAME\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$type1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$type2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "POPS LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "POPS LF@$op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "TYPE LF@$type1$ LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "TYPE LF@$type2$ LF@$op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $less_fail$ LF@$type1$ string@bool\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $less_fail$ LF@$type2$ string@bool\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $less_fail$ LF@$type1$ string@nil\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $less_fail$ LF@$type2$ string@nil\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $less_less$ LF@$type1$ LF@$type2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			// rozdielne typy
-			// ak je jeden z nich string ta sele zle
-			if (gen_code(code, "JUMPIFEQ $less_fail$ LF@$type1$ string@string\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $less_fail$ LF@$type2$ string@string\0") != OK)
-				return INTERNAL_ERROR;
-
-			// druhy op je int a prvy float
-			if (gen_code(code, "JUMPIFEQ $less_int2float_op2$ LF@$type2$ string@int\0") != OK)
-				return INTERNAL_ERROR;
-
-			// prvy op je int a druhy float
-			if (gen_code(code, "INT2FLOAT LF@$op1$ LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $less_less$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LT LF@$op1$ LF@$op2$ LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMP $less_end$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $less_fail$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "EXIT int@4\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $less_int2float_op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "INT2FLOAT LF@$op2$ LF@$op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMP $less_less$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $less_end$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "PUSHS LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "POPFRAME\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "RETURN\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $expr_less_end$\0") != OK)
-				return INTERNAL_ERROR;
-
-			return OK;
+	Code *code = create_code();
+	if (gen_code(code, "#  STACK_LESS\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMP $expr_less_end$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $expr_less$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "PUSHFRAME\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$type1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$type2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "POPS LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "POPS LF@$op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "TYPE LF@$type1$ LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "TYPE LF@$type2$ LF@$op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $less_fail$ LF@$type1$ string@bool\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $less_fail$ LF@$type2$ string@bool\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $less_fail$ LF@$type1$ string@nil\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $less_fail$ LF@$type2$ string@nil\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $less_less$ LF@$type1$ LF@$type2$\0") != OK)
+		return INTERNAL_ERROR;
+	// rozdielne typy
+	// ak je jeden z nich string ta sele zle
+	if (gen_code(code, "JUMPIFEQ $less_fail$ LF@$type1$ string@string\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $less_fail$ LF@$type2$ string@string\0") != OK)
+		return INTERNAL_ERROR;
+	// druhy op je int a prvy float
+	if (gen_code(code, "JUMPIFEQ $less_int2float_op2$ LF@$type2$ string@int\0") != OK)
+		return INTERNAL_ERROR;
+	// prvy op je int a druhy float
+	if (gen_code(code, "INT2FLOAT LF@$op1$ LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $less_less$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LT LF@$op1$ LF@$op2$ LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMP $less_end$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $less_fail$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "EXIT int@4\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $less_int2float_op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "INT2FLOAT LF@$op2$ LF@$op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMP $less_less$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $less_end$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "PUSHS LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "POPFRAME\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "RETURN\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $expr_less_end$\0") != OK)
+		return INTERNAL_ERROR;
+	return OK;
 }
 
 int gen_stack_lesseq(){
-			Code *code = create_code();
-			if (gen_code(code, "# STACK_LESSEQ\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMP $expr_lesseq_end$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $expr_lesseq$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "PUSHFRAME\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$res_less$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$res_eq$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$type1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$type2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "POPS LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "POPS LF@$op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "TYPE LF@$type1$ LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "TYPE LF@$type2$ LF@$op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $lesseq_fail$ LF@$type1$ string@bool\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $lesseq_fail$ LF@$type2$ string@bool\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $lesseq_fail$ LF@$type1$ string@nil\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $lesseq_fail$ LF@$type2$ string@nil\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $lesseq_lteq$ LF@$type1$ LF@$type2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			// rozdielne typy
-			// ak je jeden z nich string ta sele zle
-			if (gen_code(code, "JUMPIFEQ $lesseq_fail$ LF@$type1$ string@string\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $lesseq_fail$ LF@$type2$ string@string\0") != OK)
-				return INTERNAL_ERROR;
-
-			// druhy op je int a prvy float
-			if (gen_code(code, "JUMPIFEQ $lesseq_int2float_op2$ LF@$type2$ string@int\0") != OK)
-				return INTERNAL_ERROR;
-
-			// prvy op je int a druhy float
-			if (gen_code(code, "INT2FLOAT LF@$op1$ LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $lesseq_lteq$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LT LF@$res_less$ LF@$op2$ LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "EQ LF@$res_eq$ LF@$op2$ LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMP $lesseq_end$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $lesseq_fail$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "EXIT int@4\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $lesseq_int2float_op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "INT2FLOAT LF@$op2$ LF@$op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMP $lesseq_lteq$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $lesseq_end$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "OR LF@$op1$ LF@$res_less$ LS@$res_eq$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "PUSHS LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "POPFRAME\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "RETURN\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $expr_lesseq_end$\0") != OK)
-				return INTERNAL_ERROR;
-
-			return OK;
+	Code *code = create_code();
+	if (gen_code(code, "# STACK_LESSEQ\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMP $expr_lesseq_end$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $expr_lesseq$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "PUSHFRAME\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$res_less$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$res_eq$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$type1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$type2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "POPS LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "POPS LF@$op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "TYPE LF@$type1$ LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "TYPE LF@$type2$ LF@$op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $lesseq_fail$ LF@$type1$ string@bool\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $lesseq_fail$ LF@$type2$ string@bool\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $lesseq_fail$ LF@$type1$ string@nil\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $lesseq_fail$ LF@$type2$ string@nil\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $lesseq_lteq$ LF@$type1$ LF@$type2$\0") != OK)
+		return INTERNAL_ERROR;
+	// rozdielne typy
+	// ak je jeden z nich string ta sele zle
+	if (gen_code(code, "JUMPIFEQ $lesseq_fail$ LF@$type1$ string@string\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $lesseq_fail$ LF@$type2$ string@string\0") != OK)
+		return INTERNAL_ERROR;
+	// druhy op je int a prvy float
+	if (gen_code(code, "JUMPIFEQ $lesseq_int2float_op2$ LF@$type2$ string@int\0") != OK)
+		return INTERNAL_ERROR;
+	// prvy op je int a druhy float
+	if (gen_code(code, "INT2FLOAT LF@$op1$ LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $lesseq_lteq$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LT LF@$res_less$ LF@$op2$ LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "EQ LF@$res_eq$ LF@$op2$ LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMP $lesseq_end$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $lesseq_fail$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "EXIT int@4\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $lesseq_int2float_op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "INT2FLOAT LF@$op2$ LF@$op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMP $lesseq_lteq$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $lesseq_end$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "OR LF@$op1$ LF@$res_less$ LS@$res_eq$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "PUSHS LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "POPFRAME\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "RETURN\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $expr_lesseq_end$\0") != OK)
+		return INTERNAL_ERROR;
+	return OK;
 }
 
 int gen_stack_greater(){
-			Code *code = create_code();
-			if (gen_code(code, "#  STACK_GREATER\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMP $expr_greater_end$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $expr_greater$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "PUSHFRAME\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$type1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$type2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "POPS LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "POPS LF@$op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "TYPE LF@$type1$ LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "TYPE LF@$type2$ LF@$op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $greater_fail$ LF@$type1$ string@bool\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $greater_fail$ LF@$type2$ string@bool\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $greater_fail$ LF@$type1$ string@nil\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $greater_fail$ LF@$type2$ string@nil\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $greater_gt$ LF@$type1$ LF@$type2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			// rozdielne typy
-			// ak je jeden z nich string ta sele zle
-			if (gen_code(code, "JUMPIFEQ $greater_fail$ LF@$type1$ string@string\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $greater_fail$ LF@$type2$ string@string\0") != OK)
-				return INTERNAL_ERROR;
-
-			// druhy op je int a prvy float
-			if (gen_code(code, "JUMPIFEQ $greater_int2float_op2$ LF@$type2$ string@int\0") != OK)
-				return INTERNAL_ERROR;
-
-			// prvy op je int a druhy float
-			if (gen_code(code, "INT2FLOAT LF@$op1$ LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $greater_gt$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "GT LF@$op1$ LF@$op2$ LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMP $greater_end$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $greater_fail$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "EXIT int@4\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $greater_int2float_op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "INT2FLOAT LF@$op2$ LF@$op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMP $greater_gt$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $greater_end$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "PUSHS LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "POPFRAME\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "RETURN\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $expr_greater_end$\0") != OK)
-				return INTERNAL_ERROR;
-
-			return OK;
+	Code *code = create_code();
+	if (gen_code(code, "#  STACK_GREATER\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMP $expr_greater_end$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $expr_greater$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "PUSHFRAME\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$type1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$type2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "POPS LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "POPS LF@$op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "TYPE LF@$type1$ LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "TYPE LF@$type2$ LF@$op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $greater_fail$ LF@$type1$ string@bool\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $greater_fail$ LF@$type2$ string@bool\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $greater_fail$ LF@$type1$ string@nil\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $greater_fail$ LF@$type2$ string@nil\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $greater_gt$ LF@$type1$ LF@$type2$\0") != OK)
+		return INTERNAL_ERROR;
+	// rozdielne typy
+	// ak je jeden z nich string ta sele zle
+	if (gen_code(code, "JUMPIFEQ $greater_fail$ LF@$type1$ string@string\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $greater_fail$ LF@$type2$ string@string\0") != OK)
+		return INTERNAL_ERROR;
+	// druhy op je int a prvy float
+	if (gen_code(code, "JUMPIFEQ $greater_int2float_op2$ LF@$type2$ string@int\0") != OK)
+		return INTERNAL_ERROR;
+	// prvy op je int a druhy float
+	if (gen_code(code, "INT2FLOAT LF@$op1$ LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $greater_gt$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "GT LF@$op1$ LF@$op2$ LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMP $greater_end$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $greater_fail$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "EXIT int@4\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $greater_int2float_op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "INT2FLOAT LF@$op2$ LF@$op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMP $greater_gt$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $greater_end$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "PUSHS LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "POPFRAME\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "RETURN\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $expr_greater_end$\0") != OK)
+		return INTERNAL_ERROR;
+	return OK;
 }
 
 int gen_stack_greatereq(){
-			Code *code = create_code();
-			if (gen_code(code, "#  STACK_GREATEREQ\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMP $expr_greatereq_end$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $expr_greatereq$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "PUSHFRAME\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$res_greater$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$res_eq$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$type1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "DEFVAR LF@$type2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "POPS LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "POPS LF@$op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "TYPE LF@$type1$ LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "TYPE LF@$type2$ LF@$op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $greateq_fail$ LF@$type1$ string@bool\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $greateq_fail$ LF@$type2$ string@bool\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $greateq_fail$ LF@$type1$ string@nil\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $greateq_fail$ LF@$type2$ string@nil\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $greateq_gteq$ LF@$type1$ LF@$type2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			// rozdielne typy
-			// ak je jeden z nich string ta sele zle
-			if (gen_code(code, "JUMPIFEQ $greateq_fail$ LF@$type1$ string@string\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMPIFEQ $greateq_fail$ LF@$type2$ string@string\0") != OK)
-				return INTERNAL_ERROR;
-
-			// druhy op je int a prvy float
-			if (gen_code(code, "JUMPIFEQ $greateq_int2float_op2$ LF@$type2$ string@int\0") != OK)
-				return INTERNAL_ERROR;
-
-			// prvy op je int a druhy float
-			if (gen_code(code, "INT2FLOAT LF@$op1$ LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $greateq_gteq$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "GT LF@$res_greater$ LF@$op2$ LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "EQ LF@$res_eq$ LF@$op2$ LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMP $greateq_end$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $greateq_fail$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "EXIT int@4\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $greateq_int2float_op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "INT2FLOAT LF@$op2$ LF@$op2$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "JUMP $greateq_gteq$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $greateq_end$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "OR LF@$op1$ LF@$res_less$ LS@$res_eq$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "PUSHS LF@$op1$\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "POPFRAME\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "RETURN\0") != OK)
-				return INTERNAL_ERROR;
-
-			if (gen_code(code, "LABEL $expr_greatereq_end$\0") != OK)
-				return INTERNAL_ERROR;
-
-			return OK;
+	Code *code = create_code();
+	if (gen_code(code, "#  STACK_GREATEREQ\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMP $expr_greatereq_end$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $expr_greatereq$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "PUSHFRAME\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$res_greater$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$res_eq$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$type1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "DEFVAR LF@$type2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "POPS LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "POPS LF@$op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "TYPE LF@$type1$ LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "TYPE LF@$type2$ LF@$op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $greateq_fail$ LF@$type1$ string@bool\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $greateq_fail$ LF@$type2$ string@bool\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $greateq_fail$ LF@$type1$ string@nil\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $greateq_fail$ LF@$type2$ string@nil\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $greateq_gteq$ LF@$type1$ LF@$type2$\0") != OK)
+		return INTERNAL_ERROR;
+	// rozdielne typy
+	// ak je jeden z nich string ta sele zle
+	if (gen_code(code, "JUMPIFEQ $greateq_fail$ LF@$type1$ string@string\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMPIFEQ $greateq_fail$ LF@$type2$ string@string\0") != OK)
+		return INTERNAL_ERROR;
+	// druhy op je int a prvy float
+	if (gen_code(code, "JUMPIFEQ $greateq_int2float_op2$ LF@$type2$ string@int\0") != OK)
+		return INTERNAL_ERROR;
+	// prvy op je int a druhy float
+	if (gen_code(code, "INT2FLOAT LF@$op1$ LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $greateq_gteq$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "GT LF@$res_greater$ LF@$op2$ LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "EQ LF@$res_eq$ LF@$op2$ LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMP $greateq_end$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $greateq_fail$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "EXIT int@4\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $greateq_int2float_op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "INT2FLOAT LF@$op2$ LF@$op2$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "JUMP $greateq_gteq$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $greateq_end$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "OR LF@$op1$ LF@$res_less$ LS@$res_eq$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "PUSHS LF@$op1$\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "POPFRAME\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "RETURN\0") != OK)
+		return INTERNAL_ERROR;
+	if (gen_code(code, "LABEL $expr_greatereq_end$\0") != OK)
+		return INTERNAL_ERROR;
+	return OK;
 }
 
 int gen_if_exprval_check(){
 	Code *code = create_code();
 	if (gen_code(code, "#  IF_EXPRVAL_CHECK\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "JUMP %exprval_check%end\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "LABEL %exprval_check%\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "TYPE GF@&expr&val&type GF@&expr&val\0") != OK)
 		return INTERNAL_ERROR;
-
 	// vysledok expr je bool
 	if (gen_code(code, "JUMPIFNEQ %exprval_check%not_bool% GF@&expr&val&type string@bool\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "RETURN\0") != OK)
 		return INTERNAL_ERROR;
-
 	// vysledok expr neni bool
 	if (gen_code(code, "LABEL %exprval_check%not_bool%\0") != OK)
 		return INTERNAL_ERROR;
-
 	// jump na None
 	if (gen_code(code, "JUMPIFEQ %exprval_check%false GF@&expr&val&type string@nil\0") != OK)
 		return INTERNAL_ERROR;
-
 	// jump na int
 	if (gen_code(code, "JUMPIFEQ %exprval_check%int GF@&expr&val&type string@int\0") != OK)
 		return INTERNAL_ERROR;
-
 	// jump na float
 	if (gen_code(code, "JUMPIFEQ %exprval_check%float GF@&expr&val&type string@float\0") != OK)
 		return INTERNAL_ERROR;
-
 	// jump na string
 	if (gen_code(code, "JUMPIFEQ %exprval_check%string GF@&expr&val&type string@string\0") != OK)
 		return INTERNAL_ERROR;
-
 	// int
 	if (gen_code(code, "LABEL %exprval_check%int\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "JUMPIFEQ %exprval_check%false GF@&expr&val int@0\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "MOVE GF@&expr&val bool@true\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "RETURN\0") != OK)
 		return INTERNAL_ERROR;
-
 	// float
 	if (gen_code(code, "LABEL %exprval_check%float\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "JUMPIFEQ %exprval_check%false GF@&expr&val float@0x0p+0\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "MOVE GF@&expr&val bool@true\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "RETURN\0") != OK)
 		return INTERNAL_ERROR;
-
 	// string
 	if (gen_code(code, "LABEL %exprval_check%string\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "JUMPIFEQ %exprval_check%false GF@&expr&val string@\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "MOVE GF@&expr&val bool@true\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "RETURN\0") != OK)
 		return INTERNAL_ERROR;
-
 	// false do exprval
 	if (gen_code(code, "LABEL %exprval_check%false\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "MOVE GF@&expr&val bool@false\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "RETURN\0") != OK)
 		return INTERNAL_ERROR;
-
 	if (gen_code(code, "LABEL %exprval_check%end\0") != OK)
 		return INTERNAL_ERROR;
-
 	return OK;
 }
