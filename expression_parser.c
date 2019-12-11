@@ -399,6 +399,10 @@ int callExpression(Token *token)
                   return DIVISION_BY_ZERO_ERROR;
             }
       }
+      if ( token ->type == TK_COMMA)
+      {
+            return SYNTAX_ERROR;
+      }
       // inserting into a list
       if (eList.act == NULL)
       {
