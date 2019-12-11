@@ -13,6 +13,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "scanner.h"
+#include "parser.h"
 #include "error.h"
 #include "my_string.h"
 #include "symtable.h"

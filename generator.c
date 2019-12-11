@@ -7,6 +7,7 @@
  */
 
 #include "generator.h"
+extern bool in_if_while;
 
 void pq_init(){
 	pq.first = NULL;
