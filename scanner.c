@@ -127,10 +127,10 @@ int preload_token(Token *token){
 	int ret_val = scan(token);
 	if (tkq_queue(token, ret_val) == INTERNAL_ERROR){
 		return INTERNAL_ERROR;
+	// queue nie je prazdna
 	} else {
 		return ret_val;
 	}
-	// queue nie je prazdna
 }
 
 int get_next_token(Token *token){
