@@ -186,7 +186,8 @@ Data_type getFinalType(pRules rule, exprStack* sym1, exprStack* sym2, exprStack*
  * @return OK if everythings is right 
  *         SYNTAX_ERROR if there was some syntax error
  *         DIVISION_BY_ERROR if there was division by 0 
- *         ?? OTHER ERROR if there was another error
+ *         SEM_ERR if there was sematic error 
+ *         INTERNAL ERROR if there was another error
  */
 int callExpression(Token *token);
 
