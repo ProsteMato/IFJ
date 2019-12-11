@@ -311,7 +311,7 @@ int callExpression(Token *token)
       {
             return ee;
       }
-      return OK;
+      return SYNTAX_ERROR;
   }
   
   // Load tokens into list, count brackets, control division by 0
