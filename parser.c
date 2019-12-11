@@ -214,6 +214,7 @@ int next_st_list(Token *token) {
 				param_list = NULL;
 				local_table = NULL;
 				in_function = false;
+				setAllVariablesCalledToFalse(root);
 			} else if (!in_function && in_if_while && depth == 0) {
 				in_while = false;
 				in_if_while = false;
@@ -768,6 +769,11 @@ int def_id(Token *token) {
 			return returnValue;
 		}
 	} else if (token->type == TK_EOL || token->type == TK_EOF) {
+		if(in_function) {
+			if(!is_variable_defined(NULL, local_table, param_list, saved_id)) {
+				SetCalled(root, saved_id);
+			}
+		}
 		if(!is_variable_defined(root, local_table, param_list, saved_id)) {
 			return SEM_FUNCTION_ERROR;
 		}
@@ -841,6 +847,9 @@ int value(Token *token) {
 			return OK;
 			break;
 		case TK_ID:
+			if(!is_variable_defined(NULL, local_table, param_list, token->attribute)) {
+				SetCalled(root, token->attribute);
+			}
 			if (is_variable_defined(root, local_table, param_list, token->attribute)) {
 				pq_queue(token, 0);
 				return OK;
@@ -851,12 +860,4 @@ int value(Token *token) {
 			return OTHER_ERROR;
 			break;
 	}
-}
-
-int expression(Token *token) {
-	while(token->type != TK_EOL && token->type != TK_COLON && token->type != TK_EOF) {
-			GET_NEXT_TOKEN(token);
-	}
-	UNGET_TOKEN(token);
-	return OK;
 }

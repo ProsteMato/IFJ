@@ -1,7 +1,9 @@
 /** Project: Implementace prekladace imperativniho jazyka IFJ19
 
  @brief Tabulka symbolu, implementovana pomoci binarniho stromu
- @author Zuzana Hradilova <xhradi16@stud.fit.vutbr.cz> */
+ @author Zuzana Hradilova <xhradi16@stud.fit.vutbr.cz> 
+
+*/
 
 #ifndef _SYM_TABLE_
 #define _SYM_TABLE_
@@ -72,36 +74,42 @@ typedef struct SymTabNode { // struktura definujici symbol
 // FUNKCE PRO GLOBALNI TABULKU SYMBOLU
 
 /** inicializace globalni tabulky symbolu
-@param SymTabNodePtr - ukazatel na tabulku symbolu */
+  @param SymTabNodePtr - ukazatel na tabulku symbolu
+*/
 void GlobalSymTabInit (SymTabNodePtr *);
 
 /** vlozeni noveho symbolu
-@param SymTabNodePtr - ukazatel na sym.tab. 
-@param char - klic (id) vlozeneho symbolu 
-@param tData - ukazatel na data 
-@return v pripade neuspech alokace vraci chybu INTERNAL_ERROR */
+  @param SymTabNodePtr - ukazatel na sym.tab. 
+  @param char - klic (id) vlozeneho symbolu 
+  @param tData - ukazatel na data 
+  @return v pripade neuspech alokace vraci chybu INTERNAL_ERROR
+*/
 int GlobalSymTabInsert (SymTabNodePtr *, char *, GlobalTableData *);
 
 /** hledani symbolu podle klice
-@param SymTabNodePtr - tabulka symbolu
-@param char - klic (id) hledaneho symbolu
-@param tData - misto kam se ulozi najdena data
-@return vraci false pokud je hledani neuspesne */
+  @param SymTabNodePtr - tabulka symbolu
+  @param char - klic (id) hledaneho symbolu
+  @param tData - misto kam se ulozi najdena data
+  @return vraci false pokud je hledani neuspesne 
+*/
 int GlobalSymTabSearch (SymTabNodePtr, char *, GlobalTableData **);
 
 /** hledani bez ulozeni nalezenych dat
-@param SymTabNodePtr - globalni tabulka symbolu
-@param char - ukazatel na klic
-@return vraci TRUE kdyz prvek s klicem v tabulce je, jinak FALSE */
+  @param SymTabNodePtr - globalni tabulka symbolu
+  @param char - ukazatel na klic
+  @return vraci TRUE kdyz prvek s klicem v tabulce je, jinak FALSE
+*/
 int GlobalSymTabSearchMinus (SymTabNodePtr, char *);
 
 /** vymazani symbolu z tabulky symbolu
-@param SymTabNodePtr - ukazatel na sym.tab.
-@param char - klic (id) symbolu který má být smazán */
+  @param SymTabNodePtr - ukazatel na sym.tab.
+  @param char - klic (id) symbolu který má být smazán 
+*/
 void GlobalSymTabDelete (SymTabNodePtr *, char *);
 
 /** zruseni tabulky symbolu
-@param SymTabNodePtr - ukazatel na tabulku symbolu */
+  @param SymTabNodePtr - ukazatel na tabulku symbolu 
+*/
 void GlobalSymTabDispose (SymTabNodePtr *);
 
 /** nastavi hodnutu define na true
@@ -129,47 +137,54 @@ void SetCalled(SymTabNodePtr RootPtr, char * K);
 bool WasCalled(SymTabNodePtr RootPtr, char * K);
 
 /** nastavi typ globalni premmennej
-@param LocalTableNode - tabulka symbolu
-@param char - ukazatel na klic
-@param Data_type - datovy typ */
+  @param LocalTableNode - tabulka symbolu
+  @param char - ukazatel na klic
+  @param Data_type - datovy typ
+*/
 void GlobalSetType(SymTabNodePtr, char *, Data_type);
 
 /** vraci lokalni tabulku symbolu patrici k funkci z globalni tabulky
-@param SymTabNodePtr - tabulka symbolu
-@param char - ukazatel na klic
-@return pokud klic neni nalezen vraci NULL, jinak vraci lokalni tabulku symbolu */
+  @param SymTabNodePtr - tabulka symbolu
+  @param char - ukazatel na klic
+  @return pokud klic neni nalezen vraci NULL, jinak vraci lokalni tabulku symbolu
+*/
 LocalTableNode FindLocalTable(SymTabNodePtr, char *);
 
 /** vrati param list funkce
-@param SymTabNodePtr - tabulka symbolu
-@param char - ukazatel na klic
-@return pokud klic neni nalezen vraci NULL, jinak vraci list parametru */
+  @param SymTabNodePtr - tabulka symbolu
+  @param char - ukazatel na klic
+  @return pokud klic neni nalezen vraci NULL, jinak vraci list parametru 
+*/
 ParamList * FindParamList(SymTabNodePtr, char *);
 
 /** nastavi pocet paramentru
-@param SymTabNodePtr - tabulka symbolu
-@param char - ukazatel na klic
-@param int - pocet parametru */
+  @param SymTabNodePtr - tabulka symbolu
+  @param char - ukazatel na klic
+  @param int - pocet parametru 
+*/
 void SetParamCount (SymTabNodePtr, char *, int);
 
 // FUNKCE PRO LOKALNI TABULKU SYMBOLU
 
 /** inicializace lokalni tabulky symbolu
-@param SymTabNodePtr - ukazatel na tabulku symbolu */
+  @param SymTabNodePtr - ukazatel na tabulku symbolu 
+*/
 void LocalSymTabInit (LocalTableNode *);
 
 /** vlozeni noveho symbolu
-@param SymTabNodePtr - ukazatel na sym.tab. 
-@param char - klic (id) vlozeneho symbolu 
-@param tData - ukazatel na data 
-@return v pripade neuspech alokace vraci chybu INTERNAL_ERROR */
+  @param SymTabNodePtr - ukazatel na sym.tab. 
+  @param char - klic (id) vlozeneho symbolu 
+  @param tData - ukazatel na data 
+  @return v pripade neuspech alokace vraci chybu INTERNAL_ERROR 
+*/
 int LocalSymTabInsert (LocalTableNode *, char *, LocalTableData *);
 
 /** hledani symbolu podle klice
-@param SymTabNodePtr - tabulka symbolu
-@param char - klic (id) hledaneho symbolu
-@param tData - misto kam se ulozi najdena data
-@return vraci false pokud je hledani neuspesne */
+  @param SymTabNodePtr - tabulka symbolu
+  @param char - klic (id) hledaneho symbolu
+  @param tData - misto kam se ulozi najdena data
+  @return vraci false pokud je hledani neuspesne 
+*/
 int LocalSymTabSearch (LocalTableNode, char *, LocalTableData **);
 
 /** hledani bez ulozeni nalezenych dat
@@ -179,67 +194,97 @@ int LocalSymTabSearch (LocalTableNode, char *, LocalTableData **);
 int LocalSymTabSearchMinus (LocalTableNode, char *);
 
 /** vymazani symbolu z tabulky symbolu
-@param SymTabNodePtr - ukazatel na sym.tab.
-@param char - klic (id) symbolu který má být smazán */
+  @param SymTabNodePtr - ukazatel na sym.tab.
+  @param char - klic (id) symbolu který má být smazán 
+*/
 void LocalSymTabDelete (LocalTableNode *, char *);
 
 /** zruseni tabulky symbolu
-@param SymTabNodePtr - ukazatel na tabulku symbolu */
+  @param SymTabNodePtr - ukazatel na tabulku symbolu 
+*/
 void LocalSymTabDispose (LocalTableNode *);
 
 /** nastavi hodnutu define na true
-@param SymTabNodePtr - tabulka symbolu
-@char - klic symbolu u ktereho mam provest zmenu */
+  @param SymTabNodePtr - tabulka symbolu
+  @param - klic symbolu u ktereho mam provest zmenu 
+*/
 void LocalSetDefine(LocalTableNode, char *);
 
 /** nastavi typ localni promenne
-@param LocalTableNode - tabulka symbolu
-@param char - ukazatel na klic
-@param Data_type - datovy typ */
+  @param LocalTableNode - tabulka symbolu
+  @param char - ukazatel na klic
+  @param Data_type - datovy typ */
 void LocalSetType(LocalTableNode, char *, Data_type);
 
 // FUNKCE PRO SEZNAM PARAMETRU
 
 /** inicializace seznamu parametru
-@param param - ukazatel seznam parametru */
+  @param param - ukazatel seznam parametru */
 void ParamInit (ParamList *);
 
 /** vlozeni parametru na seznam, parametr bude vlozen na konec 
-@param param - ukazatel na seznam parametru
-@param char - klic (id) paramentru 
-@return v pripade neupechu alokace vraci chybu 99 */
+  @param param - ukazatel na seznam parametru
+  @param char - klic (id) paramentru 
+  @return v pripade neupechu alokace vraci chybu 99 */
 int ParamInsert (ParamList *, char *);
 
 /** zruseni seznamu parametru
-@param param - ukazatel seznam parametru */
+  @param param - ukazatel seznam parametru */
 void ParamDispose (ParamList *);
 
 /** nastaveni aktivitu na 1. prvek seznamu parametru
-@param param - ukazatel seznam parametru */
+  @param param - ukazatel seznam parametru */
 void ParamFirst (ParamList *);
 
 /** posune aktivitu na nasledujici prvek seznamu parametru
-@param param - ukazatel seznam parametru */
+  @param param - ukazatel seznam parametru */
 void ParamSucc (ParamList *);
 
 /** vraci id aktivniho prvku
-@param param - ukazatel seznam parametru 
-@return vraci id aktivniho prvku nebo NULL pokud neni aktivni */
+  @param param - ukazatel seznam parametru 
+  @return vraci id aktivniho prvku nebo NULL pokud neni aktivni */
 char *ParamGetActive(ParamList *);
 
 /** hleda parametr podle klici
-@param ParamList - seznam parametru
-@param char - klic ktery hledam
-@return pokud je nalezeno vraci TRUE */
+  @param ParamList - seznam parametru
+  @param char - klic ktery hledam
+  @return pokud je nalezeno vraci TRUE 
+*/
 bool ParamSearch (ParamList *, char *);
 
+/**
+ * @brief 
+ * 
+ * @param L ukazatel na list parametrov
+ * @param id id parametra
+ * @param index index najdeneho klúča
+ * @return true ak bol nájdený kluč
+ * @return false ak nebol nájdený klúč
+ */
 bool ParamIndex (ParamList *L, char * id, int *index);
 
+/**
+ * @brief skontroluje že bola globálna funkcia použitá
+ * 
+ * @param RootPtr pointer na globálnu tabulku symbolov
+ * @param K kluč
+ * @return true ak bola použitá
+ * @return false ak nebola použitá
+ */
 bool WasVariableCalled(SymTabNodePtr RootPtr, char * K);
 
-/**TODO:
-funkce ktera projde celou globalni tabulku a zkontroluje vsechny funkce, 
-pokud najde nedefinovanou fci, vrati ukazatel prvni nedef. fce, jinak NULL */
+/**
+ * @brief nastavi kazdu globalnu premenú na false že nebola použitá
+ * 
+ * @param RootPtr ukazatel na glob8lnu tabulku symbolov
+ */
+void setAllVariablesCalledToFalse(SymTabNodePtr RootPtr);
+
+/**
+ * @brief skontroluje ci sú všetky funkcie definovano
+ * 
+ * @return char* pointer na globalnu tabulku symbolov
+ */
 char *UndefinedFunctionControl(SymTabNodePtr);
 
 #endif

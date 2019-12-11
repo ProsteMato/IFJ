@@ -346,7 +346,10 @@ int callExpression(Token *token)
       }
       else numberinID = false ;
      if (token->type == TK_ID)
-      {
+      {     
+            if(!is_variable_defined(NULL, local_table, param_list, token->attribute)) {
+                  SetCalled(root, token->attribute);
+            }
             if (!is_variable_defined(root, local_table, param_list, token->attribute))
             {
                   return SEM_FUNCTION_ERROR;
