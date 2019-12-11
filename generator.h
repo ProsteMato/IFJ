@@ -233,6 +233,18 @@ int gen_defvar(char *var);
  */
 int gen_clear();
 
+/**
+ * @brief      Generates local variable for parameter and moves the value of
+ *             parameter to the variable
+ *
+ * @param      var          The variable name
+ * @param[in]  param_index  The parameter index
+ *
+ * @return     OK if successfull, INTERNAL_ERROR in case of internal error
+ *             occurrence
+ */
+int gen_param(char *var, int param_index);
+
 //----------------------------------------
 //          BUILT-IN FUNCTIONS           -
 //----------------------------------------
