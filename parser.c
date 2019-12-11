@@ -25,7 +25,7 @@
 			return token_return_value
 
 bool in_function = false;
-bool in_if_while = false;
+extern bool in_if_while;
 bool if_in_else = false;
 int token_return_value = OK;
 int depth = 0;
