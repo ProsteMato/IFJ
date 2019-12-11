@@ -1,6 +1,6 @@
 /**
  * Project: Implementace překladače imperativního jazyka IFJ19
- *
+ * @file error.h
  * @brief Error codes definitions
  *
  * @author Michal Koval <xkoval17@stud.fit.vutbr.cz>

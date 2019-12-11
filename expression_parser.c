@@ -1,6 +1,6 @@
 /**
  *  Project: Implementace prekladača imperatívneho jazýka IFJ19
- * 
+ * @file expression_parser.c
  * @brief Expression parser
  * 
  * @author Magdaléna Ondrušková <xondru16@stud.fit.vutbr.cz>

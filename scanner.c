@@ -1,6 +1,6 @@
 /**
  * Project: Implementace překladače imperativního jazyka IFJ19
- *
+ * @file scanner.c
  * @brief Scanner implementation.
  *
  * @author Michal Koval <xkoval17@stud.fit.vutbr.cz>

@@ -1,6 +1,6 @@
 /**
  * Project: Implementace překladače imperativního jazyka IFJ19
- *
+ * @file stack.h
  * @brief Stack interface.
  *
  * @author Michal Koval <xkoval17@stud.fit.vutbr.cz>

@@ -1,6 +1,6 @@
 /**
  * Project: Implementace překladače imperativního jazyka IFJ19
- *
+ * @file main.c
  * @brief IFJ19 to IFJcode19 compiler
  *
  * @author Michal Koval <xkoval17@stud.fit.vutbr.cz>

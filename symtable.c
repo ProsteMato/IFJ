@@ -1,7 +1,8 @@
 /** Project: Implementace prekladace imperativniho jazyka IFJ19
-
+ @file symtable.c
  @brief Tabulka symbolu, implementovana pomoci binarniho stromu
- @author Zuzana Hradilova <xhradi16@stud.fit.vutbr.cz> */
+ @author Zuzana Hradilova <xhradi16@stud.fit.vutbr.cz> 
+*/
 
 #include <stdio.h>
 #include <stdlib.h>

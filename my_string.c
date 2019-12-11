@@ -1,6 +1,6 @@
 /**
  * Project: Implementace překladače imperativního jazyka IFJ19
- *
+ * @file my_string.c
  * @brief String implementation
  *
  * @author Michal Koval <xkoval17@stud.fit.vutbr.cz>

@@ -1,6 +1,6 @@
 /**
  *  Project: Implementace prekladača imperatívneho jazýka IFJ19
- * 
+ * @file expression_list.c
  * @brief Double linked list for expression parser
  * 
  * @author Magdaléna Ondrušková <xondru16@stud.fit.vutbr.cz>
