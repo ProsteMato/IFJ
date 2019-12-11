@@ -11,7 +11,7 @@
 #include <string.h>
 #include <stdbool.h>
 
-//definice datovych typu pro ulozena data
+/** definice datovych typu pro ulozena data */
 typedef enum {
   TYPE_INT,
   TYPE_FLOAT,
@@ -22,11 +22,12 @@ typedef enum {
   TYPE_PARAM,
 } Data_type;
 
-// ulozeni paramentru funkce
+/** ulozeni paramentru funkce
+ulozen unikatni klic (id) a ukazatel na predchazejici a nasledujici parametr */
 typedef struct param {
-    char * id;	//ukazatel na id
-    struct param * before; //predchozi paramentr
-    struct param * next;	//dalsi parametr
+    char * id;
+    struct param * before;
+    struct param * next;
 } param;
 
 // seznam parametru funkce
@@ -36,13 +37,13 @@ typedef struct paramlist {
   param *last;
 } ParamList;
 
-// tada symbolu v lokalni tabulce
+/** Data symbolu v lokalni tabulce */
 typedef struct LocalTableData {
   bool define;
   Data_type type;
 } LocalTableData;
 
-// binarni strom lokalni tabulky
+/** Binarni strom lokalni tabulky */
 typedef struct LocalTableNode {
   char * Key;
   LocalTableData * localData;
@@ -50,23 +51,28 @@ typedef struct LocalTableNode {
   struct LocalTableNode * RPtr;
 } * LocalTableNode;
 
-// tada symbolu v globalni tabulce
+/** Data symbolu v globalni tabulce
+wasCalled, pocet_par, ukazetel na lokalni tabulku a 
+list parametru je pouze pokud je symbol funkce */
 typedef struct GlobalTableData{
-  Data_type type; //typ symbolu
+  Data_type type;
   bool define;
-  bool funkce; //funkce
+  bool funkce;
   bool wasCalled;
-  int pocet_par; //pouze u fce
+  int pocet_par;
   LocalTableNode *localTableNode;
-  ParamList *paramList; //0. parametr (pouze u fce)
+  ParamList *paramList;
 } GlobalTableData;
 
-// binarni strom globalni tabulky
-typedef struct SymTabNode { // struktura definujici symbol
-	char * Key; //id
+/** Binarni strom globalni tabulky
+Key - id symbolu
+LPtr - levy podstrom
+RPtr - pravy podstrom */
+typedef struct SymTabNode {
+	char * Key;
 	GlobalTableData * Data;
-	struct SymTabNode * LPtr; //levy podstrom
-	struct SymTabNode * RPtr; //pravy podstrom
+	struct SymTabNode * LPtr;
+	struct SymTabNode * RPtr;
 } * SymTabNodePtr;
 
 // FUNKCE PRO GLOBALNI TABULKU SYMBOLU
@@ -97,7 +103,7 @@ int GlobalSymTabSearchMinus (SymTabNodePtr, char *);
 
 /** vymazani symbolu z tabulky symbolu
 @param SymTabNodePtr - ukazatel na sym.tab.
-@param char - klic (id) symbolu který má být smazán */
+@param char - klic (id) symbolu ktery ma byt smazan */
 void GlobalSymTabDelete (SymTabNodePtr *, char *);
 
 /** zruseni tabulky symbolu
@@ -105,27 +111,20 @@ void GlobalSymTabDelete (SymTabNodePtr *, char *);
 void GlobalSymTabDispose (SymTabNodePtr *);
 
 /** nastavi hodnutu define na true
-* @param SymTabNodePtr - tabulka symbolu
-* @param char - klic symbolu u ktereho mam provest zmenu 
-*/
+@param SymTabNodePtr - tabulka symbolu
+@param char - klic symbolu u ktereho mam provest zmenu */
 void SetDefine(SymTabNodePtr, char *);
 
-/**
- * @brief Nastaví premennú volania funckie na true
- * 
- * @param RootPtr pointer na globálnu tabuľku symbolov
- * @param K klúč ktorý bude hľadaný
- */
+/** nastavi premennu volania funckie na true
+ @param RootPtr pointer na globalnu tabulku symbolov
+ @param K kluc ktory bude hladany */
 void SetCalled(SymTabNodePtr RootPtr, char * K);
 
-/**
- * @brief skontroluje že či je funkcia volaná
- * 
- * @param RootPtr pointer na globálnu tabuľku symbolov
- * @param K klúč ktorý bude hľadaný
- * @return true ak funkcia bola volaná
- * @return false ak funkcia volaná nebola
- */
+/** zkontroluje ci je funkcia volana
+ @param RootPtr pointer na globalnu tabulku symbolov
+ @param K kluc ktory bude hladany
+ @return true ak funkcia bola volana
+ @return false ak funkcia volana nebola */
 bool WasCalled(SymTabNodePtr RootPtr, char * K);
 
 /** nastavi typ globalni premmennej
@@ -151,6 +150,17 @@ ParamList * FindParamList(SymTabNodePtr, char *);
 @param char - ukazatel na klic
 @param int - pocet parametru */
 void SetParamCount (SymTabNodePtr, char *, int);
+
+/** zkontroluje jestli nebyla nalezena nedefinova funkce
+@param SymTabNodePtr - globalni tabulka symbolu
+@return vrati ukazatel prvni nedef. fce, pokud tam takova neni - NULL */
+char *UndefinedFunctionControl(SymTabNodePtr);
+
+/** zjisti jestli byla funkce volana
+@param SymTabNodePtr - tabulka symbolu
+@param char - ukazatel na klic
+@return vraci true pokud je funkce a byla volana, jinak false */
+bool WasVariableCalled(SymTabNodePtr RootPtr, char * K);
 
 // FUNKCE PRO LOKALNI TABULKU SYMBOLU
 
@@ -180,7 +190,7 @@ int LocalSymTabSearchMinus (LocalTableNode, char *);
 
 /** vymazani symbolu z tabulky symbolu
 @param SymTabNodePtr - ukazatel na sym.tab.
-@param char - klic (id) symbolu který má být smazán */
+@param char - klic (id) symbolu ktery ma byt smazan */
 void LocalSymTabDelete (LocalTableNode *, char *);
 
 /** zruseni tabulky symbolu
@@ -235,11 +245,5 @@ bool ParamSearch (ParamList *, char *);
 
 bool ParamIndex (ParamList *L, char * id, int *index);
 
-bool WasVariableCalled(SymTabNodePtr RootPtr, char * K);
-
-/**TODO:
-funkce ktera projde celou globalni tabulku a zkontroluje vsechny funkce, 
-pokud najde nedefinovanou fci, vrati ukazatel prvni nedef. fce, jinak NULL */
-char *UndefinedFunctionControl(SymTabNodePtr);
 
 #endif
