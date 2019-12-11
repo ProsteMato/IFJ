@@ -285,6 +285,7 @@ int stat(Token *token) {
 		*/
 		} else if (strcmp(token->attribute, "if") == 0) {
 			GET_NEXT_TOKEN(token);
+			in_if_while = true;
 			if ((returnValue = callExpression(token)) == OK) {
 				if((returnValue = gen_if()) != OK) {
 					return returnValue;
@@ -302,6 +303,7 @@ int stat(Token *token) {
 							if (returnValue == OK) {
 								GET_NEXT_TOKEN(token);
 								if (token->type == TK_KW && strcmp(token->attribute, "else") == 0) {
+									in_if_while = true;
 									if((returnValue = gen_else()) != OK) {
 										return returnValue;
 									}
@@ -313,7 +315,6 @@ int stat(Token *token) {
 											if (token->type == TK_INDENT) {
 												GET_NEXT_TOKEN(token);
 												depth++;
-												in_if_while = true;
 												return st_list(token);
 											}
 										}
@@ -334,6 +335,7 @@ int stat(Token *token) {
 			36:  <nested-stat> -> while expr : EOL INDENT <nested-st-list>
 		*/
 		} else if (strcmp(token->attribute, "while") == 0) {
+			in_if_while = true;
 			if((returnValue = gen_while_label()) != OK) {
 				return returnValue;
 			}
@@ -350,7 +352,6 @@ int stat(Token *token) {
 						if (token->type == TK_INDENT) {
 							depth++;
 							GET_NEXT_TOKEN(token);
-							in_if_while = true;
 							return st_list(token);
 						}
 					}

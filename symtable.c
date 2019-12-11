@@ -335,8 +335,22 @@ void SetCalled(SymTabNodePtr RootPtr, char * K){
 
 bool WasCalled(SymTabNodePtr RootPtr, char * K){
 	GlobalTableData *data;
-	if (GlobalSymTabSearch (RootPtr, K, &data) == false) return false;
-	else return data->wasCalled;
+	if (GlobalSymTabSearch (RootPtr, K, &data)) {
+		if (data->funkce) {
+			return data->wasCalled;
+		}
+	}
+	return false;
+}
+
+bool WasVariableCalled(SymTabNodePtr RootPtr, char * K){
+	GlobalTableData *data;
+	if (GlobalSymTabSearch (RootPtr, K, &data)) {
+		if (!data->funkce) {
+			return data->wasCalled;
+		}
+	}
+	return false;
 }
 
 void LocalSetDefine(LocalTableNode RootPtr, char * K){
