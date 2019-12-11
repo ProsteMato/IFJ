@@ -146,7 +146,6 @@ int init_generator(){
 	while_counter = 0;
 	if_counter = 0;
 	print_counter = 0;
-	in_while = 0;
 	s_init(&while_stack);
 	s_init(&if_stack);
 	CL_init(&code_list);
@@ -284,6 +283,8 @@ char* transform_for_write(char *str){
 				return NULL;
 		}
 	}
+	if (!append_char(&(code->inst), &(code->len), &(code->cap), '\0'))
+		return NULL;
 	char *ret = code->inst;
 	free(code);
 	return ret;
@@ -335,8 +336,8 @@ int gen_if(){
 	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
-	if (!in_while){
-		in_while = 1;
+	if (!in_if_while){
+		//in_if_while = 1;
 		in_between_list = code_list.last;
 	}
 
@@ -404,7 +405,7 @@ int gen_defvar(char *var){
 		return INTERNAL_ERROR;
 	if (get_variable_scope_prefix(code, var))
 		return INTERNAL_ERROR;
-	if (in_while){
+	if (in_if_while){
 		if (CL_add_in_between(code))
 			return INTERNAL_ERROR;
 	} else {
@@ -458,6 +459,9 @@ int gen_expr(){
 				free(tmp);
 			} else if (operand->symbol == PT_ID){
 				if (get_variable_scope_prefix(code, operand->attribute))
+					return INTERNAL_ERROR;
+			} else if (precedenceRules[i] == PR_NONE){
+				if (add_code(code, "nil@nil\0"))
 					return INTERNAL_ERROR;
 			} else {
 				return INTERNAL_ERROR;
@@ -765,8 +769,8 @@ int gen_while_label(){
 	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
-	if (!in_while){
-		in_while = 1;
+	if (!in_if_while){
+		//in_if_while = 1;
 		in_between_list = code_list.last;
 	}
 	return OK;
