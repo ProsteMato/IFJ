@@ -9,6 +9,18 @@
 #include "generator.h"
 
 bool in_while;
+int while_counter;
+int print_counter;
+int if_counter;
+int param_c;
+int if_used;
+Stack while_stack;
+Stack if_stack;
+TKQueue pq;
+Code_list code_list;
+Code_list builtin_list;
+Code_line *in_between_list;
+
 
 void pq_init(){
 	pq.first = NULL;
@@ -149,6 +161,7 @@ int init_generator(){
 	if_counter = 0;
 	print_counter = 0;
 	in_while = 0;
+	if_used = 0;
 	s_init(&while_stack);
 	s_init(&if_stack);
 	CL_init(&code_list);
@@ -330,18 +343,26 @@ int gen_param(char *var, int param_index){
 }
 
 int gen_if(){
+	Code *code;
 	char *tmp = int_to_str(if_counter);
 	if (tmp == NULL)
 		return INTERNAL_ERROR;
 
-	static int if_used = 0;
 	if (!if_used){
 		if (gen_if_exprval_check())
 			return INTERNAL_ERROR;
 		if_used = 1;
 	}
 
-	Code *code = create_code();
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "POPS GF@&expr&val\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&code_list, code))
+		return INTERNAL_ERROR;
+
+	code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
 	if (add_code(code, "CALL %exprval_check%\0"))
@@ -818,7 +839,9 @@ int gen_while_label(){
 }
 
 int gen_while_begin(){
-	Code *code = create_code();
+	Code *code;
+
+	code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
 	if (add_code(code, "POPS GF@&expr&val\0"))
@@ -826,6 +849,18 @@ int gen_while_begin(){
 	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "CALL %exprval_check%\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&code_list, code))
+		return INTERNAL_ERROR;
+	if (!if_used){
+		if (gen_if_exprval_check())
+			return INTERNAL_ERROR;
+		if_used = 1;
+	}
 
 	code = create_code();
 	if (!code)
@@ -5740,14 +5775,6 @@ int gen_if_exprval_check(){
 	if (!code)
 		return INTERNAL_ERROR;
 	if (add_code(code, "LABEL %exprval_check%\0"))
-		return INTERNAL_ERROR;
-	if (CL_add_line(&builtin_list, code))
-		return INTERNAL_ERROR;
-
-	code = create_code();
-	if (!code)
-		return INTERNAL_ERROR;
-	if (add_code(code, "POPS GF@&expr&val\0"))
 		return INTERNAL_ERROR;
 	if (CL_add_line(&builtin_list, code))
 		return INTERNAL_ERROR;

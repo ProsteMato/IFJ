@@ -26,6 +26,7 @@
 extern int while_counter;
 extern int print_counter;
 extern int if_counter;
+extern int if_used;
 extern int param_c;
 extern Stack while_stack;
 extern Stack if_stack;
@@ -52,9 +53,9 @@ typedef struct{
 	Code_line *last;
 } Code_list;
 
-Code_list code_list;
-Code_list builtin_list;
-Code_line *in_between_list;
+extern Code_list code_list;
+extern Code_list builtin_list;
+extern Code_line *in_between_list;
 
 //----------------------------------------
 //     INTERNAL TRANSFORM FUNCTIONS      -

@@ -11,6 +11,11 @@
 
 #include "main.h"
 
+SymTabNodePtr root;
+LocalTableNode local_table;
+ParamList *param_list;
+
+
 int main (int argc, char * argv[]){
 	// init globalnej tabulky symbolov
 	GlobalSymTabInit(&root);
