@@ -268,7 +268,7 @@ bool ParamIndex (ParamList *L, char * id, int *index){
 		ParamSucc(L);
 		*index = *index + 1;
 		if (L->act == NULL) 
-			return false; //došlo se na konec seznamu
+			return false; //doslo se na konec seznamu
 	} 
 	if (L->act == NULL) {
 		return false;
