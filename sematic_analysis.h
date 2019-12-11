@@ -198,6 +198,16 @@ int define_global_variable(SymTabNodePtr *root, bool function_call, char *variab
 char * expr_parser_gen_uniq_id(SymTabNodePtr *root, LocalTableNode local_table);
 
 /**
+ * @brief function will define and generate params when function is defined
+ * 
+ * @param local_table Poiter to local symtable
+ * @param variable_id name of parameter
+ * @param index index of parameter
+ * @return int error code
+ */
+int define_param(LocalTableNode *local_table, char *variable_id, int index);
+
+/**
  * @brief This function will generate uniq id for expr_parser with prefix
  * 
  * @param root  Pointer to a global sym table.

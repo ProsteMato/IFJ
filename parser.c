@@ -472,10 +472,14 @@ int params(Token *token) {
 			return SEM_FUNCTION_ERROR; //chyba redefinacia funkcie v parametri
 		} 
 		int returnValue = ParamInsert(param_list, token->attribute);
-		GET_NEXT_TOKEN(token);
 		if (returnValue != OK) {
 			return returnValue;
 		}
+		returnValue = define_param(&local_table, token->attribute, 1);
+		if (returnValue != OK) {
+			return returnValue;
+		}
+		GET_NEXT_TOKEN(token);
 		return params_next(token);
 	} else {
 		return SYNTAX_ERROR;
@@ -495,6 +499,10 @@ int params_next(Token *token) {
 				return SEM_FUNCTION_ERROR; //chyba redefinacia funkcie v parametri
 			}
 			int returnValue = ParamInsert(param_list, token->attribute);
+			if (returnValue != OK) {
+				return returnValue;
+			}
+			returnValue = define_param(&local_table, token->attribute, count + 1);
 			if (returnValue != OK) {
 				return returnValue;
 			}
@@ -843,6 +851,12 @@ int value(Token *token) {
 			return OK;
 			break;
 		case TK_INT:
+			if(strcmp(saved_id, "chr") == 0) {
+				int parameter = atoi(token->attribute);
+				if (parameter < 0 || parameter > 255) {
+					return OTHER_ERROR;
+				}
+			}
 			pq_queue(token, 0);
 			return OK;
 			break;
