@@ -13,19 +13,6 @@
 #include "expression_parser.h"
 
 /**
- * @struct Structure to represent a stack
- * 
- * @param symbol represents symbol on the stack 
- * @param dType data type of symbol on stack (NONE if operand )
- * @param next next symbol on stack 
- 
-typedef struct stack {
-    pTable symbol;
-    data_type dType; 
-    struct stack *next; 
-} exprStack; 
-*/
-/**
  * @struct Structure, that represent the top symbol on stack 
  * 
  * @param top pointer to the top symbol of stack 
@@ -33,8 +20,6 @@ typedef struct stack {
 typedef struct {
     exprStack *top; 
 } stackTop;
-
-
 
 /** 
  * @brief Initialization of stack 
@@ -69,16 +54,5 @@ int sPush(stackTop* eStack, pTable symbol, Data_type dType);
  * @param eStack stack 
  */
 int sPop(stackTop* eStack);
-
-
-/** 
- * @brief Function deletes stack
- * 
- * @param eStack stack to delete 
- * 
- */
-void disposeStack(stackTop* eStack);
-
-
 
 #endif //_EXPRESSION_STACK_H

@@ -94,13 +94,10 @@ int getIndex(Token *token)
 
 int checkDivisionByZero(Token *token)
 {
-  //Token *nextToken;
-  //preload_token(nextToken);
   void tkq_init(); 
   int l = preload_token(token);
   if ( l != OK)
   {
-      fprintf(stderr,"Error with getting next token.\n");
       return l; 
   }
   if ( (strcmp(token -> attribute, "0")) == 0)
@@ -220,7 +217,7 @@ int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3
             case PR_EMULTE: 
             case PR_EDIVE: 
             case PR_EDIVDIVE: 
-                  error = arithmetic_operation_check(sym1->dType, sym2->symbol, sym3->dType);
+                  error = arithmetic_operation_check(sym1->dType, rule, sym3->dType);
                   return error;
             case PR_ELESSE: 
             case PR_ELESSEQE: 
@@ -228,7 +225,7 @@ int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3
             case PR_EGREATEQE: 
             case PR_EEQE: 
             case PR_ENOTEQE: 
-                  error = comparison_check(sym1->dType, sym2->symbol, sym3->dType);
+                  error = comparison_check(sym1->dType, rule, sym3->dType);
                   return error; 
             case PR_BIB: 
                   switch (sym2->symbol)
@@ -294,48 +291,17 @@ int callExpression(Token *token)
   int rightBracket =0; 
   pTable symbol= getIndex(token);
   exprList eList;
- // Data_type dType = get_type_from_token(root, local_table,*token);
   if (symbol == -1 )
   {
       return INTERNAL_ERROR;
   }
   listInitialize(&eList);
   listInitialize(&operandList);
-  /**
-  if (token->type == TK_ID)
-  {
-      if (!is_variable_defined(root, local_table, NULL, token->attribute))
-      {
-            return SEM_FUNCTION_ERROR;
-      }
-  }
-
-  if (symbol == PT_ID || symbol == PT_INT || symbol == PT_FLOAT ||symbol == PT_STRING)
-  {
-      listInsertFirst(&operandList,token->attribute, symbol, dType);
-  }
-  if (token->type == TK_BRACKET_L)
-  {
-      leftBracket+=1;
-  }
-
-  if (token->type == TK_BRACKET_R)
-  {
-      rightBracket+=1;
-  }
-  
-  listInsertFirst(&eList,token->attribute, symbol,dType);
-  int e = get_next_token(token); 
-  if  (e != OK)
-  {     
-      return e;
-  } */
   bool numberinID = false;
+
   // Load tokens into list, count brackets, control division by 0
    while ( token->type != TK_EOL && token->type != TK_EOF && token->type != TK_COLON)
   {
-       // printf("%s\n", token->attribute);
-      
       if ( token->type == TK_ID && numberinID)
       {
             return SYNTAX_ERROR;
@@ -345,7 +311,7 @@ int callExpression(Token *token)
             numberinID = true;
       }
       else numberinID = false ;
-     if (token->type == TK_ID)
+      if (token->type == TK_ID)
       {
             if (!is_variable_defined(root, local_table, param_list, token->attribute))
             {
@@ -413,7 +379,6 @@ int callExpression(Token *token)
             if ( div == DIVISION_BY_ZERO_ERROR)
             { 
                   listDispose(&eList);
-                  fprintf(stderr, "Div with zero.\n");
                   return DIVISION_BY_ZERO_ERROR;
             }
       } 
@@ -424,7 +389,6 @@ int callExpression(Token *token)
             if ( div == DIVISION_BY_ZERO_ERROR)
             { 
                   listDispose(&eList);
-                  fprintf(stderr, "Div Div with zero.\n");
                   return DIVISION_BY_ZERO_ERROR;
             }
       }
@@ -463,7 +427,6 @@ int callExpression(Token *token)
 
   if ( leftBracket != rightBracket) 
   {
-      fprintf(stderr, "Number of left brackets doesnt match number of right brackets.\n");
       listDispose(&eList);
       return SYNTAX_ERROR;
   }
@@ -494,7 +457,6 @@ int callExpression(Token *token)
             case PT_STRING: 
             case PT_NONE:
             case PT_ID:
-                  // gen code 
                   return OK;
             default:
                   return SYNTAX_ERROR;
@@ -631,6 +593,5 @@ int callExpression(Token *token)
       }
  }
  listDispose(&eList);
- //disposeStack(&stack);
  return OK;
 }

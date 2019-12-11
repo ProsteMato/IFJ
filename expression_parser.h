@@ -52,10 +52,6 @@ typedef enum {
   PT_E, // 23
 } pTable;
 
-// Obviously, it has to be here even when it's stack 
-//because my header files are making mess and if it was in 
-// stack's header file it was making mess 
-
 /**
  * @struct Structure to represent a stack
  * 
@@ -123,22 +119,11 @@ exprList operandList;
  */
 int getIndex(Token *token) ;
 
-/**
- * @brief Function to find data type of token 
- * 
- * @param token token, which data type we want to know 
- * 
- * @return TYPE_INT if it was integer number
- *         TYPE_FLOAT if it was float number
- *         TYPE_STRING if it was string 
- *         TYPE_NONE if it wasn't defined or called function when it shouldnt 
- */
-//ata_type getDataType(Token *token);
 
 /**
  * @brief Function checks data type of operands
  * 
- * @param pRules in which we are 
+ * @param rule in which we are 
  * @param sym1 symbol on stack -- operand 1 (the newer on stack)
  * @param sym2 symbol on stack -- operator 
  * @param sym3 symbol on stack -- operand 2 (the older on stack )
@@ -157,16 +142,6 @@ int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3
  *         DIVISION_BY_ZERO_ERROR error if division by zero 
  */
 int checkDivisionByZero(Token *token);
-
-/** 
- * @brief Function loads tokens into list and does some controls 
- * 
- * @param token first token 
- * 
- * @return OK if everything was okay
- *        CODE_ERROR if there was error
- */
-//int createList(Token *token, exprList *eList);
 
 /**
  * @brief Functions finds rule for reducing 

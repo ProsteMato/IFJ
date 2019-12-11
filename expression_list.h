@@ -43,13 +43,6 @@ int listInsertFirst(exprList *eList, char *attribute, pTable symbol, Data_type d
 int listInsertAct(exprList *eList, char *attribute, pTable symbol, Data_type dType);
 
 /**
- * @brief Function returns token from active item and next item becomes active
- * 
- * @param eList list of tokens 
- */
-//Token* copyAct(exprList *eList);
-
-/**
  * @brief Delete all items on the list 
  * 
  * @param eList list to delete 

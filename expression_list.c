@@ -70,18 +70,6 @@ int listInsertAct(exprList *eList, char *attribute, pTable symbol, Data_type dTy
     return OK;
 }
 
-/**
-Token* copyAct(exprList *eList)
-{
-    if (eList->act != NULL)
-    {
-        Token* tokenReturn = eList->act->token;
-        eList->act=eList->act->rptr;
-        return tokenReturn;
-    }
-}
-*/
-
 void listDispose(exprList *eList)
 {
     item itemDelete; 
