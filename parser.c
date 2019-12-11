@@ -210,7 +210,6 @@ int next_st_list(Token *token) {
 			depth--;
 			if (in_function && in_if_while && depth == 1) {
 				in_while = false;
-				in_if = false;
 				in_if_while = false;
 			} else if (in_function && !in_if_while && depth == 0) {
 				param_list = NULL;
@@ -218,7 +217,6 @@ int next_st_list(Token *token) {
 				in_function = false;
 			} else if (!in_function && in_if_while && depth == 0) {
 				in_while = false;
-				in_if = false;
 				in_if_while = false;
 			}
 			return OK;
