@@ -341,18 +341,26 @@ int gen_param(char *var, int param_index){
 }
 
 int gen_if(){
+	Code *code;
 	char *tmp = int_to_str(if_counter);
 	if (tmp == NULL)
 		return INTERNAL_ERROR;
 
-	static int if_used = 0;
 	if (!if_used){
 		if (gen_if_exprval_check())
 			return INTERNAL_ERROR;
 		if_used = 1;
 	}
 
-	Code *code = create_code();
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "POPS GF@&expr&val\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&code_list, code))
+		return INTERNAL_ERROR;
+
+	code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
 	if (add_code(code, "CALL %exprval_check%\0"))
@@ -829,7 +837,9 @@ int gen_while_label(){
 }
 
 int gen_while_begin(){
-	Code *code = create_code();
+	Code *code;
+
+	code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
 	if (add_code(code, "POPS GF@&expr&val\0"))
@@ -837,6 +847,18 @@ int gen_while_begin(){
 	if (CL_add_line(&code_list, code))
 		return INTERNAL_ERROR;
 
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "CALL %exprval_check%\0"))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&code_list, code))
+		return INTERNAL_ERROR;
+	if (!if_used){
+		if (gen_if_exprval_check())
+			return INTERNAL_ERROR;
+		if_used = 1;
+	}
 
 	code = create_code();
 	if (!code)
@@ -5751,14 +5773,6 @@ int gen_if_exprval_check(){
 	if (!code)
 		return INTERNAL_ERROR;
 	if (add_code(code, "LABEL %exprval_check%\0"))
-		return INTERNAL_ERROR;
-	if (CL_add_line(&builtin_list, code))
-		return INTERNAL_ERROR;
-
-	code = create_code();
-	if (!code)
-		return INTERNAL_ERROR;
-	if (add_code(code, "POPS GF@&expr&val\0"))
 		return INTERNAL_ERROR;
 	if (CL_add_line(&builtin_list, code))
 		return INTERNAL_ERROR;

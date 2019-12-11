@@ -308,7 +308,16 @@ int callExpression(Token *token)
   listInitialize(&eList);
   listInitialize(&operandList);
   bool numberinID = false;
-
+  if (token->type == TK_EOL || token->type == TK_EOF || token->type == TK_COLON)
+  {
+      int ee = unget_token(token);
+      if (ee != OK)
+      {
+            return ee;
+      }
+      return OK;
+  }
+  
   // Load tokens into list, count brackets, control division by 0
    while ( token->type != TK_EOL && token->type != TK_EOF && token->type != TK_COLON)
   {
@@ -438,6 +447,7 @@ int callExpression(Token *token)
       if (token->type == TK_EOL || token->type == TK_EOF || token->type == TK_COLON )
       {
             listInsertAct(&eList,token->attribute, PT_DOLLAR, TYPE_UNDEFINED);
+            
       }
       
   }
@@ -446,7 +456,6 @@ int callExpression(Token *token)
   {
       return err_unget;
   }
-  
   // controls number of brackets
   if ( leftBracket != rightBracket) 
   {
@@ -470,6 +479,7 @@ int callExpression(Token *token)
         precedenceRules[j] = -1;
   }
   eList.act=eList.first;
+
 
   if ( eList.act ->rptr == NULL)
   {
