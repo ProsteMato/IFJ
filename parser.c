@@ -32,6 +32,7 @@ char *function_id = NULL;
 char *saved_id = NULL;
 char *copy_id = NULL;
 
+//this is starting function of syntax analysis
 int prog(Token *token) {
 	pq_init();
 	generate = true;
@@ -40,6 +41,7 @@ int prog(Token *token) {
   	|1: <prog> -> <st-list>|
   	+----------------------+ 
 	*/
+	// keyword
 	if (token->type == TK_KW) {
 		if(strcmp(token->attribute, "if") == 0) {
 
@@ -66,12 +68,13 @@ int prog(Token *token) {
 			return SYNTAX_ERROR;
 
 		}
+	// id or constant
 	} else if (token->type == TK_ID || token->type == TK_STRING || 
 			   token->type == TK_FLOAT || token->type == TK_INT || 
 			   token->type == TK_BRACKET_L) {
 
 		return st_list(token);
-
+	// end of file
 	} else if (token->type == TK_EOF) {
 
 		return OK;
@@ -91,8 +94,9 @@ int st_list(Token *token) {
 		32:  <nested-st-list> -> <nested-stat> <next-nested-st-list>
 	*/
 	int returnValue = 0;
+	//keyword
 	if (token->type == TK_KW && !(strcmp(token->attribute, "None") == 0)) {
-		
+		//definition of function and generation of end of the function
 		if (strcmp(token->attribute, "def") == 0 && !in_function && !in_if_while) {
 			returnValue = stat(token);
 			if (returnValue == OK) {
@@ -106,6 +110,7 @@ int st_list(Token *token) {
 			} else {
 				return returnValue;
 			}
+		// if else and generation end of the if statement
 		} else if (strcmp(token->attribute, "if") == 0) {
 			returnValue = stat(token);
 			if (returnValue == OK) {
@@ -121,6 +126,7 @@ int st_list(Token *token) {
 			} else {
 				return returnValue;
 			}
+		//while and generation end of while
 		} else if (strcmp(token->attribute, "while") == 0) {
 			returnValue = stat(token);
 			if (returnValue == OK) {
@@ -136,6 +142,7 @@ int st_list(Token *token) {
 			} else {
 				return returnValue;
 			}
+		//pass nothing will generate
 		} else if (strcmp(token->attribute, "pass") == 0) {
 			returnValue = stat(token);
 			if (returnValue == OK) {
@@ -148,6 +155,7 @@ int st_list(Token *token) {
 			} else {
 				return returnValue;
 			}
+		// return only in function
 		} else if (strcmp(token->attribute, "return") == 0 && in_function) {
 			returnValue = stat(token);
 			if (returnValue == OK) {
@@ -161,6 +169,7 @@ int st_list(Token *token) {
 				return returnValue;
 			}
 		}
+	// id this may be also functioncall later
 	} else if (token->type == TK_ID) {
 		returnValue = stat(token);
 		if (returnValue == OK) {
@@ -179,7 +188,8 @@ int st_list(Token *token) {
 	/*
 		3: <st-list> -> EOF
 	*/
-	 else if (token->type == TK_EOF) {
+	// End of file if the there is a function call in function and is not defined this will return error
+	else if (token->type == TK_EOF) {
 		char *key = UndefinedFunctionControl(root);
 		if (key != NULL) {
 			fprintf(stderr, "Funcia %s nieje definovaná\n", key);
@@ -187,6 +197,7 @@ int st_list(Token *token) {
 		}
 		pq_destroy();
 		return OK;
+	// expression
 	} else if (token->type == TK_STRING || 
 			   token->type == TK_FLOAT || token->type == TK_INT || 
 			   token->type == TK_BRACKET_L) {
@@ -234,6 +245,7 @@ int stat(Token *token) {
 		/*
 			4:  <stat> -> def id ( <params> : EOL INDENT <func-nested-st-list>
 		*/
+		// definition of function will define in symtable only if it was not called before.
 		if (strcmp(token->attribute, "def") == 0 && !in_function && !in_if_while) {
 			GET_NEXT_TOKEN(token);
 			if (token->type == TK_ID) {
@@ -283,6 +295,7 @@ int stat(Token *token) {
 			25:  <func-nested-stat> -> if expr : EOL INDENT <func-nested-st-list> else : EOL INDENT <func-nested-st-list>
 			34:  <nested-stat> -> if expr : EOL INDENT <nested-st-list> else : EOL INDENT <nested-st-list>
 		*/
+		// if generation of if and cheking syntax of if else statement and all its content
 		} else if (strcmp(token->attribute, "if") == 0) {
 			GET_NEXT_TOKEN(token);
 			in_if_while = true;
@@ -334,6 +347,7 @@ int stat(Token *token) {
 			27:  <func-nested-stat> -> while expr : EOL INDENT <func-nested-st-list>
 			36:  <nested-stat> -> while expr : EOL INDENT <nested-st-list>
 		*/
+		// generation while and cheking syntax of while and all of its content
 		} else if (strcmp(token->attribute, "while") == 0) {
 			in_if_while = true;
 			if((returnValue = gen_while_label()) != OK) {
@@ -389,6 +403,7 @@ int stat(Token *token) {
 		35:  <nested-stat> -> expr <eof-or-eol>
 		6:  <stat> -> expr <eof-or-eol>
 	*/
+	// cheking if its ID then it will check if it is expretiion
 	} else if (token->type == TK_ID) {
 		saved_id = token->attribute;
 		UNGET_TOKEN(token);
@@ -415,6 +430,7 @@ int stat(Token *token) {
 			} else {
 				return returnValue;
 			}
+		// when it was not expretion it will check if it is onlz variable or funtion or assign
 		} else if (
 				token->type == TK_EOL ||
 				token->type == TK_EOF ||
@@ -430,6 +446,7 @@ int stat(Token *token) {
 		35:  <nested-stat> -> expr <eof-or-eol>
 		6:  <stat> -> expr <eof-or-eol>
 	*/
+	// if it was not ID and it was just constant it will call exprettion parser 
 	} else if (
 		token->type == TK_FLOAT ||
 		token->type == TK_STRING ||
@@ -460,6 +477,7 @@ int stat(Token *token) {
 */
 int params(Token *token) {
 	GET_NEXT_TOKEN(token);
+	// if it has no parameters and function was called it will just check parameters
 	if (token->type == TK_BRACKET_R) {
 		if(WasCalled(root, saved_id)){
 			return check_function_param_count(root, saved_id, 0);
@@ -468,6 +486,7 @@ int params(Token *token) {
 		}
 		return OK;
 	} else if (token->type == TK_ID) {
+		// if in params is ID that belogns to another global funtion it is a error
 		if(is_function_created(root, token->attribute)) {
 			return SEM_FUNCTION_ERROR; //chyba redefinacia funkcie v parametri
 		} 
@@ -475,6 +494,7 @@ int params(Token *token) {
 		if (returnValue != OK) {
 			return returnValue;
 		}
+		// generating params in begining of function
 		returnValue = define_param(&local_table, token->attribute, 1);
 		if (returnValue != OK) {
 			return returnValue;
@@ -637,6 +657,7 @@ int arg_next_params(Token *token) {
 */
 int assign(Token *token) {
 	int returnValue = 0;
+	// exprettion
 	if (token->type == TK_BRACKET_L ||
 		token->type == TK_FLOAT ||
 		token->type == TK_INT ||
@@ -671,6 +692,7 @@ int assign(Token *token) {
 		} else {
 			return returnValue;
 		}
+	// id or function call
 	} else if (token->type == TK_ID) {
 		saved_id = token->attribute;
 		PRELOAD_TOKEN(token);
@@ -697,6 +719,7 @@ int assign(Token *token) {
 				GlobalSetType(root, copy_id, TYPE_UNDEFINED);
 			}
 			return OK;
+		// if it was id it will check if it is exprettion
 		} else if (
 			token->type == TK_PLUS ||
 			token->type == TK_MINUS ||
@@ -760,6 +783,7 @@ int after_id(Token *token) {
 */
 int def_id(Token *token) {
 	int returnValue = 0;
+	// if function call will check and generate params and call 
 	if (token->type == TK_BRACKET_L) {
 		GET_NEXT_TOKEN(token);
 		if ((returnValue = arg_params(token)) == OK) {
@@ -776,6 +800,7 @@ int def_id(Token *token) {
 		} else {
 			return returnValue;
 		}
+	// if it is just eol it will check if varibale is defined if no it will be error
 	} else if (token->type == TK_EOL || token->type == TK_EOF) {
 		if(in_function) {
 			if(!is_variable_defined(NULL, local_table, param_list, saved_id)) {
@@ -796,7 +821,6 @@ int def_id(Token *token) {
 */
 int eof_or_eol(Token *token) {
 	if (token->type == TK_EOL || token->type == TK_EOF) {
-		//copy_id = NULL;
 		return OK;
 	}
 	return SYNTAX_ERROR;
@@ -834,6 +858,7 @@ int after_return(Token *token) {
 22:  <value> -> id
 */
 int value(Token *token) {
+	// adding tokens from function that will be called to queue 
 	switch(token->type) {
 		case TK_KW:
 			if (strcmp(token->attribute, "None") == 0) {
@@ -851,6 +876,7 @@ int value(Token *token) {
 			return OK;
 			break;
 		case TK_INT:
+			// if it is function chr and its argument is out of range it will be error
 			if(strcmp(saved_id, "chr") == 0) {
 				int parameter = atoi(token->attribute);
 				if (parameter < 0 || parameter > 255) {
@@ -861,6 +887,7 @@ int value(Token *token) {
 			return OK;
 			break;
 		case TK_ID:
+			// need to check if variable is defined and if it is global variable set it to its called variable to true
 			if(!is_variable_defined(NULL, local_table, param_list, token->attribute)) {
 				SetCalled(root, token->attribute);
 			}
