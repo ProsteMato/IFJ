@@ -1,3 +1,7 @@
+##
+# FILE: Makefile
+# breaf: Makefile will create program for translation of IFJ19
+
 CC = gcc
 CFLAGS = -std=c99 -Wall -Werror -pedantic -g
 OBJ = scanner.o symtable.o stack.o main.o parser.o generator.o scanner.o my_string.o sematic_analysis.o expression_parser.o expression_list.o expression_stack.o

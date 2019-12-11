@@ -296,6 +296,39 @@ char* transform_for_write(char *str){
 // -------------------
 // generovacie funkcie
 // -------------------
+int gen_param(char *var, int param_index){
+	Code *code;
+
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "DEFVAR LF@\0"))
+		return INTERNAL_ERROR;
+	if (add_code(code, var))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&code_list, code))
+		return INTERNAL_ERROR;
+
+	code = create_code();
+	if (!code)
+		return INTERNAL_ERROR;
+	if (add_code(code, "MOVE LF@\0"))
+		return INTERNAL_ERROR;
+	if (add_code(code, var))
+		return INTERNAL_ERROR;
+	if (add_code(code, " LF@%\0"))
+		return INTERNAL_ERROR;
+	char *tmp = int_to_str(param_index);
+	if (tmp == NULL)
+		return INTERNAL_ERROR;
+	if (add_code(code, tmp))
+		return INTERNAL_ERROR;
+	if (CL_add_line(&code_list, code))
+		return INTERNAL_ERROR;
+
+	return OK;
+}
+
 int gen_if(){
 	char *tmp = int_to_str(if_counter);
 	if (tmp == NULL)
@@ -762,7 +795,6 @@ int gen_assign_expr_res(char *dest){
 	return OK;
 }
 
-// TODO zvlast list, na konci while pozriet ci obashuje definicie a hodit ich pred while
 int gen_while_label(){
 	Code *code = create_code();
 	if (!code)
@@ -2090,38 +2122,6 @@ int gen_chr(){
 	code = create_code();
 	if (!code)
 		return INTERNAL_ERROR;
-	if (add_code(code, "LT LF@%retval LF@%1 int@0\0"))
-		return INTERNAL_ERROR;
-	if (CL_add_line(&builtin_list, code))
-		return INTERNAL_ERROR;
-
-	code = create_code();
-	if (!code)
-		return INTERNAL_ERROR;
-	if (add_code(code, "JUMPIFEQ $chr$return$6 LF@%retval bool@true\0"))
-		return INTERNAL_ERROR;
-	if (CL_add_line(&builtin_list, code))
-		return INTERNAL_ERROR;
-
-	code = create_code();
-	if (!code)
-		return INTERNAL_ERROR;
-	if (add_code(code, "GT LF@%retval LF@%1 int@255\0"))
-		return INTERNAL_ERROR;
-	if (CL_add_line(&builtin_list, code))
-		return INTERNAL_ERROR;
-
-	code = create_code();
-	if (!code)
-		return INTERNAL_ERROR;
-	if (add_code(code, "JUMPIFEQ $chr$return$58 LF@%retval bool@true\0"))
-		return INTERNAL_ERROR;
-	if (CL_add_line(&builtin_list, code))
-		return INTERNAL_ERROR;
-
-	code = create_code();
-	if (!code)
-		return INTERNAL_ERROR;
 	if (add_code(code, "INT2CHAR LF@%retval LF@%1\0"))
 		return INTERNAL_ERROR;
 	if (CL_add_line(&builtin_list, code))
@@ -2159,21 +2159,6 @@ int gen_chr(){
 	if (CL_add_line(&builtin_list, code))
 		return INTERNAL_ERROR;
 
-	code = create_code();
-	if (!code)
-		return INTERNAL_ERROR;
-	if (add_code(code, "LABEL $chr$return$58\0"))
-		return INTERNAL_ERROR;
-	if (CL_add_line(&builtin_list, code))
-		return INTERNAL_ERROR;
-
-	code = create_code();
-	if (!code)
-		return INTERNAL_ERROR;
-	if (add_code(code, "EXIT int@6\0"))
-		return INTERNAL_ERROR;
-	if (CL_add_line(&builtin_list, code))
-		return INTERNAL_ERROR;
 
 	code = create_code();
 	if (!code)
@@ -4548,270 +4533,6 @@ int gen_stack_notequal(){
 				return INTERNAL_ERROR;
 
 			return OK;
-			/*
-			code = create_code();
-			if (!code)
-				return INTERNAL_ERROR;
-			if (add_code(code, "JUMP $expr_notequal_end$\0"))
-				return INTERNAL_ERROR;
-			if (CL_add_line(&builtin_list, code))
-				return INTERNAL_ERROR;
-
-			code = create_code();
-			if (!code)
-				return INTERNAL_ERROR;
-			if (add_code(code, "LABEL $expr_notequal$\0"))
-				return INTERNAL_ERROR;
-			if (CL_add_line(&builtin_list, code))
-				return INTERNAL_ERROR;
-
-			code = create_code();
-			if (!code)
-				return INTERNAL_ERROR;
-			if (add_code(code, "PUSHFRAME\0"))
-				return INTERNAL_ERROR;
-			if (CL_add_line(&builtin_list, code))
-				return INTERNAL_ERROR;
-
-			code = create_code();
-			if (!code)
-				return INTERNAL_ERROR;
-			if (add_code(code, "DEFVAR LF@$op1$\0"))
-				return INTERNAL_ERROR;
-			if (CL_add_line(&builtin_list, code))
-				return INTERNAL_ERROR;
-
-			code = create_code();
-			if (!code)
-				return INTERNAL_ERROR;
-			if (add_code(code, "DEFVAR LF@$op2$\0"))
-				return INTERNAL_ERROR;
-			if (CL_add_line(&builtin_list, code))
-				return INTERNAL_ERROR;
-
-			code = create_code();
-			if (!code)
-				return INTERNAL_ERROR;
-			if (add_code(code, "DEFVAR LF@$type1$\0"))
-				return INTERNAL_ERROR;
-			if (CL_add_line(&builtin_list, code))
-				return INTERNAL_ERROR;
-
-			code = create_code();
-			if (!code)
-				return INTERNAL_ERROR;
-			if (add_code(code, "DEFVAR LF@$type2$\0"))
-				return INTERNAL_ERROR;
-			if (CL_add_line(&builtin_list, code))
-				return INTERNAL_ERROR;
-
-			code = create_code();
-			if (!code)
-				return INTERNAL_ERROR;
-			if (add_code(code, "POPS LF@$op1$\0"))
-				return INTERNAL_ERROR;
-			if (CL_add_line(&builtin_list, code))
-				return INTERNAL_ERROR;
-
-			code = create_code();
-			if (!code)
-				return INTERNAL_ERROR;
-			if (add_code(code, "POPS LF@$op2$\0"))
-				return INTERNAL_ERROR;
-			if (CL_add_line(&builtin_list, code))
-				return INTERNAL_ERROR;
-
-			code = create_code();
-			if (!code)
-				return INTERNAL_ERROR;
-			if (add_code(code, "TYPE LF@$type1$ LF@$op1$\0"))
-				return INTERNAL_ERROR;
-			if (CL_add_line(&builtin_list, code))
-				return INTERNAL_ERROR;
-
-			code = create_code();
-			if (!code)
-				return INTERNAL_ERROR;
-			if (add_code(code, "TYPE LF@$type2$ LF@$op2$\0"))
-				return INTERNAL_ERROR;
-			if (CL_add_line(&builtin_list, code))
-				return INTERNAL_ERROR;
-
-			code = create_code();
-			if (!code)
-				return INTERNAL_ERROR;
-			if (add_code(code, "JUMPIFEQ $notequal_eq$ LF@$type1$ LF@$type2$\0"))
-				return INTERNAL_ERROR;
-			if (CL_add_line(&builtin_list, code))
-				return INTERNAL_ERROR;
-
-			// rozdielne typy
-			// 
-			code = create_code();
-			if (!code)
-				return INTERNAL_ERROR;
-			if (add_code(code, "JUMPIFEQ $notequal_eq$ LF@$type1$ string@nil\0"))
-				return INTERNAL_ERROR;
-			if (CL_add_line(&builtin_list, code))
-				return INTERNAL_ERROR;
-
-			code = create_code();
-			if (!code)
-				return INTERNAL_ERROR;
-			if (add_code(code, "JUMPIFEQ $notequal_eq$ LF@$type2$ string@nil\0"))
-				return INTERNAL_ERROR;
-			if (CL_add_line(&builtin_list, code))
-				return INTERNAL_ERROR;
-
-			// ak je jeden z nich string ta sele zle
-			code = create_code();
-			if (!code)
-				return INTERNAL_ERROR;
-			if (add_code(code, "JUMPIFEQ $notequal_fail$ LF@$type1$ string@string\0"))
-				return INTERNAL_ERROR;
-			if (CL_add_line(&builtin_list, code))
-				return INTERNAL_ERROR;
-
-			code = create_code();
-			if (!code)
-				return INTERNAL_ERROR;
-			if (add_code(code, "JUMPIFEQ $notequal_fail$ LF@$type2$ string@string\0"))
-				return INTERNAL_ERROR;
-			if (CL_add_line(&builtin_list, code))
-				return INTERNAL_ERROR;
-
-			// druhy op je int a prvy float
-			code = create_code();
-			if (!code)
-				return INTERNAL_ERROR;
-			if (add_code(code, "JUMPIFEQ $notequal_int2float_op2$ LF@$type2$ string@int\0"))
-				return INTERNAL_ERROR;
-			if (CL_add_line(&builtin_list, code))
-				return INTERNAL_ERROR;
-
-			// prvy op je int a druhy float
-			code = create_code();
-			if (!code)
-				return INTERNAL_ERROR;
-			if (add_code(code, "INT2FLOAT LF@$op1$ LF@$op1$\0"))
-				return INTERNAL_ERROR;
-			if (CL_add_line(&builtin_list, code))
-				return INTERNAL_ERROR;
-
-			code = create_code();
-			if (!code)
-				return INTERNAL_ERROR;
-			if (add_code(code, "LABEL $notequal_eq$\0"))
-				return INTERNAL_ERROR;
-			if (CL_add_line(&builtin_list, code))
-				return INTERNAL_ERROR;
-
-			code = create_code();
-			if (!code)
-				return INTERNAL_ERROR;
-			if (add_code(code, "EQ LF@$op1$ LF@$op2$ LF@$op1$\0"))
-				return INTERNAL_ERROR;
-			if (CL_add_line(&builtin_list, code))
-				return INTERNAL_ERROR;
-
-			code = create_code();
-			if (!code)
-				return INTERNAL_ERROR;
-			if (add_code(code, "JUMP $notequal_eq$\0"))
-				return INTERNAL_ERROR;
-			if (CL_add_line(&builtin_list, code))
-				return INTERNAL_ERROR;
-
-			code = create_code();
-			if (!code)
-				return INTERNAL_ERROR;
-			if (add_code(code, "LABEL $notequal_fail$\0"))
-				return INTERNAL_ERROR;
-			if (CL_add_line(&builtin_list, code))
-				return INTERNAL_ERROR;
-
-			code = create_code();
-			if (!code)
-				return INTERNAL_ERROR;
-			if (add_code(code, "EXIT int@4\0"))
-				return INTERNAL_ERROR;
-			if (CL_add_line(&builtin_list, code))
-				return INTERNAL_ERROR;
-
-			code = create_code();
-			if (!code)
-				return INTERNAL_ERROR;
-			if (add_code(code, "LABEL $notequal_int2float_op2$\0"))
-				return INTERNAL_ERROR;
-			if (CL_add_line(&builtin_list, code))
-				return INTERNAL_ERROR;
-
-			code = create_code();
-			if (!code)
-				return INTERNAL_ERROR;
-			if (add_code(code, "INT2FLOAT LF@$op2$ LF@$op2$\0"))
-				return INTERNAL_ERROR;
-			if (CL_add_line(&builtin_list, code))
-				return INTERNAL_ERROR;
-
-			code = create_code();
-			if (!code)
-				return INTERNAL_ERROR;
-			if (add_code(code, "JUMP $notequal_eq$\0"))
-				return INTERNAL_ERROR;
-			if (CL_add_line(&builtin_list, code))
-				return INTERNAL_ERROR;
-
-			code = create_code();
-			if (!code)
-				return INTERNAL_ERROR;
-			if (add_code(code, "LABEL $notequal_end$\0"))
-				return INTERNAL_ERROR;
-			if (CL_add_line(&builtin_list, code))
-				return INTERNAL_ERROR;
-
-			code = create_code();
-			if (!code)
-				return INTERNAL_ERROR;
-			if (add_code(code, "NOT LF@$op1$ LF@$op1$\0"))
-				return INTERNAL_ERROR;
-			if (CL_add_line(&builtin_list, code))
-				return INTERNAL_ERROR;
-
-			code = create_code();
-			if (!code)
-				return INTERNAL_ERROR;
-			if (add_code(code, "PUSHS LF@$op1$\0"))
-				return INTERNAL_ERROR;
-			if (CL_add_line(&builtin_list, code))
-				return INTERNAL_ERROR;
-
-			code = create_code();
-			if (!code)
-				return INTERNAL_ERROR;
-			if (add_code(code, "POPFRAME\0"))
-				return INTERNAL_ERROR;
-			if (CL_add_line(&builtin_list, code))
-				return INTERNAL_ERROR;
-
-			code = create_code();
-			if (!code)
-				return INTERNAL_ERROR;
-			if (add_code(code, "RETURN\0"))
-				return INTERNAL_ERROR;
-			if (CL_add_line(&builtin_list, code))
-				return INTERNAL_ERROR;
-
-			code = create_code();
-			if (!code)
-				return INTERNAL_ERROR;
-			if (add_code(code, "LABEL $expr_noteqal_end$\0"))
-				return INTERNAL_ERROR;
-			if (CL_add_line(&builtin_list, code))
-				return INTERNAL_ERROR;
-
-			return OK;
-			*/
 }
 
 int gen_stack_less(){

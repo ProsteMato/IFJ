@@ -21,9 +21,9 @@
 
 
 #define tableSize 19 
-bool isRelational;  //is operator relational? <, <=, >, >=, ==, != 
-bool generate;
-Data_type finalType;
+extern bool isRelational;  //is operator relational? <, <=, >, >=, ==, != 
+extern bool generate;
+extern Data_type finalType;
 
 typedef enum {
   PT_PLUS,  // 0
