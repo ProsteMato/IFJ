@@ -15,6 +15,8 @@ TOTAL_SEMFOUR=0
 TOTAL_SEMFIVE=0
 TOTAL_SEMSIX=0
 TOTAL_ZERO=0
+TOTAL_RUNFOUR=0
+TOTAL_RUNTHREE=0
 TOTAL_OK=0
 ERR_LEX=0
 ERR_SYN=0
@@ -24,6 +26,8 @@ ERR_SEMFIVE=0
 ERR_SEMSIX=0
 ERR_ZERO=0
 ERR_OK=0
+ERR_RUNTHREE=0
+ERR_RUNFOUR=0
 
 function print_ok() {
   TEXT=$1
@@ -183,7 +187,7 @@ for f in ./tests/run_time_err4/*.run_time_err4
 do 
      echo "-------------------------------------------"
    ((TOTAL_CNT++))
-    ((TOTAL_ZERO++))
+    ((TOTAL_RUNFOUR++))
     timeout 2s ${APP} <$f > $f.output
     if [ -f "/pub/courses/ifj/ic19int/linux/ic19int" ]
     then
@@ -208,7 +212,7 @@ do
     else 
         print_err "Test File: $f \nError: Should be runtime err 4 Return Code: $RETURN_CODE"
         ((ERROR_CNT++))
-        ((ERR_ZERO++))
+        ((ERR_RUNFOUR++))
     fi
 done
 
@@ -216,7 +220,7 @@ for f in ./tests/run_time_err3/*.runtime_err3
 do 
      echo "-------------------------------------------"
    ((TOTAL_CNT++))
-    ((TOTAL_ZERO++))
+    ((TOTAL_RUNTHREE++))
     timeout 2s ${APP} <$f > $f.output
     RETURN_CODE=$?
     if [ $RETURN_CODE -eq 3 ]  
@@ -225,7 +229,7 @@ do
     else 
         print_err "Test File: $f \nError: Should be runtime err 3 Return Code: $RETURN_CODE"
         ((ERROR_CNT++))
-        ((ERR_ZERO++))
+        ((ERR_RUNTHREE++))
     fi
 done
 
@@ -279,5 +283,7 @@ echo "Test sem4 count: $TOTAL_SEMFOUR, Error sem4 count: $ERR_SEMFOUR"
 echo "Test sem5 count: $TOTAL_SEMFIVE, Error sem5 count: $ERR_SEMFIVE"
 echo "Test sem6 count: $TOTAL_SEMSIX, Error sem6 count: $ERR_SEMSIX"
 echo "Test zero count: $TOTAL_ZERO, Error zero count: $ERR_ZERO"
+echo "Test runtime err 3: $TOTAL_RUNTHREE, Error runtime3 count: $ERR_RUNTHREE"
+echo "Test runtime err 4: $TOTAL_RUNTHREE, Error runtime4 count: $ERR_RUNFOUR"
 echo "Test OK count: $TOTAL_OK, Error OK count: $ERR_OK"
 echo "Test count: $TOTAL_CNT, Error count: $ERROR_CNT"
