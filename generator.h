@@ -26,6 +26,7 @@
 extern int while_counter;
 extern int print_counter;
 extern int if_counter;
+extern int if_used;
 extern int param_c;
 extern Stack while_stack;
 extern Stack if_stack;

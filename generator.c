@@ -13,6 +13,7 @@ int while_counter;
 int print_counter;
 int if_counter;
 int param_c;
+int if_used;
 Stack while_stack;
 Stack if_stack;
 TKQueue pq;
@@ -160,6 +161,7 @@ int init_generator(){
 	if_counter = 0;
 	print_counter = 0;
 	in_while = 0;
+	if_used = 0;
 	s_init(&while_stack);
 	s_init(&if_stack);
 	CL_init(&code_list);
