@@ -46,7 +46,7 @@ int getIndex(Token *token)
    {
      return -1;
    }
-
+   // from token returns symbol in precedence table 
   switch (token->type)
   {
     case (TK_ID): 
@@ -99,12 +99,12 @@ int checkDivisionByZero(Token *token)
   if ( l != OK)
   {
       return l; 
-  }
+  } 
+  // if next token is 0 returns div with zero error
   if ( (strcmp(token -> attribute, "0")) == 0)
   {
     return DIVISION_BY_ZERO_ERROR;
   }
-
   return OK;
 }
 
@@ -212,6 +212,7 @@ int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3
       int error;
       switch (rule)
       {
+            //controls aritmetic operations 
             case PR_EPLUSE:
             case PR_EMINUSE:
             case PR_EMULTE: 
@@ -219,6 +220,7 @@ int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3
             case PR_EDIVDIVE: 
                   error = arithmetic_operation_check(sym1->dType, rule, sym3->dType);
                   return error;
+            // controls relation operations
             case PR_ELESSE: 
             case PR_ELESSEQE: 
             case PR_EGREATE: 
@@ -227,6 +229,7 @@ int checkSematics(pRules rule, exprStack* sym1, exprStack* sym2, exprStack* sym3
             case PR_ENOTEQE: 
                   error = comparison_check(sym1->dType, rule, sym3->dType);
                   return error; 
+            // controls symbol between brackets
             case PR_BIB: 
                   switch (sym2->symbol)
                   {
@@ -250,12 +253,14 @@ Data_type getFinalType(pRules rule, exprStack* sym1, exprStack* sym2, exprStack*
 {
       switch (rule)
       {
+            // final type of arithmetic operation
             case PR_EPLUSE:
             case PR_EMINUSE:
             case PR_EMULTE:
             case PR_EDIVDIVE:
             case PR_EDIVE: 
                   return arithmetic_operation_return_type(sym1->dType,rule,sym3->dType);
+            // final type of relational operation
             case PR_ELESSE:
             case PR_ELESSEQE:
             case PR_EGREATE:
@@ -263,6 +268,7 @@ Data_type getFinalType(pRules rule, exprStack* sym1, exprStack* sym2, exprStack*
             case PR_EEQE: 
             case PR_ENOTEQE: 
                   return TYPE_BOOL;
+            // final type between brackets
             case PR_BIB:
                   return sym2->dType;
             default: 
@@ -305,7 +311,8 @@ int callExpression(Token *token)
       if ( token->type == TK_ID && numberinID)
       {
             return SYNTAX_ERROR;
-      }
+      } 
+      //Control for name of id like 5a 
       if ( token->type == TK_INT || token->type == TK_FLOAT)
       {
             numberinID = true;
@@ -345,9 +352,10 @@ int callExpression(Token *token)
       }
 
        if (token->type ==TK_ASSIGN)
-       {
+      {
              return SYNTAX_ERROR;
-       }
+      }
+      // if there was a relational operand, it sets variable to true
       if (token->type == TK_EQUAL)
       {
             isRelational = true; 
@@ -372,7 +380,7 @@ int callExpression(Token *token)
       {
             isRelational = true;
       }
-
+      // control for div and divdiv with zero
       if (token->type == TK_DIV)
       {
             int div = checkDivisionByZero(token);
@@ -382,7 +390,6 @@ int callExpression(Token *token)
                   return DIVISION_BY_ZERO_ERROR;
             }
       } 
-      
       if (token->type == TK_DIV_DIV)
       {
             int div = checkDivisionByZero(token);
@@ -392,6 +399,7 @@ int callExpression(Token *token)
                   return DIVISION_BY_ZERO_ERROR;
             }
       }
+      // inserting into a list
       if (eList.act == NULL)
       {
             listInsertFirst(&eList, token->attribute, symbol, dType);
@@ -410,8 +418,8 @@ int callExpression(Token *token)
                   listInsertAct(&operandList,token->attribute, symbol, dType);
             }
       }
-      
-     int e = get_next_token(token); 
+      // inserts the last $ into a list
+      int e = get_next_token(token); 
       if  (e != OK)
       {     
             return e;
@@ -423,14 +431,18 @@ int callExpression(Token *token)
       
   }
   int err_unget= unget_token(token);
+  if (err_unget  != OK )
+  {
+      return err_unget;
+  }
   
-
+  // controls number of brackets
   if ( leftBracket != rightBracket) 
   {
       listDispose(&eList);
       return SYNTAX_ERROR;
   }
- 
+  // initialization of stack
   int sError = sInit(&stack);
   if (sError != OK)
   {
@@ -463,6 +475,7 @@ int callExpression(Token *token)
 
         }
   }
+  // check if the expression has alright syntax/sematics
   sPush(&stack, PT_DOLLAR, TYPE_UNDEFINED);
   do 
   {
@@ -576,16 +589,16 @@ int callExpression(Token *token)
 
             }
       } while ( stack.top->symbol != PT_DOLLAR || eList.act->symbol != PT_DOLLAR);
- if (err_unget != OK)
- {
-        return err_unget;
- }
- if (generate || generateExpr)  { // musia byt obe true aby sa generovalo
+  if (err_unget != OK)
+  {
+      return err_unget;
+  }
+  if (generate || generateExpr)  { // musia byt obe true aby sa generovalo
       int returnValue = OK;
       if((returnValue = gen_expr()) != OK){ //kontrola ci nahodou nevratil chybu
             return returnValue;
       }
- } else {
+  } else {
       generate = true; //aby sa nabudúce generovalo
       int returnValue = OK;
       if((returnValue = gen_clear()) != OK){ //aby na stacku neostala vyhodnotená hodnota z expr
